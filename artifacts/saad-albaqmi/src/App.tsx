@@ -11,6 +11,7 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import ReportsPage from "@/pages/reports";
 import SettingsPage from "@/pages/settings";
+import NfcPage from "@/pages/nfc";
 import {
   DashboardPage, BranchesPage, RoomsPage, AssetsPage, DiplomasPage, StudentsPage,
   InstructorsPage, FinancePage, SchedulePage,
@@ -161,7 +162,7 @@ const P = {
   dashboard: protect(DashboardPage), branches: protect(BranchesPage), rooms: protect(RoomsPage),
   assets: protect(AssetsPage), diplomas: protect(DiplomasPage), students: protect(StudentsPage),
   instructors: protect(InstructorsPage), finance: protect(FinancePage), schedule: protect(SchedulePage),
-  reports: protect(ReportsPage), settings: protect(SettingsPage),
+  reports: protect(ReportsPage), settings: protect(SettingsPage), nfc: protect(NfcPage),
 };
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -212,6 +213,7 @@ function ClerkProviderWithRoutes() {
               <Route path="/finance" component={P.finance} />
               <Route path="/schedule" component={P.schedule} />
               <Route path="/reports" component={P.reports} />
+              <Route path="/nfc" component={P.nfc} />
               <Route path="/settings" component={P.settings} />
               <Route component={NotFound} />
             </Switch>

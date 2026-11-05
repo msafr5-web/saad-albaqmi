@@ -30,6 +30,8 @@ Arabic RTL educational branch and resource management web application with insta
 - No payment gateway is configured. Payment records represent externally collected amounts.
 - PWA worker does not cache private APIs, student records or financial records. Offline navigation explains that connectivity is required.
 
+- NFC page (`/nfc`) uses Web NFC: Chrome on Android over HTTPS only. Reads UID and NDEF, writes text/URL/vCard/Wi-Fi (as `WIFI:` text), read-only lock only if `makeReadOnly` exists. No password lock, tag type/capacity, or background tasks. Scan history stays in localStorage.
+
 ## Stack and conventions
 
 - pnpm, React/Vite, TypeScript, Tailwind, Express, PostgreSQL/Drizzle.
