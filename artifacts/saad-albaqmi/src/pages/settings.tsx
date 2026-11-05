@@ -49,14 +49,15 @@ export default function SettingsPage() {
             <div className="text-xs text-primary-foreground/60">مساحة العمل الحالية</div>
             <div className="mt-1 font-display text-2xl" data-testid="text-workspace-label">{ws.data?.label ?? "..."}</div>
             <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-              <span className="rounded-full bg-primary-foreground/10 px-2.5 py-1">{ws.data?.mode === "personal" ? "مساحة شخصية خاصة" : "بيانات توضيحية"}</span>
+              <span className="rounded-full bg-primary-foreground/10 px-2.5 py-1">{ws.data?.mode === "organization" ? "مساحة المعهد المشتركة" : ws.data?.mode === "personal" ? "مساحة شخصية خاصة" : "بيانات توضيحية"}</span>
               <span className="rounded-full bg-primary-foreground/10 px-2.5 py-1">{ws.data?.canWrite ? "قراءة وكتابة" : "قراءة فقط"}</span>
             </div>
           </div>
           <div className="rounded-xl border bg-card p-6">
             <h3 className="mb-3 flex items-center gap-2 font-medium"><ShieldCheck className="h-4 w-4 text-success" /> مفعّل في هذا الإصدار</h3>
             <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
-              <li>تسجيل دخول آمن، وكل حساب يحصل على مساحة عمل خاصة فارغة.</li>
+              <li>تسجيل دخول آمن؛ التسجيل وحده لا يمنح أي صلاحية على المعهد، والحساب غير المدعو يحصل على مساحة خاصة فارغة.</li>
+              <li>مساحة مشتركة وأدوار (الإدارة العليا، مدير الفرع، المالية، المنسق، المدرب، الطالب) بنطاق فرع يفرضه الخادم.</li>
               <li>تحقق الخادم من العلاقات بين السجلات وتعارضات الجدولة والسعة.</li>
               <li>البيانات التوضيحية العامة للقراءة فقط ولا تحتوي بيانات حقيقية.</li>
             </ul>
@@ -64,8 +65,7 @@ export default function SettingsPage() {
           <div className="rounded-xl border border-accent/40 bg-accent/10 p-6">
             <h3 className="mb-3 flex items-center gap-2 font-medium"><ShieldAlert className="h-4 w-4 text-[hsl(32_80%_32%)]" /> غير مفعّل بعد</h3>
             <ul className="space-y-2 text-sm leading-6">
-              <li>مساحة مؤسسية مشتركة وأدوار الفريق (الإدارة العليا، مدير الفرع، المالية، التنسيق، المدرب، الطالب).</li>
-              <li>سجل تدقيق للعمليات المالية، والنسخ الاحتياطي والاستعادة المختبرة.</li>
+              <li>سجل تدقيق مفصل للعمليات المالية، والنسخ الاحتياطي والاستعادة المختبرة.</li>
               <li>الإشعارات، وسياسات الأقساط والإهلاك وتوزيع الطاقة المعتمدة.</li>
             </ul>
             <p className="mt-3 text-xs text-muted-foreground">لا تُدخل بيانات تشغيلية حقيقية للمعهد قبل تفعيل هذه الضوابط.</p>

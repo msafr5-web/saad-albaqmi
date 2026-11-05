@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorState, Kpi, LoadingRows } from "@/components/bits";
+import { useWorkspace } from "@/hooks/use-data";
 import { useLedger, usePayroll, useRecordIndex, useRecords } from "@/hooks/use-data";
 import { fmtDate, fmtDec, fmtSAR } from "@/lib/domain";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ const INST_STATE: Record<string, { label: string; cls: string }> = {
   overdue: { label: "متأخر", cls: "text-destructive" },
 };
 
-export function PayrollPanel() {
+function PayrollPanelBody() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const payroll = usePayroll(from, to);
@@ -59,7 +60,7 @@ export function PayrollPanel() {
   );
 }
 
-export function LedgerPanel() {
+function LedgerPanelBody() {
   const ledger = useLedger();
   const records = useRecords();
   const idx = useRecordIndex(records.data);
@@ -108,4 +109,13 @@ export function LedgerPanel() {
       )}
     </section>
   );
+}
+
+export function PayrollPanel() {
+  const ws = useWorkspace();
+  return ws.data?.canViewPayroll ? <PayrollPanelBody /> : null;
+}
+export function LedgerPanel() {
+  const ws = useWorkspace();
+  return ws.data?.canViewLedger ? <LedgerPanelBody /> : null;
 }

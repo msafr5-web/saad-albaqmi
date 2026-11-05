@@ -115,6 +115,55 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/StudentLedger"
+  /team:
+    get:
+      operationId: listTeam
+      responses:
+        "200":
+          description: Organization members and pending invitations (top-level administrators only)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+  /team/invitations:
+    post:
+      operationId: inviteMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteInput"
+      responses:
+        "201":
+          description: Invitation created; it is claimed only by a Clerk-verified matching email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+  /team/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer }
+    patch:
+      operationId: updateMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberUpdate"
+      responses:
+        "200":
+          description: Updated role or scope, or revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
   /healthz:
     get:
       operationId: healthCheck
@@ -130,13 +179,57 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    Role:
+      type: string
+      enum: [super_admin, branch_manager, finance, coordinator, instructor, student]
     Workspace:
       type: object
-      required: [mode, canWrite, label]
+      required: [mode, canWrite, label, role, branchId, pages, writableKinds, canManageTeam, canViewPayroll, canViewLedger]
       properties:
-        mode: { type: string, enum: [demo, personal] }
+        mode: { type: string, enum: [demo, personal, organization] }
         canWrite: { type: boolean }
         label: { type: string }
+        role:
+          oneOf:
+            - $ref: "#/components/schemas/Role"
+            - type: "null"
+        branchId: { type: [integer, "null"] }
+        pages:
+          type: array
+          items: { type: string }
+        writableKinds:
+          type: array
+          items: { type: string }
+        canManageTeam: { type: boolean }
+        canViewPayroll: { type: boolean }
+        canViewLedger: { type: boolean }
+    TeamMember:
+      type: object
+      required: [id, email, role, branchId, linkedRecordId, status, createdAt, activatedAt]
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        role: { $ref: "#/components/schemas/Role" }
+        branchId: { type: [integer, "null"] }
+        linkedRecordId: { type: [integer, "null"] }
+        status: { type: string, enum: [invited, active, revoked] }
+        createdAt: { type: string }
+        activatedAt: { type: [string, "null"] }
+    InviteInput:
+      type: object
+      required: [email, role]
+      properties:
+        email: { type: string, maxLength: 200 }
+        role: { $ref: "#/components/schemas/Role" }
+        branchId: { type: [integer, "null"] }
+        linkedRecordId: { type: [integer, "null"] }
+    MemberUpdate:
+      type: object
+      properties:
+        role: { $ref: "#/components/schemas/Role" }
+        branchId: { type: [integer, "null"] }
+        linkedRecordId: { type: [integer, "null"] }
+        status: { type: string, enum: [revoked] }
     RecordInput:
       type: object
       required: [kind, name, status, details]

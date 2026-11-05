@@ -5,18 +5,88 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export type Role = typeof Role[keyof typeof Role];
+
+
+export const Role = {
+  super_admin: 'super_admin',
+  branch_manager: 'branch_manager',
+  finance: 'finance',
+  coordinator: 'coordinator',
+  instructor: 'instructor',
+  student: 'student',
+} as const;
+
 export type WorkspaceMode = typeof WorkspaceMode[keyof typeof WorkspaceMode];
 
 
 export const WorkspaceMode = {
   demo: 'demo',
   personal: 'personal',
+  organization: 'organization',
 } as const;
 
 export interface Workspace {
   mode: WorkspaceMode;
   canWrite: boolean;
   label: string;
+  role: Role | null;
+  /** @nullable */
+  branchId: number | null;
+  pages: string[];
+  writableKinds: string[];
+  canManageTeam: boolean;
+  canViewPayroll: boolean;
+  canViewLedger: boolean;
+}
+
+export type TeamMemberStatus = typeof TeamMemberStatus[keyof typeof TeamMemberStatus];
+
+
+export const TeamMemberStatus = {
+  invited: 'invited',
+  active: 'active',
+  revoked: 'revoked',
+} as const;
+
+export interface TeamMember {
+  id: number;
+  email: string;
+  role: Role;
+  /** @nullable */
+  branchId: number | null;
+  /** @nullable */
+  linkedRecordId: number | null;
+  status: TeamMemberStatus;
+  createdAt: string;
+  /** @nullable */
+  activatedAt: string | null;
+}
+
+export interface InviteInput {
+  /** @maxLength 200 */
+  email: string;
+  role: Role;
+  /** @nullable */
+  branchId?: number | null;
+  /** @nullable */
+  linkedRecordId?: number | null;
+}
+
+export type MemberUpdateStatus = typeof MemberUpdateStatus[keyof typeof MemberUpdateStatus];
+
+
+export const MemberUpdateStatus = {
+  revoked: 'revoked',
+} as const;
+
+export interface MemberUpdate {
+  role?: Role;
+  /** @nullable */
+  branchId?: number | null;
+  /** @nullable */
+  linkedRecordId?: number | null;
+  status?: MemberUpdateStatus;
 }
 
 export type RecordInputKind = typeof RecordInputKind[keyof typeof RecordInputKind];

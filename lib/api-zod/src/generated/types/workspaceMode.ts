@@ -12,4 +12,5 @@ export type WorkspaceMode = typeof WorkspaceMode[keyof typeof WorkspaceMode];
 export const WorkspaceMode = {
   demo: 'demo',
   personal: 'personal',
+  organization: 'organization',
 } as const;

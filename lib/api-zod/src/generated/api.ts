@@ -9,9 +9,16 @@ import * as zod from 'zod';
 
 
 export const GetWorkspaceResponse = zod.object({
-  "mode": zod.enum(['demo', 'personal']),
+  "mode": zod.enum(['demo', 'personal', 'organization']),
   "canWrite": zod.boolean(),
-  "label": zod.string()
+  "label": zod.string(),
+  "role": zod.union([zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),zod.null()]),
+  "branchId": zod.number().int().nullable(),
+  "pages": zod.array(zod.string()),
+  "writableKinds": zod.array(zod.string()),
+  "canManageTeam": zod.boolean(),
+  "canViewPayroll": zod.boolean(),
+  "canViewLedger": zod.boolean()
 })
 
 
@@ -197,6 +204,65 @@ export const GetLedgerResponseItem = zod.object({
 }))
 })
 export const GetLedgerResponse = zod.array(GetLedgerResponseItem)
+
+
+export const ListTeamResponseItem = zod.object({
+  "id": zod.number().int(),
+  "email": zod.string(),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "branchId": zod.number().int().nullable(),
+  "linkedRecordId": zod.number().int().nullable(),
+  "status": zod.enum(['invited', 'active', 'revoked']),
+  "createdAt": zod.string(),
+  "activatedAt": zod.string().nullable()
+})
+export const ListTeamResponse = zod.array(ListTeamResponseItem)
+
+
+export const inviteMemberBodyEmailMax = 200;
+
+
+
+export const InviteMemberBody = zod.object({
+  "email": zod.string().max(inviteMemberBodyEmailMax),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "branchId": zod.number().int().nullish(),
+  "linkedRecordId": zod.number().int().nullish()
+})
+
+export const InviteMemberResponse = zod.object({
+  "id": zod.number().int(),
+  "email": zod.string(),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "branchId": zod.number().int().nullable(),
+  "linkedRecordId": zod.number().int().nullable(),
+  "status": zod.enum(['invited', 'active', 'revoked']),
+  "createdAt": zod.string(),
+  "activatedAt": zod.string().nullable()
+})
+
+
+export const UpdateMemberParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const UpdateMemberBody = zod.object({
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']).optional(),
+  "branchId": zod.number().int().nullish(),
+  "linkedRecordId": zod.number().int().nullish(),
+  "status": zod.enum(['revoked']).optional()
+})
+
+export const UpdateMemberResponse = zod.object({
+  "id": zod.number().int(),
+  "email": zod.string(),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "branchId": zod.number().int().nullable(),
+  "linkedRecordId": zod.number().int().nullable(),
+  "status": zod.enum(['invited', 'active', 'revoked']),
+  "createdAt": zod.string(),
+  "activatedAt": zod.string().nullable()
+})
 
 
 /**

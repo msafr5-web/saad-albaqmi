@@ -5,10 +5,19 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { Role } from './role';
 import type { WorkspaceMode } from './workspaceMode';
 
 export interface Workspace {
   mode: WorkspaceMode;
   canWrite: boolean;
   label: string;
+  role: Role | null;
+  /** @nullable */
+  branchId: number | null;
+  pages: string[];
+  writableKinds: string[];
+  canManageTeam: boolean;
+  canViewPayroll: boolean;
+  canViewLedger: boolean;
 }

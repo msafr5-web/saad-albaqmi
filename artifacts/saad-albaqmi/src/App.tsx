@@ -16,7 +16,9 @@ import {
   DashboardPage, BranchesPage, RoomsPage, AssetsPage, DiplomasPage, StudentsPage,
   InstructorsPage, FinancePage, SchedulePage,
 } from "@/pages/modules";
-import { AppShell } from "@/components/shell";
+import { AppShell, allowed } from "@/components/shell";
+import TeamPage from "@/pages/team";
+import { useWorkspace } from "@/hooks/use-data";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: true, retry: 1 } },
@@ -98,7 +100,7 @@ function AuthFrame({ children }: { children: ReactNode }) {
         <div className="font-display text-lg">صرح د. سعد البقمي التعليمي</div>
         <div>
           <p className="font-display text-4xl leading-[1.4]">الفروع والتدريب والتكاليف<br /><span className="text-sidebar-primary">في مساحة واحدة.</span></p>
-          <p className="mt-4 max-w-md text-sm leading-7 text-sidebar-foreground/70">بعد الدخول تحصل على مساحة عمل شخصية خاصة وفارغة. مساحة المعهد المشتركة وأدوار الفريق لم تُفعّل بعد.</p>
+          <p className="mt-4 max-w-md text-sm leading-7 text-sidebar-foreground/70">التسجيل لا يمنح صلاحيات على مساحة المعهد. تُمنح الصلاحيات بدعوة من الإدارة العليا حسب الدور والفرع، وإلا تحصل على مساحة شخصية خاصة وفارغة.</p>
         </div>
         <div className="text-xs text-sidebar-foreground/45">إصدار تشغيلي أول</div>
       </div>
@@ -147,11 +149,18 @@ function HomeRedirect() {
   );
 }
 
-function protect(Page: ComponentType) {
+function RoleGate({ page, children }: { page: string; children: ReactNode }) {
+  const ws = useWorkspace();
+  if (ws.isLoading) return <div className="p-8 text-sm text-muted-foreground">جارٍ التحقق من صلاحياتك...</div>;
+  if (!ws.data || !allowed(ws.data, `/${page}`)) return <Redirect to="/dashboard" />;
+  return <>{children}</>;
+}
+
+function protect(Page: ComponentType, page: string) {
   return function Protected() {
     return (
       <>
-        <Show when="signed-in"><AppShell><Page /></AppShell></Show>
+        <Show when="signed-in"><AppShell>{page === "dashboard" ? <Page /> : <RoleGate page={page}><Page /></RoleGate>}</AppShell></Show>
         <Show when="signed-out"><Redirect to="/" /></Show>
       </>
     );
@@ -159,10 +168,10 @@ function protect(Page: ComponentType) {
 }
 
 const P = {
-  dashboard: protect(DashboardPage), branches: protect(BranchesPage), rooms: protect(RoomsPage),
-  assets: protect(AssetsPage), diplomas: protect(DiplomasPage), students: protect(StudentsPage),
-  instructors: protect(InstructorsPage), finance: protect(FinancePage), schedule: protect(SchedulePage),
-  reports: protect(ReportsPage), settings: protect(SettingsPage), nfc: protect(NfcPage),
+  dashboard: protect(DashboardPage, "dashboard"), branches: protect(BranchesPage, "branches"), rooms: protect(RoomsPage, "rooms"),
+  assets: protect(AssetsPage, "assets"), diplomas: protect(DiplomasPage, "diplomas"), students: protect(StudentsPage, "students"),
+  instructors: protect(InstructorsPage, "instructors"), finance: protect(FinancePage, "finance"), schedule: protect(SchedulePage, "schedule"),
+  reports: protect(ReportsPage, "reports"), settings: protect(SettingsPage, "settings"), nfc: protect(NfcPage, "nfc"), team: protect(TeamPage, "team"),
 };
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -183,7 +192,7 @@ function ClerkProviderWithRoutes() {
       localization={{
         locale: "ar-SA",
         signIn: { start: { title: "مرحبًا بعودتك", subtitle: "سجّل الدخول إلى مساحة عملك", actionText: "ليس لديك حساب؟", actionLink: "أنشئ حسابًا" } },
-        signUp: { start: { title: "إنشاء حساب", subtitle: "ستحصل على مساحة عمل شخصية خاصة", actionText: "لديك حساب؟", actionLink: "سجّل الدخول" } },
+        signUp: { start: { title: "إنشاء حساب", subtitle: "استخدم البريد الذي وصلته به الدعوة إن كانت لديك دعوة", actionText: "لديك حساب؟", actionLink: "سجّل الدخول" } },
         formFieldLabel__emailAddress: "البريد الإلكتروني",
         formFieldLabel__password: "كلمة المرور",
         formFieldLabel__firstName: "الاسم الأول",
@@ -214,6 +223,7 @@ function ClerkProviderWithRoutes() {
               <Route path="/schedule" component={P.schedule} />
               <Route path="/reports" component={P.reports} />
               <Route path="/nfc" component={P.nfc} />
+              <Route path="/team" component={P.team} />
               <Route path="/settings" component={P.settings} />
               <Route component={NotFound} />
             </Switch>

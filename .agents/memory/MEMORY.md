@@ -1,1 +1,2 @@
 - [نطاق تجربة الجوال](mobile-scope.md) — اختار المستخدم موقعًا وتطبيق ويب قابلًا للتثبيت بدل تطبيقات المتاجر.
+- [Org roles / first admin](org-roles.md) — ORG_OWNER_EMAIL bootstraps super_admin; invites claimed by verified email.

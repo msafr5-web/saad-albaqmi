@@ -1,11 +1,12 @@
 import { Link } from "wouter";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
-import { useSummary, useRecords, useRecordIndex } from "@/hooks/use-data";
+import { useSummary, useRecords, useRecordIndex, useWorkspace } from "@/hooks/use-data";
 import { ErrorState, EmptyState, Kpi, LoadingRows, Meter, StatusPill } from "@/components/bits";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KINDS, det, fmtDate, fmtPct, fmtSAR, fmtNum } from "@/lib/domain";
 
 export function Overview({ publicView = false }: { publicView?: boolean }) {
+  const ws = useWorkspace();
   const s = useSummary();
   const records = useRecords();
   const idx = useRecordIndex(records.data);
@@ -26,8 +27,8 @@ export function Overview({ publicView = false }: { publicView?: boolean }) {
   if (!publicView && d.branches === 0 && d.students === 0) {
     return (
       <EmptyState
-        title="مساحة عملك الخاصة جاهزة وفارغة"
-        desc="هذه مساحة شخصية لا تحتوي أي بيانات للمعهد. ابدأ بإنشاء الفروع، ثم القاعات والدبلومات، ثم الطلاب والمدربين. ستظهر المؤشرات هنا تلقائيًا من سجلاتك الفعلية."
+        title={ws.data?.mode === "organization" ? "لا توجد بيانات ضمن نطاق دورك بعد" : "مساحة عملك الخاصة جاهزة وفارغة"}
+        desc={ws.data?.mode === "organization" ? "تظهر هنا السجلات التي تقع ضمن فرعك ودورك فقط. إذا كنت تتوقع بيانات، راجع الإدارة العليا." : "هذه مساحة شخصية لا تحتوي أي بيانات للمعهد. ابدأ بإنشاء الفروع، ثم القاعات والدبلومات، ثم الطلاب والمدربين. ستظهر المؤشرات هنا تلقائيًا من سجلاتك الفعلية."}
         action={<Link href="/branches" className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground" data-testid="link-start-branches">ابدأ بالفروع <ArrowLeft className="h-4 w-4" /></Link>}
       />
     );

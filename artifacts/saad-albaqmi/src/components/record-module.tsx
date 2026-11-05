@@ -274,7 +274,7 @@ function KindTable({ kind, extra }: { kind: Kind; extra?: ReactNode }) {
   const [viewing, setViewing] = useState<EducationRecord | null>(null);
   const [deleting, setDeleting] = useState<EducationRecord | null>(null);
   const [formKey, setFormKey] = useState(0);
-  const canWrite = !!ws.data?.canWrite;
+  const canWrite = !!ws.data?.canWrite && (ws.data.mode !== "organization" || ws.data.writableKinds.includes(kind));
 
   const rows = useMemo(() => {
     const list = idx.of(kind);
@@ -288,7 +288,9 @@ function KindTable({ kind, extra }: { kind: Kind; extra?: ReactNode }) {
 
   return (
     <div>
-      {ws.data && !canWrite && <ReadOnlyNotice />}
+      {ws.data && !canWrite && (ws.data.mode === "organization"
+        ? <div className="mb-5 rounded-xl border border-accent/40 bg-accent/10 p-4 text-sm" data-testid="status-role-readonly">دورك لا يملك صلاحية تعديل هذا القسم؛ العرض ضمن نطاق فرعك ودورك فقط.</div>
+        : <ReadOnlyNotice />)}
       {extra}
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
