@@ -26,8 +26,11 @@ import type {
 
 import type {
   EducationRecord,
+  GetPayrollParams,
   HealthStatus,
+  Payroll,
   RecordInput,
+  StudentLedger,
   Summary,
   Workspace
 } from './api.schemas';
@@ -565,6 +568,203 @@ export function useGetSummary<TData = Awaited<ReturnType<typeof getSummary>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSummaryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPayrollUrl = (params?: GetPayrollParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/payroll?${stringifiedParams}` : `/api/payroll`
+}
+
+export const getPayroll = async (params?: GetPayrollParams, options?: Parameters<typeof customFetch>[1]): Promise<Payroll> => {
+
+  return customFetch<Payroll>(getGetPayrollUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPayrollQueryKey = (params?: GetPayrollParams,) => {
+    return [
+    `/api/payroll`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetPayrollQueryOptions = <TData = Awaited<ReturnType<typeof getPayroll>>, TError = ErrorType<unknown>>(params?: GetPayrollParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPayrollQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPayroll>>> = ({ signal }) => getPayroll(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPayrollQueryResult = NonNullable<Awaited<ReturnType<typeof getPayroll>>>
+export type GetPayrollQueryError = ErrorType<unknown>
+
+
+export function useGetPayroll<TData = Awaited<ReturnType<typeof getPayroll>>, TError = ErrorType<unknown>>(
+ params: undefined |  GetPayrollParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayroll>>,
+          TError,
+          Awaited<ReturnType<typeof getPayroll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPayroll<TData = Awaited<ReturnType<typeof getPayroll>>, TError = ErrorType<unknown>>(
+ params?: GetPayrollParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayroll>>,
+          TError,
+          Awaited<ReturnType<typeof getPayroll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPayroll<TData = Awaited<ReturnType<typeof getPayroll>>, TError = ErrorType<unknown>>(
+ params?: GetPayrollParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPayroll<TData = Awaited<ReturnType<typeof getPayroll>>, TError = ErrorType<unknown>>(
+ params?: GetPayrollParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPayroll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPayrollQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetLedgerUrl = () => {
+
+
+
+
+  return `/api/ledger`
+}
+
+export const getLedger = async ( options?: Parameters<typeof customFetch>[1]): Promise<StudentLedger[]> => {
+
+  return customFetch<StudentLedger[]>(getGetLedgerUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLedgerQueryKey = () => {
+    return [
+    `/api/ledger`
+    ] as const;
+    }
+
+
+export const getGetLedgerQueryOptions = <TData = Awaited<ReturnType<typeof getLedger>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLedgerQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLedger>>> = ({ signal }) => getLedger({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLedgerQueryResult = NonNullable<Awaited<ReturnType<typeof getLedger>>>
+export type GetLedgerQueryError = ErrorType<unknown>
+
+
+export function useGetLedger<TData = Awaited<ReturnType<typeof getLedger>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLedger>>,
+          TError,
+          Awaited<ReturnType<typeof getLedger>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLedger<TData = Awaited<ReturnType<typeof getLedger>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLedger>>,
+          TError,
+          Awaited<ReturnType<typeof getLedger>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLedger<TData = Awaited<ReturnType<typeof getLedger>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetLedger<TData = Awaited<ReturnType<typeof getLedger>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLedger>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLedgerQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

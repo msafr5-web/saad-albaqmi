@@ -27,12 +27,15 @@ export const RecordInputKind = {
   room: 'room',
   asset: 'asset',
   diploma: 'diploma',
+  level: 'level',
+  subject: 'subject',
   student: 'student',
   instructor: 'instructor',
   expense: 'expense',
   invoice: 'invoice',
   session: 'session',
   payment: 'payment',
+  installment: 'installment',
   attendance: 'attendance',
   grade: 'grade',
 } as const;
@@ -81,7 +84,78 @@ export interface Summary {
   recent: EducationRecord[];
 }
 
+export interface PayrollLine {
+  instructorId: number;
+  name: string;
+  /** @nullable */
+  branchId: number | null;
+  hourlyRate: number;
+  heldSessions: number;
+  heldHours: number;
+  earned: number;
+  scheduledSessions: number;
+  scheduledHours: number;
+}
+
+export interface Payroll {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  total: number;
+  lines: PayrollLine[];
+}
+
+export type LedgerInstallmentState = typeof LedgerInstallmentState[keyof typeof LedgerInstallmentState];
+
+
+export const LedgerInstallmentState = {
+  paid: 'paid',
+  partial: 'partial',
+  pending: 'pending',
+  overdue: 'overdue',
+} as const;
+
+export interface LedgerInstallment {
+  id: number;
+  name: string;
+  dueDate: string;
+  amount: number;
+  paid: number;
+  remaining: number;
+  state: LedgerInstallmentState;
+}
+
+export interface LedgerPayment {
+  id: number;
+  name: string;
+  date: string;
+  amount: number;
+}
+
+export interface StudentLedger {
+  studentId: number;
+  name: string;
+  /** @nullable */
+  branchId: number | null;
+  /** @nullable */
+  diplomaId: number | null;
+  fees: number;
+  planned: number;
+  paid: number;
+  balance: number;
+  overdue: number;
+  unallocated: number;
+  installments: LedgerInstallment[];
+  payments: LedgerPayment[];
+}
+
 export interface HealthStatus {
   status: string;
 }
+
+export type GetPayrollParams = {
+from?: string;
+to?: string;
+};
 

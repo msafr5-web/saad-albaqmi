@@ -4,6 +4,10 @@ import {
   useGetWorkspace,
   useListRecords,
   useGetSummary,
+  useGetPayroll,
+  useGetLedger,
+  getGetPayrollQueryKey,
+  getGetLedgerQueryKey,
   useCreateRecord,
   useUpdateRecord,
   useDeleteRecord,
@@ -24,6 +28,14 @@ export function useRecords() {
 }
 export function useSummary() {
   return useGetSummary({ query: { ...q, queryKey: getGetSummaryQueryKey() } });
+}
+
+export function usePayroll(from: string, to: string) {
+  const params = { ...(from ? { from } : {}), ...(to ? { to } : {}) };
+  return useGetPayroll(params, { query: { ...q, queryKey: getGetPayrollQueryKey(params) } });
+}
+export function useLedger() {
+  return useGetLedger({ query: { ...q, queryKey: getGetLedgerQueryKey() } });
 }
 
 export function useRecordIndex(records: EducationRecord[] | undefined) {
@@ -48,6 +60,8 @@ export function useRecordMutations() {
   const refresh = () => {
     qc.invalidateQueries({ queryKey: getListRecordsQueryKey() });
     qc.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetPayrollQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetLedgerQueryKey() });
   };
   const create = useCreateRecord({ mutation: { onSuccess: refresh } });
   const update = useUpdateRecord({ mutation: { onSuccess: refresh } });

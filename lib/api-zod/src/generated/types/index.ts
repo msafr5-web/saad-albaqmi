@@ -8,10 +8,17 @@
 
 export * from './branchSummary';
 export * from './educationRecord';
+export * from './getPayrollParams';
 export * from './healthStatus';
+export * from './ledgerInstallment';
+export * from './ledgerInstallmentState';
+export * from './ledgerPayment';
+export * from './payroll';
+export * from './payrollLine';
 export * from './recordInput';
 export * from './recordInputDetails';
 export * from './recordInputKind';
+export * from './studentLedger';
 export * from './summary';
 export * from './workspace';
 export * from './workspaceMode';

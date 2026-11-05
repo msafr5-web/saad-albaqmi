@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { PageHeader, Kpi, ErrorState } from "@/components/bits";
 import { RecordModule } from "@/components/record-module";
+import { LedgerPanel, PayrollPanel } from "@/components/finance-panels";
 import { Overview } from "@/components/overview";
 import { useRecords, useRecordIndex, usePageTitle, useWorkspace } from "@/hooks/use-data";
 import { det, fmtSAR, fmtNum, num, toMinutes } from "@/lib/domain";
@@ -30,15 +31,15 @@ export function AssetsPage() {
 }
 export function DiplomasPage() {
   usePageTitle("الدبلومات");
-  return (<><PageHeader eyebrow="المناهج" title="الدبلومات" desc="المدة والرسوم والمستويات والمواد لكل برنامج تدريبي." /><RecordModule kinds={["diploma"]} /></>);
+  return (<><PageHeader eyebrow="المناهج" title="الدبلومات" desc="المدة والرسوم، ثم مستويات كل دبلوم ومواده بأسعارها ومتطلباتها السابقة." /><RecordModule kinds={["diploma", "level", "subject"]} /></>);
 }
 export function StudentsPage() {
   usePageTitle("الطلاب");
-  return (<><PageHeader eyebrow="الأكاديمية" title="الطلاب" desc="التسجيل والرسوم والحضور والدرجات. الرسوم المستحقة منفصلة عن المدفوعات المحصلة." /><RecordModule kinds={["student", "attendance", "grade"]} /></>);
+  return (<><PageHeader eyebrow="الأكاديمية" title="الطلاب" desc="التسجيل والرسوم والحضور والدرجات. الرسوم المستحقة منفصلة عن المدفوعات المحصلة." /><RecordModule kinds={["student", "installment", "attendance", "grade"]} extra={{ student: <LedgerPanel /> }} /></>);
 }
 export function InstructorsPage() {
   usePageTitle("المدربون");
-  return (<><PageHeader eyebrow="الكادر" title="المدربون" desc="المؤهلات والأجور والساعات الأسبوعية والمواد المسندة." /><RecordModule kinds={["instructor"]} /></>);
+  return (<><PageHeader eyebrow="الكادر" title="المدربون" desc="المؤهلات والأجور والساعات الأسبوعية والمواد المسندة." /><RecordModule kinds={["instructor"]} extra={{ instructor: <PayrollPanel /> }} /></>);
 }
 
 export function FinancePage() {
@@ -66,7 +67,7 @@ export function FinancePage() {
     <>
       <PageHeader eyebrow="المالية" title="المصروفات والفواتير والمدفوعات" desc="أرقام مجمعة من السجلات المدخلة فقط. لا تُعد قوائم مالية نهائية قبل اعتماد سياسات الأقساط والضرائب والإهلاك." />
       {records.isError ? <ErrorState error={records.error} onRetry={() => records.refetch()} /> : strip}
-      <RecordModule kinds={["expense", "invoice", "payment"]} />
+      <RecordModule kinds={["payment", "installment", "expense", "invoice"]} extra={{ payment: <><PayrollPanel /><LedgerPanel /></> }} />
     </>
   );
 }

@@ -2,8 +2,9 @@ import { Router, type IRouter, type Request } from "express";
 import { getAuth } from "@clerk/express";
 import { and, eq, sql } from "drizzle-orm";
 import { db, educationRecords, educationAudit } from "@workspace/db";
-import { CreateRecordBody, UpdateRecordBody, UpdateRecordParams, DeleteRecordParams, ListRecordsResponse, GetSummaryResponse, GetWorkspaceResponse, CreateRecordResponse, UpdateRecordResponse } from "@workspace/api-zod";
+import { CreateRecordBody, UpdateRecordBody, UpdateRecordParams, DeleteRecordParams, ListRecordsResponse, GetSummaryResponse, GetWorkspaceResponse, GetPayrollQueryParams, GetPayrollResponse, GetLedgerResponse, CreateRecordResponse, UpdateRecordResponse } from "@workspace/api-zod";
 import { demoRecords, summarize, type EducationRow } from "../lib/education-demo";
+import { computeLedger, computePayroll } from "../lib/education-finance";
 import { DomainError, ensureDeletable, validateRecord } from "../lib/education-validation";
 
 const router: IRouter = Router();
@@ -16,7 +17,7 @@ async function records(req: Request) {
   const id = owner(req);
   return id ? serialize(await db.select().from(educationRecords).where(eq(educationRecords.ownerId,id))) : demoRecords;
 }
-router.use(["/workspace","/records","/summary"], (req,res,next) => {
+router.use(["/workspace","/records","/summary","/payroll","/ledger"], (req,res,next) => {
   res.set("Cache-Control","private, no-store");
   if (!["GET","HEAD","OPTIONS"].includes(req.method)) {
     const source = req.get("origin");
@@ -32,6 +33,14 @@ router.get("/workspace", (req,res) => {
 });
 router.get("/records", async(req,res): Promise<void> => { res.json(ListRecordsResponse.parse(await records(req))); });
 router.get("/summary", async(req,res): Promise<void> => { res.json(GetSummaryResponse.parse(summarize(await records(req)))); });
+
+router.get("/payroll", async(req,res): Promise<void> => {
+  const q = GetPayrollQueryParams.safeParse(req.query);
+  const valid = (v?: string) => v === undefined || /^\d{4}-\d{2}-\d{2}$/.test(v);
+  if (!q.success || !valid(q.data.from) || !valid(q.data.to)) { res.status(400).json({error:"نطاق التاريخ غير صحيح"}); return; }
+  res.json(GetPayrollResponse.parse(computePayroll(await records(req), q.data.from || undefined, q.data.to || undefined)));
+});
+router.get("/ledger", async(req,res): Promise<void> => { res.json(GetLedgerResponse.parse(computeLedger(await records(req)))); });
 
 router.post("/records", async(req,res): Promise<void> => {
   const parsed = CreateRecordBody.safeParse(req.body);
@@ -59,7 +68,7 @@ router.patch("/records/:id", async(req,res): Promise<void> => {
     validateRecord({...parsed.data,branchId:parsed.data.branchId ?? null},all,params.data.id);
     // Revalidate dependents to prevent room capacity / student diploma edits invalidating sessions.
     const candidate = all.map(r => r.id === params.data.id ? {...r,...parsed.data,branchId:parsed.data.branchId ?? null} : r);
-    for (const r of candidate.filter(r=>r.kind === "session")) validateRecord(r,candidate,r.id);
+    for (const r of candidate.filter(r=>["session","student","installment","payment","subject","level"].includes(r.kind))) validateRecord(r,candidate,r.id);
     const [result] = await tx.update(educationRecords).set({...parsed.data,name:parsed.data.name.trim()}).where(and(eq(educationRecords.id,params.data.id),eq(educationRecords.ownerId,ownerId))).returning();
     await tx.insert(educationAudit).values({ownerId,action:"update",recordId:params.data.id});
     return serialize([result!])[0];

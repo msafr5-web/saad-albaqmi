@@ -32,7 +32,7 @@ export function renderValue(f: FieldDef, v: unknown, idx: Index): ReactNode {
     case "relation":
       return idx.nameOf(v);
     case "multirelation":
-      return Array.isArray(v) ? `${v.length} طالب` : "—";
+      return Array.isArray(v) ? `${v.length} ${f.relation === "student" ? "طالب" : "مادة"}` : "—";
     case "bool":
       return v ? <span className="text-success">نعم</span> : <span className="text-destructive">لا</span>;
     case "list":
@@ -88,11 +88,24 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
   const { toast } = useToast();
   const pending = create.isPending || update.isPending;
 
-  const setD = (k: string, v: unknown) => setState((s) => ({ ...s, details: { ...s.details, [k]: v } }));
+  const setD = (k: string, v: unknown) => setState((s) => {
+    const details = { ...s.details, [k]: v };
+    if (kind === "student" && k === "subjectIds" && (v as number[]).length) {
+      details.fees = String((v as number[]).reduce((a, id) => a + Number(det(idx.byId.get(id) as EducationRecord, "price") ?? 0), 0));
+    }
+    if (k === "diplomaId" && s.details.diplomaId !== v) {
+      for (const f of def.fields) if (f.relation === "level" || f.relation === "subject" || (f.relation === "student" && kind === "session")) details[f.key] = f.type === "multirelation" ? [] : "";
+    }
+    return { ...s, details };
+  });
 
   const relOptions = (f: FieldDef) => {
-    const list = idx.of(f.relation!);
-    if (f.relation === "diploma" || !state.branchId) return list;
+    let list = idx.of(f.relation!);
+    const dip = state.details.diplomaId;
+    if ((f.relation === "level" || f.relation === "subject") && dip) list = list.filter((r) => String(det(r, "diplomaId")) === String(dip));
+    if (f.relation === "student" && kind === "session" && dip) list = list.filter((r) => String(det(r, "diplomaId")) === String(dip));
+    if (f.relation === "subject" && kind === "subject" && editing) list = list.filter((r) => r.id !== editing.id);
+    if (["diploma", "level", "subject"].includes(f.relation!) || !state.branchId) return list;
     return list.filter((r) => String(r.branchId) === state.branchId);
   };
 
@@ -189,7 +202,7 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
                 <div key={f.key} className="sm:col-span-2">
                   {label}
                   <div className="max-h-40 overflow-y-auto rounded-lg border bg-background p-2">
-                    {opts.length === 0 && <p className="p-2 text-xs text-muted-foreground">لا يوجد طلاب في هذا الفرع.</p>}
+                    {opts.length === 0 && <p className="p-2 text-xs text-muted-foreground">لا توجد خيارات متاحة.</p>}
                     <div className="grid gap-1 sm:grid-cols-2">
                       {opts.map((o) => {
                         const on = sel.includes(o.id);
@@ -204,7 +217,7 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
                       })}
                     </div>
                   </div>
-                  <p className="mt-1 text-[11px] text-muted-foreground">{sel.length} محدد. يرفض الخادم تجاوز سعة القاعة.</p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{sel.length} محدد.{f.relation === "student" ? " يرفض الخادم تجاوز سعة القاعة." : ""}</p>
                 </div>
               );
             }

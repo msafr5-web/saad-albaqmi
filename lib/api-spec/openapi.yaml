@@ -84,6 +84,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Summary"
+  /payroll:
+    get:
+      operationId: getPayroll
+      parameters:
+        - in: query
+          name: from
+          required: false
+          schema: { type: string }
+        - in: query
+          name: to
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Instructor dues computed only from sessions actually held (status done)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payroll"
+  /ledger:
+    get:
+      operationId: getLedger
+      responses:
+        "200":
+          description: Per-student financial ledger with installment schedule and payment allocation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentLedger"
   /healthz:
     get:
       operationId: healthCheck
@@ -112,7 +143,7 @@ components:
       properties:
         kind:
           type: string
-          enum: [branch, room, asset, diploma, student, instructor, expense, invoice, session, payment, attendance, grade]
+          enum: [branch, room, asset, diploma, level, subject, student, instructor, expense, invoice, session, payment, installment, attendance, grade]
         name: { type: string, minLength: 1, maxLength: 200 }
         branchId: { type: [integer, "null"] }
         status: { type: string, maxLength: 50 }
@@ -156,6 +187,68 @@ components:
         recent:
           type: array
           items: { $ref: "#/components/schemas/EducationRecord" }
+    PayrollLine:
+      type: object
+      required: [instructorId, name, branchId, hourlyRate, heldSessions, heldHours, earned, scheduledSessions, scheduledHours]
+      properties:
+        instructorId: { type: integer }
+        name: { type: string }
+        branchId: { type: [integer, "null"] }
+        hourlyRate: { type: number }
+        heldSessions: { type: integer }
+        heldHours: { type: number }
+        earned: { type: number }
+        scheduledSessions: { type: integer }
+        scheduledHours: { type: number }
+    Payroll:
+      type: object
+      required: [from, to, total, lines]
+      properties:
+        from: { type: [string, "null"] }
+        to: { type: [string, "null"] }
+        total: { type: number }
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/PayrollLine" }
+    LedgerInstallment:
+      type: object
+      required: [id, name, dueDate, amount, paid, remaining, state]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        dueDate: { type: string }
+        amount: { type: number }
+        paid: { type: number }
+        remaining: { type: number }
+        state: { type: string, enum: [paid, partial, pending, overdue] }
+    LedgerPayment:
+      type: object
+      required: [id, name, date, amount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        date: { type: string }
+        amount: { type: number }
+    StudentLedger:
+      type: object
+      required: [studentId, name, branchId, diplomaId, fees, planned, paid, balance, overdue, unallocated, installments, payments]
+      properties:
+        studentId: { type: integer }
+        name: { type: string }
+        branchId: { type: [integer, "null"] }
+        diplomaId: { type: [integer, "null"] }
+        fees: { type: number }
+        planned: { type: number }
+        paid: { type: number }
+        balance: { type: number }
+        overdue: { type: number }
+        unallocated: { type: number }
+        installments:
+          type: array
+          items: { $ref: "#/components/schemas/LedgerInstallment" }
+        payments:
+          type: array
+          items: { $ref: "#/components/schemas/LedgerPayment" }
     HealthStatus:
       type: object
       properties:

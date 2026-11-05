@@ -22,7 +22,7 @@ export const listRecordsResponseOneStatusMax = 50;
 
 
 export const ListRecordsResponseItem = zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(listRecordsResponseOneNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(listRecordsResponseOneStatusMax),
@@ -41,7 +41,7 @@ export const createRecordBodyStatusMax = 50;
 
 
 export const CreateRecordBody = zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(createRecordBodyNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(createRecordBodyStatusMax),
@@ -55,7 +55,7 @@ export const createRecordResponseOneStatusMax = 50;
 
 
 export const CreateRecordResponse = zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(createRecordResponseOneNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(createRecordResponseOneStatusMax),
@@ -77,7 +77,7 @@ export const updateRecordBodyStatusMax = 50;
 
 
 export const UpdateRecordBody = zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(updateRecordBodyNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(updateRecordBodyStatusMax),
@@ -91,7 +91,7 @@ export const updateRecordResponseOneStatusMax = 50;
 
 
 export const UpdateRecordResponse = zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(updateRecordResponseOneNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(updateRecordResponseOneStatusMax),
@@ -134,7 +134,7 @@ export const GetSummaryResponse = zod.object({
   "alert": zod.string()
 })),
   "recent": zod.array(zod.object({
-  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'attendance', 'grade']),
+  "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(getSummaryResponseRecentItemOneNameMax),
   "branchId": zod.number().int().nullish(),
   "status": zod.string().max(getSummaryResponseRecentItemOneStatusMax),
@@ -144,6 +144,59 @@ export const GetSummaryResponse = zod.object({
   "createdAt": zod.string()
 })))
 })
+
+
+export const GetPayrollQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional()
+})
+
+export const GetPayrollResponse = zod.object({
+  "from": zod.string().nullable(),
+  "to": zod.string().nullable(),
+  "total": zod.number(),
+  "lines": zod.array(zod.object({
+  "instructorId": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable(),
+  "hourlyRate": zod.number(),
+  "heldSessions": zod.number().int(),
+  "heldHours": zod.number(),
+  "earned": zod.number(),
+  "scheduledSessions": zod.number().int(),
+  "scheduledHours": zod.number()
+}))
+})
+
+
+export const GetLedgerResponseItem = zod.object({
+  "studentId": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable(),
+  "diplomaId": zod.number().int().nullable(),
+  "fees": zod.number(),
+  "planned": zod.number(),
+  "paid": zod.number(),
+  "balance": zod.number(),
+  "overdue": zod.number(),
+  "unallocated": zod.number(),
+  "installments": zod.array(zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "dueDate": zod.string(),
+  "amount": zod.number(),
+  "paid": zod.number(),
+  "remaining": zod.number(),
+  "state": zod.enum(['paid', 'partial', 'pending', 'overdue'])
+})),
+  "payments": zod.array(zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "date": zod.string(),
+  "amount": zod.number()
+}))
+})
+export const GetLedgerResponse = zod.array(GetLedgerResponseItem)
 
 
 /**
