@@ -1,45 +1,43 @@
-# [Project name]
+# صرح د. سعد البقمي التعليمي
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Arabic RTL educational branch and resource management web application with installable PWA support.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Web workflow: `artifacts/saad-albaqmi: web`
+- API workflow: `artifacts/api-server: API Server`
+- `pnpm run typecheck` — full workspace typecheck
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API contracts
+- `pnpm --filter @workspace/db run push` — development schema only
+- `node scripts/create-pwa-icons.mjs` — reproduce PNG installation icons
 
-## Stack
+## Sources and scope
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- User-supplied PRD and SWOT are in `attached_assets/`.
+- Arabic analysis and explicit first-release limitations: `د.سعد البقمي/تحليل-المتطلبات.md`.
+- Web app: `artifacts/saad-albaqmi/`, at `/`.
+- Shared API: `artifacts/api-server/`, at `/api`.
+- API contract: `lib/api-spec/openapi.yaml`.
+- Database schema: `lib/db/src/schema/education.ts`.
 
-## Where things live
+## Product decisions
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- The user selected an installable web application, not native store apps.
+- Anonymous visitors see synthetic read-only examples, never private records.
+- Signed-in users get isolated personal workspaces, initially empty. This is not shared institutional RBAC; do not imply that all six PRD roles are already supported.
+- Demo fixtures never populate personal workspaces. Do not grant shared administrator access to arbitrary signups.
+- Financial totals are cumulative entered amounts, not recognized accounting profit. Utility allocation, depreciation and student cost models require approved business policies.
+- No payment gateway is configured. Payment records represent externally collected amounts.
+- PWA worker does not cache private APIs, student records or financial records. Offline navigation explains that connectivity is required.
 
-## Architecture decisions
+## Stack and conventions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- pnpm, React/Vite, TypeScript, Tailwind, Express, PostgreSQL/Drizzle.
+- Replit-managed Clerk with canonical production proxy and cookie auth.
+- OpenAPI-first generated hooks and validators; regenerate after every contract edit.
+- Structured pino logging; never log credentials, sessions or record payloads.
+- Scheduling and related mutations use owner-scoped transaction locks; preserve concurrency safety.
 
-## Product
+## Before institutional use
 
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+Complete verified administrator onboarding, team invitations and branch-scoped authorization; approved cost/utility/depreciation models; detailed curricula and trainer dues; recovery, security and performance validation.

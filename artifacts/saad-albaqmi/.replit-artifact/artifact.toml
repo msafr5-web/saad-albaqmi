@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "صرح د. سعد البقمي التعليمي"
+description = "منصة عربية لإدارة الفروع والموارد والعمليات الأكاديمية والتكاليف، وموقع قابل للتثبيت على الجوال."
+version = "1.0.0"
+id = "artifacts/saad-albaqmi"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22002
+
+[services.development]
+run = "pnpm --filter @workspace/saad-albaqmi run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/saad-albaqmi", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/saad-albaqmi/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22002"
+BASE_PATH = "/"

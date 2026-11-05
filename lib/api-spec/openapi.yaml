@@ -11,6 +11,79 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /workspace:
+    get:
+      operationId: getWorkspace
+      responses:
+        "200":
+          description: Workspace identity; anonymous visitors get read-only illustrative data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+  /records:
+    get:
+      operationId: listRecords
+      responses:
+        "200":
+          description: All records in the current isolated workspace
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EducationRecord"
+    post:
+      operationId: createRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationRecord"
+  /records/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer }
+    patch:
+      operationId: updateRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationRecord"
+    delete:
+      operationId: deleteRecord
+      responses:
+        "204":
+          description: Deleted
+  /summary:
+    get:
+      operationId: getSummary
+      responses:
+        "200":
+          description: Computed branch financial and operational summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Summary"
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +99,63 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    Workspace:
+      type: object
+      required: [mode, canWrite, label]
+      properties:
+        mode: { type: string, enum: [demo, personal] }
+        canWrite: { type: boolean }
+        label: { type: string }
+    RecordInput:
+      type: object
+      required: [kind, name, status, details]
+      properties:
+        kind:
+          type: string
+          enum: [branch, room, asset, diploma, student, instructor, expense, invoice, session, payment, attendance, grade]
+        name: { type: string, minLength: 1, maxLength: 200 }
+        branchId: { type: [integer, "null"] }
+        status: { type: string, maxLength: 50 }
+        details:
+          type: object
+          additionalProperties: true
+    EducationRecord:
+      allOf:
+        - $ref: "#/components/schemas/RecordInput"
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: integer }
+            createdAt: { type: string }
+    BranchSummary:
+      type: object
+      required: [id, name, budget, spent, collected, students, rooms, usage, alert]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        budget: { type: number }
+        spent: { type: number }
+        collected: { type: number }
+        students: { type: integer }
+        rooms: { type: integer }
+        usage: { type: number }
+        alert: { type: string }
+    Summary:
+      type: object
+      required: [students, instructors, branches, diplomas, expenses, collected, branchSummaries, recent]
+      properties:
+        students: { type: integer }
+        instructors: { type: integer }
+        branches: { type: integer }
+        diplomas: { type: integer }
+        expenses: { type: number }
+        collected: { type: number }
+        branchSummaries:
+          type: array
+          items: { $ref: "#/components/schemas/BranchSummary" }
+        recent:
+          type: array
+          items: { $ref: "#/components/schemas/EducationRecord" }
     HealthStatus:
       type: object
       properties:
