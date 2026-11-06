@@ -115,9 +115,9 @@
   --success: 158 45% 32%;
   --warning: 32 85% 46%;
 
-  --app-font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
-  --app-font-serif: 'Reem Kufi', 'IBM Plex Sans Arabic', serif;
-  --app-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --app-font-sans: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --app-font-serif: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --radius: 0.75rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0); /*replace with H S L */
   --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0); /*replace with H S L */
