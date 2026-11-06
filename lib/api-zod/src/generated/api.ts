@@ -13,7 +13,7 @@ export const GetWorkspaceResponse = zod.object({
   "canWrite": zod.boolean(),
   "label": zod.string(),
   "role": zod.union([zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),zod.null()]),
-  "branchId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
   "pages": zod.array(zod.string()),
   "writableKinds": zod.array(zod.string()),
   "canManageTeam": zod.boolean(),
@@ -31,11 +31,11 @@ export const listRecordsResponseOneStatusMax = 50;
 export const ListRecordsResponseItem = zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(listRecordsResponseOneNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(listRecordsResponseOneStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 }).and(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "createdAt": zod.string()
 }))
 export const ListRecordsResponse = zod.array(ListRecordsResponseItem)
@@ -50,7 +50,7 @@ export const createRecordBodyStatusMax = 50;
 export const CreateRecordBody = zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(createRecordBodyNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(createRecordBodyStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 })
@@ -64,11 +64,11 @@ export const createRecordResponseOneStatusMax = 50;
 export const CreateRecordResponse = zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(createRecordResponseOneNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(createRecordResponseOneStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 }).and(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "createdAt": zod.string()
 }))
 
@@ -86,7 +86,7 @@ export const updateRecordBodyStatusMax = 50;
 export const UpdateRecordBody = zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(updateRecordBodyNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(updateRecordBodyStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 })
@@ -100,11 +100,11 @@ export const updateRecordResponseOneStatusMax = 50;
 export const UpdateRecordResponse = zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(updateRecordResponseOneNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(updateRecordResponseOneStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 }).and(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "createdAt": zod.string()
 }))
 
@@ -123,31 +123,31 @@ export const getSummaryResponseRecentItemOneStatusMax = 50;
 
 
 export const GetSummaryResponse = zod.object({
-  "students": zod.number().int(),
-  "instructors": zod.number().int(),
-  "branches": zod.number().int(),
-  "diplomas": zod.number().int(),
+  "students": zod.int(),
+  "instructors": zod.int(),
+  "branches": zod.int(),
+  "diplomas": zod.int(),
   "expenses": zod.number(),
   "collected": zod.number(),
   "branchSummaries": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
   "budget": zod.number(),
   "spent": zod.number(),
   "collected": zod.number(),
-  "students": zod.number().int(),
-  "rooms": zod.number().int(),
+  "students": zod.int(),
+  "rooms": zod.int(),
   "usage": zod.number(),
   "alert": zod.string()
 })),
   "recent": zod.array(zod.object({
   "kind": zod.enum(['branch', 'room', 'asset', 'diploma', 'level', 'subject', 'student', 'instructor', 'expense', 'invoice', 'session', 'payment', 'installment', 'attendance', 'grade']),
   "name": zod.string().min(1).max(getSummaryResponseRecentItemOneNameMax),
-  "branchId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
   "status": zod.string().max(getSummaryResponseRecentItemOneStatusMax),
   "details": zod.record(zod.string(), zod.unknown())
 }).and(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "createdAt": zod.string()
 })))
 })
@@ -163,24 +163,24 @@ export const GetPayrollResponse = zod.object({
   "to": zod.string().nullable(),
   "total": zod.number(),
   "lines": zod.array(zod.object({
-  "instructorId": zod.number().int(),
+  "instructorId": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
   "hourlyRate": zod.number(),
-  "heldSessions": zod.number().int(),
+  "heldSessions": zod.int(),
   "heldHours": zod.number(),
   "earned": zod.number(),
-  "scheduledSessions": zod.number().int(),
+  "scheduledSessions": zod.int(),
   "scheduledHours": zod.number()
 }))
 })
 
 
 export const GetLedgerResponseItem = zod.object({
-  "studentId": zod.number().int(),
+  "studentId": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable(),
-  "diplomaId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
+  "diplomaId": zod.int().nullable(),
   "fees": zod.number(),
   "planned": zod.number(),
   "paid": zod.number(),
@@ -188,7 +188,7 @@ export const GetLedgerResponseItem = zod.object({
   "overdue": zod.number(),
   "unallocated": zod.number(),
   "installments": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
   "dueDate": zod.string(),
   "amount": zod.number(),
@@ -197,7 +197,7 @@ export const GetLedgerResponseItem = zod.object({
   "state": zod.enum(['paid', 'partial', 'pending', 'overdue'])
 })),
   "payments": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
   "date": zod.string(),
   "amount": zod.number()
@@ -222,19 +222,19 @@ export const GetCostPolicyResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "draftVersion": zod.number().int(),
+  "draftVersion": zod.int(),
   "approved": zod.union([zod.object({
   "period": zod.object({
   "from": zod.string(),
@@ -250,28 +250,28 @@ export const GetCostPolicyResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "approvedVersion": zod.number().int().nullable(),
+  "approvedVersion": zod.int().nullable(),
   "approvedAt": zod.string().nullable(),
   "approvedBy": zod.string().nullable(),
   "canEdit": zod.boolean(),
   "canApprove": zod.boolean(),
   "draftIsApproved": zod.boolean(),
   "rooms": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable()
+  "branchId": zod.int().nullable()
 }))
 })
 
@@ -291,12 +291,12 @@ export const SaveCostPolicyDraftBody = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
@@ -320,19 +320,19 @@ export const SaveCostPolicyDraftResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "draftVersion": zod.number().int(),
+  "draftVersion": zod.int(),
   "approved": zod.union([zod.object({
   "period": zod.object({
   "from": zod.string(),
@@ -348,34 +348,34 @@ export const SaveCostPolicyDraftResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "approvedVersion": zod.number().int().nullable(),
+  "approvedVersion": zod.int().nullable(),
   "approvedAt": zod.string().nullable(),
   "approvedBy": zod.string().nullable(),
   "canEdit": zod.boolean(),
   "canApprove": zod.boolean(),
   "draftIsApproved": zod.boolean(),
   "rooms": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable()
+  "branchId": zod.int().nullable()
 }))
 })
 
 
 export const ApproveCostPolicyBody = zod.object({
-  "version": zod.number().int()
+  "version": zod.int()
 })
 
 export const ApproveCostPolicyResponse = zod.object({
@@ -394,19 +394,19 @@ export const ApproveCostPolicyResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "draftVersion": zod.number().int(),
+  "draftVersion": zod.int(),
   "approved": zod.union([zod.object({
   "period": zod.object({
   "from": zod.string(),
@@ -422,28 +422,28 @@ export const ApproveCostPolicyResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
   "revenueRecognition": zod.enum(['cash', 'installment_due']),
   "basis": zod.string()
 }),zod.null()]),
-  "approvedVersion": zod.number().int().nullable(),
+  "approvedVersion": zod.int().nullable(),
   "approvedAt": zod.string().nullable(),
   "approvedBy": zod.string().nullable(),
   "canEdit": zod.boolean(),
   "canApprove": zod.boolean(),
   "draftIsApproved": zod.boolean(),
   "rooms": zod.array(zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable()
+  "branchId": zod.int().nullable()
 }))
 })
 
@@ -455,7 +455,7 @@ export const GetCostReportQueryParams = zod.object({
 
 export const GetCostReportResponse = zod.object({
   "status": zod.enum(['approved', 'no_approved_policy']),
-  "policyVersion": zod.number().int().nullable(),
+  "policyVersion": zod.int().nullable(),
   "policy": zod.union([zod.object({
   "period": zod.object({
   "from": zod.string(),
@@ -471,12 +471,12 @@ export const GetCostReportResponse = zod.object({
   "method": zod.enum(['meter', 'area', 'power_hours']),
   "meterAssignments": zod.array(zod.object({
   "meter": zod.string(),
-  "roomId": zod.number().int()
+  "roomId": zod.int()
 }))
 }).nullable(),
   "depreciation": zod.object({
   "method": zod.enum(['straight_line']),
-  "usefulLifeMonths": zod.number().int(),
+  "usefulLifeMonths": zod.int(),
   "salvagePercent": zod.number(),
   "startConvention": zod.enum(['purchase_month', 'next_month'])
 }).nullable(),
@@ -488,7 +488,7 @@ export const GetCostReportResponse = zod.object({
   "to": zod.string()
 }).nullable(),
   "branches": zod.array(zod.object({
-  "branchId": zod.number().int(),
+  "branchId": zod.int(),
   "name": zod.string(),
   "revenue": zod.number(),
   "cost": zod.object({
@@ -499,12 +499,12 @@ export const GetCostReportResponse = zod.object({
 }),
   "totalCost": zod.number(),
   "margin": zod.number(),
-  "students": zod.number().int(),
+  "students": zod.int(),
   "costPerStudent": zod.number().nullable(),
   "unallocatedElectricity": zod.number()
 })),
   "diplomas": zod.array(zod.object({
-  "diplomaId": zod.number().int(),
+  "diplomaId": zod.int(),
   "name": zod.string(),
   "revenue": zod.number(),
   "cost": zod.object({
@@ -514,13 +514,13 @@ export const GetCostReportResponse = zod.object({
 }),
   "totalCost": zod.number(),
   "margin": zod.number(),
-  "students": zod.number().int(),
+  "students": zod.int(),
   "costPerStudent": zod.number().nullable()
 })),
   "rooms": zod.array(zod.object({
-  "roomId": zod.number().int(),
+  "roomId": zod.int(),
   "name": zod.string(),
-  "branchId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
   "heldHours": zod.number(),
   "electricity": zod.number(),
   "depreciation": zod.number()
@@ -534,11 +534,11 @@ export const GetCostReportResponse = zod.object({
 
 
 export const ListTeamResponseItem = zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "email": zod.string(),
   "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
-  "branchId": zod.number().int().nullable(),
-  "linkedRecordId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
+  "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
   "activatedAt": zod.string().nullable(),
@@ -549,9 +549,9 @@ export const ListTeamResponse = zod.array(ListTeamResponseItem)
 
 
 export const ListAuditResponseItem = zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "action": zod.string(),
-  "recordId": zod.number().int(),
+  "recordId": zod.int(),
   "actorId": zod.string().nullable(),
   "actorEmail": zod.string().nullable(),
   "createdAt": zod.string()
@@ -566,16 +566,16 @@ export const inviteMemberBodyEmailMax = 200;
 export const InviteMemberBody = zod.object({
   "email": zod.string().max(inviteMemberBodyEmailMax),
   "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
-  "branchId": zod.number().int().nullish(),
-  "linkedRecordId": zod.number().int().nullish()
+  "branchId": zod.int().nullish(),
+  "linkedRecordId": zod.int().nullish()
 })
 
 export const InviteMemberResponse = zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "email": zod.string(),
   "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
-  "branchId": zod.number().int().nullable(),
-  "linkedRecordId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
+  "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
   "activatedAt": zod.string().nullable(),
@@ -590,17 +590,17 @@ export const UpdateMemberParams = zod.object({
 
 export const UpdateMemberBody = zod.object({
   "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']).optional(),
-  "branchId": zod.number().int().nullish(),
-  "linkedRecordId": zod.number().int().nullish(),
+  "branchId": zod.int().nullish(),
+  "linkedRecordId": zod.int().nullish(),
   "status": zod.enum(['revoked']).optional()
 })
 
 export const UpdateMemberResponse = zod.object({
-  "id": zod.number().int(),
+  "id": zod.int(),
   "email": zod.string(),
   "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
-  "branchId": zod.number().int().nullable(),
-  "linkedRecordId": zod.number().int().nullable(),
+  "branchId": zod.int().nullable(),
+  "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
   "activatedAt": zod.string().nullable(),

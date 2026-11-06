@@ -7,6 +7,6 @@
  */
 
 export type GetCostReportParams = {
-from?: string;
-to?: string;
+  from?: string;
+  to?: string;
 };

@@ -431,12 +431,12 @@ export interface HealthStatus {
 }
 
 export type GetPayrollParams = {
-from?: string;
-to?: string;
+  from?: string;
+  to?: string;
 };
 
 export type GetCostReportParams = {
-from?: string;
-to?: string;
+  from?: string;
+  to?: string;
 };
 
