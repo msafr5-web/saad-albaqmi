@@ -48,7 +48,7 @@ export function validateRecord(input: InputRecord, records: EducationRow[], excl
       if (!Number.isInteger(d.capacity)) throw new DomainError("السعة يجب أن تكون عددًا صحيحًا");
       break;
     case "asset":
-      numeric("value"); relation("roomId", "room"); if (d.maintenanceDate) date("maintenanceDate"); break;
+      numeric("value"); relation("roomId", "room"); if (d.maintenanceDate) date("maintenanceDate"); if (d.purchaseDate) date("purchaseDate"); break;
     case "diploma":
       numeric("fee"); break;
     case "level": {

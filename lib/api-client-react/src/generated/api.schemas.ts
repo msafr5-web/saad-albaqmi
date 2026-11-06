@@ -220,11 +220,204 @@ export interface StudentLedger {
   payments: LedgerPayment[];
 }
 
+export type CostPolicyPeriod = {
+  from: string;
+  to: string;
+};
+
+export type CostPolicyComponents = {
+  expenses: boolean;
+  electricity: boolean;
+  depreciation: boolean;
+  instructorPay: boolean;
+};
+
+export type CostPolicyElectricityMethod = typeof CostPolicyElectricityMethod[keyof typeof CostPolicyElectricityMethod];
+
+
+export const CostPolicyElectricityMethod = {
+  meter: 'meter',
+  area: 'area',
+  power_hours: 'power_hours',
+} as const;
+
+export type CostPolicyElectricityMeterAssignmentsItem = {
+  meter: string;
+  roomId: number;
+};
+
+/**
+ * @nullable
+ */
+export type CostPolicyElectricity = {
+  method: CostPolicyElectricityMethod;
+  meterAssignments: CostPolicyElectricityMeterAssignmentsItem[];
+} | null;
+
+export type CostPolicyDepreciationMethod = typeof CostPolicyDepreciationMethod[keyof typeof CostPolicyDepreciationMethod];
+
+
+export const CostPolicyDepreciationMethod = {
+  straight_line: 'straight_line',
+} as const;
+
+export type CostPolicyDepreciationStartConvention = typeof CostPolicyDepreciationStartConvention[keyof typeof CostPolicyDepreciationStartConvention];
+
+
+export const CostPolicyDepreciationStartConvention = {
+  purchase_month: 'purchase_month',
+  next_month: 'next_month',
+} as const;
+
+/**
+ * @nullable
+ */
+export type CostPolicyDepreciation = {
+  method: CostPolicyDepreciationMethod;
+  usefulLifeMonths: number;
+  salvagePercent: number;
+  startConvention: CostPolicyDepreciationStartConvention;
+} | null;
+
+export type CostPolicyRevenueRecognition = typeof CostPolicyRevenueRecognition[keyof typeof CostPolicyRevenueRecognition];
+
+
+export const CostPolicyRevenueRecognition = {
+  cash: 'cash',
+  installment_due: 'installment_due',
+} as const;
+
+export interface CostPolicy {
+  period: CostPolicyPeriod;
+  components: CostPolicyComponents;
+  /** @nullable */
+  electricity: CostPolicyElectricity;
+  /** @nullable */
+  depreciation: CostPolicyDepreciation;
+  revenueRecognition: CostPolicyRevenueRecognition;
+  basis: string;
+}
+
+export interface ApprovePolicyRequest {
+  version: number;
+}
+
+export type CostPolicyStateRoomsItem = {
+  id: number;
+  name: string;
+  /** @nullable */
+  branchId: number | null;
+};
+
+export interface CostPolicyState {
+  draft: CostPolicy | null;
+  draftVersion: number;
+  approved: CostPolicy | null;
+  /** @nullable */
+  approvedVersion: number | null;
+  /** @nullable */
+  approvedAt: string | null;
+  /** @nullable */
+  approvedBy: string | null;
+  canEdit: boolean;
+  canApprove: boolean;
+  draftIsApproved: boolean;
+  rooms: CostPolicyStateRoomsItem[];
+}
+
+export interface CostComponents {
+  expenses: number;
+  electricity: number;
+  depreciation: number;
+  instructorPay: number;
+}
+
+export interface CostBranchRow {
+  branchId: number;
+  name: string;
+  revenue: number;
+  cost: CostComponents;
+  totalCost: number;
+  margin: number;
+  students: number;
+  /** @nullable */
+  costPerStudent: number | null;
+  unallocatedElectricity: number;
+}
+
+export type CostDiplomaRowCost = {
+  electricity: number;
+  depreciation: number;
+  instructorPay: number;
+};
+
+export interface CostDiplomaRow {
+  diplomaId: number;
+  name: string;
+  revenue: number;
+  cost: CostDiplomaRowCost;
+  totalCost: number;
+  margin: number;
+  students: number;
+  /** @nullable */
+  costPerStudent: number | null;
+}
+
+export interface CostRoomRow {
+  roomId: number;
+  name: string;
+  /** @nullable */
+  branchId: number | null;
+  heldHours: number;
+  electricity: number;
+  depreciation: number;
+}
+
+export type CostReportStatus = typeof CostReportStatus[keyof typeof CostReportStatus];
+
+
+export const CostReportStatus = {
+  approved: 'approved',
+  no_approved_policy: 'no_approved_policy',
+} as const;
+
+/**
+ * @nullable
+ */
+export type CostReportPeriod = {
+  from: string;
+  to: string;
+} | null;
+
+export type CostReportTotals = {
+  revenue: number;
+  totalCost: number;
+};
+
+export interface CostReport {
+  status: CostReportStatus;
+  /** @nullable */
+  policyVersion: number | null;
+  policy: CostPolicy | null;
+  /** @nullable */
+  period: CostReportPeriod;
+  branches: CostBranchRow[];
+  diplomas: CostDiplomaRow[];
+  rooms: CostRoomRow[];
+  totals: CostReportTotals;
+  warnings: string[];
+}
+
 export interface HealthStatus {
   status: string;
 }
 
 export type GetPayrollParams = {
+from?: string;
+to?: string;
+};
+
+export type GetCostReportParams = {
 from?: string;
 to?: string;
 };

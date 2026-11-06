@@ -206,6 +206,333 @@ export const GetLedgerResponseItem = zod.object({
 export const GetLedgerResponse = zod.array(GetLedgerResponseItem)
 
 
+export const GetCostPolicyResponse = zod.object({
+  "draft": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "draftVersion": zod.number().int(),
+  "approved": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "approvedVersion": zod.number().int().nullable(),
+  "approvedAt": zod.string().nullable(),
+  "approvedBy": zod.string().nullable(),
+  "canEdit": zod.boolean(),
+  "canApprove": zod.boolean(),
+  "draftIsApproved": zod.boolean(),
+  "rooms": zod.array(zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable()
+}))
+})
+
+
+export const SaveCostPolicyDraftBody = zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+})
+
+export const SaveCostPolicyDraftResponse = zod.object({
+  "draft": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "draftVersion": zod.number().int(),
+  "approved": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "approvedVersion": zod.number().int().nullable(),
+  "approvedAt": zod.string().nullable(),
+  "approvedBy": zod.string().nullable(),
+  "canEdit": zod.boolean(),
+  "canApprove": zod.boolean(),
+  "draftIsApproved": zod.boolean(),
+  "rooms": zod.array(zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable()
+}))
+})
+
+
+export const ApproveCostPolicyBody = zod.object({
+  "version": zod.number().int()
+})
+
+export const ApproveCostPolicyResponse = zod.object({
+  "draft": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "draftVersion": zod.number().int(),
+  "approved": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "approvedVersion": zod.number().int().nullable(),
+  "approvedAt": zod.string().nullable(),
+  "approvedBy": zod.string().nullable(),
+  "canEdit": zod.boolean(),
+  "canApprove": zod.boolean(),
+  "draftIsApproved": zod.boolean(),
+  "rooms": zod.array(zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable()
+}))
+})
+
+
+export const GetCostReportQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional()
+})
+
+export const GetCostReportResponse = zod.object({
+  "status": zod.enum(['approved', 'no_approved_policy']),
+  "policyVersion": zod.number().int().nullable(),
+  "policy": zod.union([zod.object({
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "components": zod.object({
+  "expenses": zod.boolean(),
+  "electricity": zod.boolean(),
+  "depreciation": zod.boolean(),
+  "instructorPay": zod.boolean()
+}),
+  "electricity": zod.object({
+  "method": zod.enum(['meter', 'area', 'power_hours']),
+  "meterAssignments": zod.array(zod.object({
+  "meter": zod.string(),
+  "roomId": zod.number().int()
+}))
+}).nullable(),
+  "depreciation": zod.object({
+  "method": zod.enum(['straight_line']),
+  "usefulLifeMonths": zod.number().int(),
+  "salvagePercent": zod.number(),
+  "startConvention": zod.enum(['purchase_month', 'next_month'])
+}).nullable(),
+  "revenueRecognition": zod.enum(['cash', 'installment_due']),
+  "basis": zod.string()
+}),zod.null()]),
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}).nullable(),
+  "branches": zod.array(zod.object({
+  "branchId": zod.number().int(),
+  "name": zod.string(),
+  "revenue": zod.number(),
+  "cost": zod.object({
+  "expenses": zod.number(),
+  "electricity": zod.number(),
+  "depreciation": zod.number(),
+  "instructorPay": zod.number()
+}),
+  "totalCost": zod.number(),
+  "margin": zod.number(),
+  "students": zod.number().int(),
+  "costPerStudent": zod.number().nullable(),
+  "unallocatedElectricity": zod.number()
+})),
+  "diplomas": zod.array(zod.object({
+  "diplomaId": zod.number().int(),
+  "name": zod.string(),
+  "revenue": zod.number(),
+  "cost": zod.object({
+  "electricity": zod.number(),
+  "depreciation": zod.number(),
+  "instructorPay": zod.number()
+}),
+  "totalCost": zod.number(),
+  "margin": zod.number(),
+  "students": zod.number().int(),
+  "costPerStudent": zod.number().nullable()
+})),
+  "rooms": zod.array(zod.object({
+  "roomId": zod.number().int(),
+  "name": zod.string(),
+  "branchId": zod.number().int().nullable(),
+  "heldHours": zod.number(),
+  "electricity": zod.number(),
+  "depreciation": zod.number()
+})),
+  "totals": zod.object({
+  "revenue": zod.number(),
+  "totalCost": zod.number()
+}),
+  "warnings": zod.array(zod.string())
+})
+
+
 export const ListTeamResponseItem = zod.object({
   "id": zod.number().int(),
   "email": zod.string(),

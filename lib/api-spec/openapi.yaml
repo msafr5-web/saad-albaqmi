@@ -115,6 +115,66 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/StudentLedger"
+  /cost-policy:
+    get:
+      operationId: getCostPolicy
+      responses:
+        "200":
+          description: Draft and approved cost-allocation policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CostPolicyState"
+    put:
+      operationId: saveCostPolicyDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CostPolicy"
+      responses:
+        "200":
+          description: Saved draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CostPolicyState"
+  /cost-policy/approve:
+    post:
+      operationId: approveCostPolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovePolicyRequest"
+      responses:
+        "200":
+          description: Draft frozen as the approved policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CostPolicyState"
+  /cost-report:
+    get:
+      operationId: getCostReport
+      parameters:
+        - in: query
+          name: from
+          required: false
+          schema: { type: string }
+        - in: query
+          name: to
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Period, branch and diploma cost report computed only from the approved policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CostReport"
   /team:
     get:
       operationId: listTeam
@@ -342,6 +402,163 @@ components:
         payments:
           type: array
           items: { $ref: "#/components/schemas/LedgerPayment" }
+    CostPolicy:
+      type: object
+      required: [period, components, electricity, depreciation, revenueRecognition, basis]
+      properties:
+        period:
+          type: object
+          required: [from, to]
+          properties:
+            from: { type: string }
+            to: { type: string }
+        components:
+          type: object
+          required: [expenses, electricity, depreciation, instructorPay]
+          properties:
+            expenses: { type: boolean }
+            electricity: { type: boolean }
+            depreciation: { type: boolean }
+            instructorPay: { type: boolean }
+        electricity:
+          type: [object, "null"]
+          required: [method, meterAssignments]
+          properties:
+            method: { type: string, enum: [meter, area, power_hours] }
+            meterAssignments:
+              type: array
+              items:
+                type: object
+                required: [meter, roomId]
+                properties:
+                  meter: { type: string }
+                  roomId: { type: integer }
+        depreciation:
+          type: [object, "null"]
+          required: [method, usefulLifeMonths, salvagePercent, startConvention]
+          properties:
+            method: { type: string, enum: [straight_line] }
+            usefulLifeMonths: { type: integer }
+            salvagePercent: { type: number }
+            startConvention: { type: string, enum: [purchase_month, next_month] }
+        revenueRecognition: { type: string, enum: [cash, installment_due] }
+        basis: { type: string }
+    ApprovePolicyRequest:
+      type: object
+      required: [version]
+      properties:
+        version: { type: integer }
+    CostPolicyState:
+      type: object
+      required: [draft, draftVersion, approved, approvedVersion, approvedAt, approvedBy, canEdit, canApprove, draftIsApproved, rooms]
+      properties:
+        draft:
+          oneOf:
+            - $ref: "#/components/schemas/CostPolicy"
+            - type: "null"
+        draftVersion: { type: integer }
+        approved:
+          oneOf:
+            - $ref: "#/components/schemas/CostPolicy"
+            - type: "null"
+        approvedVersion: { type: [integer, "null"] }
+        approvedAt: { type: [string, "null"] }
+        approvedBy: { type: [string, "null"] }
+        canEdit: { type: boolean }
+        canApprove: { type: boolean }
+        draftIsApproved: { type: boolean }
+        rooms:
+          type: array
+          items:
+            type: object
+            required: [id, name, branchId]
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              branchId: { type: [integer, "null"] }
+    CostComponents:
+      type: object
+      required: [expenses, electricity, depreciation, instructorPay]
+      properties:
+        expenses: { type: number }
+        electricity: { type: number }
+        depreciation: { type: number }
+        instructorPay: { type: number }
+    CostBranchRow:
+      type: object
+      required: [branchId, name, revenue, cost, totalCost, margin, students, costPerStudent, unallocatedElectricity]
+      properties:
+        branchId: { type: integer }
+        name: { type: string }
+        revenue: { type: number }
+        cost: { $ref: "#/components/schemas/CostComponents" }
+        totalCost: { type: number }
+        margin: { type: number }
+        students: { type: integer }
+        costPerStudent: { type: [number, "null"] }
+        unallocatedElectricity: { type: number }
+    CostDiplomaRow:
+      type: object
+      required: [diplomaId, name, revenue, cost, totalCost, margin, students, costPerStudent]
+      properties:
+        diplomaId: { type: integer }
+        name: { type: string }
+        revenue: { type: number }
+        cost:
+          type: object
+          required: [electricity, depreciation, instructorPay]
+          properties:
+            electricity: { type: number }
+            depreciation: { type: number }
+            instructorPay: { type: number }
+        totalCost: { type: number }
+        margin: { type: number }
+        students: { type: integer }
+        costPerStudent: { type: [number, "null"] }
+    CostRoomRow:
+      type: object
+      required: [roomId, name, branchId, heldHours, electricity, depreciation]
+      properties:
+        roomId: { type: integer }
+        name: { type: string }
+        branchId: { type: [integer, "null"] }
+        heldHours: { type: number }
+        electricity: { type: number }
+        depreciation: { type: number }
+    CostReport:
+      type: object
+      required: [status, policyVersion, policy, period, branches, diplomas, rooms, totals, warnings]
+      properties:
+        status: { type: string, enum: [approved, no_approved_policy] }
+        policyVersion: { type: [integer, "null"] }
+        policy:
+          oneOf:
+            - $ref: "#/components/schemas/CostPolicy"
+            - type: "null"
+        period:
+          type: [object, "null"]
+          required: [from, to]
+          properties:
+            from: { type: string }
+            to: { type: string }
+        branches:
+          type: array
+          items: { $ref: "#/components/schemas/CostBranchRow" }
+        diplomas:
+          type: array
+          items: { $ref: "#/components/schemas/CostDiplomaRow" }
+        rooms:
+          type: array
+          items: { $ref: "#/components/schemas/CostRoomRow" }
+        totals:
+          type: object
+          required: [revenue, totalCost]
+          properties:
+            revenue: { type: number }
+            totalCost: { type: number }
+        warnings:
+          type: array
+          items: { type: string }
     HealthStatus:
       type: object
       properties:

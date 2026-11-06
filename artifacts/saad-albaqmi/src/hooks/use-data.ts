@@ -6,6 +6,12 @@ import {
   useGetSummary,
   useGetPayroll,
   useGetLedger,
+  useGetCostPolicy,
+  useSaveCostPolicyDraft,
+  useApproveCostPolicy,
+  useGetCostReport,
+  getGetCostPolicyQueryKey,
+  getGetCostReportQueryKey,
   getGetPayrollQueryKey,
   getGetLedgerQueryKey,
   useCreateRecord,
@@ -38,6 +44,22 @@ export function useLedger() {
   return useGetLedger({ query: { ...q, queryKey: getGetLedgerQueryKey() } });
 }
 
+export function useCostPolicy() {
+  return useGetCostPolicy({ query: { ...q, queryKey: getGetCostPolicyQueryKey() } });
+}
+export function useCostReport(from: string, to: string) {
+  const params = { ...(from ? { from } : {}), ...(to ? { to } : {}) };
+  return useGetCostReport(params, { query: { ...q, queryKey: getGetCostReportQueryKey(params) } });
+}
+export function useCostPolicyMutations() {
+  const qc = useQueryClient();
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: getGetCostPolicyQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetCostReportQueryKey() });
+  };
+  return { save: useSaveCostPolicyDraft({ mutation: { onSuccess: refresh } }), approve: useApproveCostPolicy({ mutation: { onSuccess: refresh } }) };
+}
+
 export function useRecordIndex(records: EducationRecord[] | undefined) {
   return useMemo(() => {
     const byId = new Map<number, EducationRecord>();
@@ -62,6 +84,7 @@ export function useRecordMutations() {
     qc.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
     qc.invalidateQueries({ queryKey: getGetPayrollQueryKey() });
     qc.invalidateQueries({ queryKey: getGetLedgerQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetCostReportQueryKey() });
   };
   const create = useCreateRecord({ mutation: { onSuccess: refresh } });
   const update = useUpdateRecord({ mutation: { onSuccess: refresh } });

@@ -40,3 +40,16 @@ export const orgMembers = pgTable("org_members", {
   uniqueIndex("org_members_live_email_idx").on(sql`lower(${t.email})`).where(sql`${t.status} <> 'revoked'`),
   uniqueIndex("org_members_active_user_idx").on(t.clerkUserId).where(sql`${t.status} = 'active'`),
 ]);
+
+/** Cost-allocation policy per workspace: an editable draft and the last approved (frozen) version. */
+export const costPolicies = pgTable("cost_policies", {
+  ownerId: text("owner_id").primaryKey(),
+  draft: jsonb("draft").$type<Record<string, unknown>>(),
+  draftVersion: integer("draft_version").notNull().default(0),
+  approved: jsonb("approved").$type<Record<string, unknown>>(),
+  approvedVersion: integer("approved_version"),
+  approvedBy: text("approved_by"),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

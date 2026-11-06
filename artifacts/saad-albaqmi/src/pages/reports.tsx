@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CostPolicyPanel } from "@/components/cost-policy";
+import { CostReportSection } from "@/components/cost-report";
 import { PageHeader, ErrorState, LoadingRows, Meter, EmptyState } from "@/components/bits";
 import { useRecords, useRecordIndex, usePageTitle } from "@/hooks/use-data";
 import { det, fmtDate, fmtPct, fmtSAR, fmtNum, num } from "@/lib/domain";
@@ -54,14 +56,16 @@ export default function ReportsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="التحليل" title="التقارير" desc="إجماليات تراكمية لجميع السجلات دون فلترة فترة محاسبية. المصروف = المصروفات والفواتير المسجلة؛ الصافي = المحصل ناقص المصروف المسجل، وليس ربحًا محاسبيًا. متوسط تكلفة الطالب = مصروف الفرع ÷ عدد طلابه، لا تكلفة الطالب الفعلية. لا تشمل الحسابات الإهلاك أو توزيع الطاقة على القاعات. لا تكرر فاتورة الكهرباء ضمن المصروفات." />
+      <PageHeader eyebrow="التحليل" title="التقارير" desc="إجماليات تراكمية لجميع السجلات دون فلترة فترة محاسبية. المصروف = المصروفات والفواتير المسجلة؛ الصافي = المحصل ناقص المصروف المسجل، وليس ربحًا محاسبيًا. متوسط تكلفة الطالب = مصروف الفرع ÷ عدد طلابه، لا تكلفة الطالب الفعلية. الجدول التراكمي لا يشمل الإهلاك أو توزيع الطاقة؛ تقرير التكلفة أعلاه يعتمد على السياسة المعتمدة. لا تكرر فاتورة الكهرباء ضمن المصروفات." />
       {records.isLoading ? <LoadingRows /> : records.isError ? <ErrorState error={records.error} onRetry={() => records.refetch()} /> : fin.length === 0 ? (
         <EmptyState title="لا توجد بيانات للتقارير" desc="تُبنى التقارير من الفروع والمصروفات والفواتير والمدفوعات والأصول. أضف الفروع أولًا." />
       ) : (
         <div className="space-y-10">
+          <CostPolicyPanel />
+          <CostReportSection downloadCsv={downloadCsv} />
           <section className="rise">
             <div className="mb-3 flex items-end justify-between gap-3">
-              <h2 className="font-display text-xl text-primary">التقرير المالي للفروع</h2>
+              <h2 className="font-display text-xl text-primary">التقرير المالي للفروع — إجماليات تراكمية</h2>
               <Button variant="outline" size="sm" onClick={exportFin} className="gap-1.5" data-testid="button-export-financial"><Download className="h-4 w-4" /> تصدير CSV</Button>
             </div>
             <div className="overflow-x-auto rounded-xl border bg-card">

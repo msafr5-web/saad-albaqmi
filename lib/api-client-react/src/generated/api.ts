@@ -25,7 +25,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ApprovePolicyRequest,
+  CostPolicy,
+  CostPolicyState,
+  CostReport,
   EducationRecord,
+  GetCostReportParams,
   GetPayrollParams,
   HealthStatus,
   InviteInput,
@@ -768,6 +773,367 @@ export function useGetLedger<TData = Awaited<ReturnType<typeof getLedger>>, TErr
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetLedgerQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetCostPolicyUrl = () => {
+
+
+
+
+  return `/api/cost-policy`
+}
+
+export const getCostPolicy = async ( options?: Parameters<typeof customFetch>[1]): Promise<CostPolicyState> => {
+
+  return customFetch<CostPolicyState>(getGetCostPolicyUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCostPolicyQueryKey = () => {
+    return [
+    `/api/cost-policy`
+    ] as const;
+    }
+
+
+export const getGetCostPolicyQueryOptions = <TData = Awaited<ReturnType<typeof getCostPolicy>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCostPolicyQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCostPolicy>>> = ({ signal }) => getCostPolicy({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCostPolicyQueryResult = NonNullable<Awaited<ReturnType<typeof getCostPolicy>>>
+export type GetCostPolicyQueryError = ErrorType<unknown>
+
+
+export function useGetCostPolicy<TData = Awaited<ReturnType<typeof getCostPolicy>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCostPolicy>>,
+          TError,
+          Awaited<ReturnType<typeof getCostPolicy>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCostPolicy<TData = Awaited<ReturnType<typeof getCostPolicy>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCostPolicy>>,
+          TError,
+          Awaited<ReturnType<typeof getCostPolicy>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCostPolicy<TData = Awaited<ReturnType<typeof getCostPolicy>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCostPolicy<TData = Awaited<ReturnType<typeof getCostPolicy>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostPolicy>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCostPolicyQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveCostPolicyDraftUrl = () => {
+
+
+
+
+  return `/api/cost-policy`
+}
+
+export const saveCostPolicyDraft = async (costPolicy: CostPolicy, options?: Parameters<typeof customFetch>[1]): Promise<CostPolicyState> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CostPolicyState>(getSaveCostPolicyDraftUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(costPolicy)
+  }
+);}
+
+
+
+
+
+export const getSaveCostPolicyDraftMutationKey = () => ['saveCostPolicyDraft'] as const;
+
+export const getSaveCostPolicyDraftMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveCostPolicyDraft>>, TError,SaveCostPolicyDraftMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveCostPolicyDraft>>, TError,SaveCostPolicyDraftMutationVariables, TContext> => {
+
+const mutationKey = getSaveCostPolicyDraftMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveCostPolicyDraft>>, SaveCostPolicyDraftMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveCostPolicyDraft(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveCostPolicyDraftMutationResult = NonNullable<Awaited<ReturnType<typeof saveCostPolicyDraft>>>
+    export type SaveCostPolicyDraftMutationBody = BodyType<CostPolicy>
+    export type SaveCostPolicyDraftMutationError = ErrorType<unknown>
+    export type SaveCostPolicyDraftMutationVariables = {data: BodyType<CostPolicy>}
+
+    export const useSaveCostPolicyDraft = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveCostPolicyDraft>>, TError,SaveCostPolicyDraftMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveCostPolicyDraft>>,
+        TError,
+        SaveCostPolicyDraftMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveCostPolicyDraftMutationOptions(options), queryClient);
+    }
+
+export const getApproveCostPolicyUrl = () => {
+
+
+
+
+  return `/api/cost-policy/approve`
+}
+
+export const approveCostPolicy = async (approvePolicyRequest: ApprovePolicyRequest, options?: Parameters<typeof customFetch>[1]): Promise<CostPolicyState> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CostPolicyState>(getApproveCostPolicyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approvePolicyRequest)
+  }
+);}
+
+
+
+
+
+export const getApproveCostPolicyMutationKey = () => ['approveCostPolicy'] as const;
+
+export const getApproveCostPolicyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveCostPolicy>>, TError,ApproveCostPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveCostPolicy>>, TError,ApproveCostPolicyMutationVariables, TContext> => {
+
+const mutationKey = getApproveCostPolicyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveCostPolicy>>, ApproveCostPolicyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  approveCostPolicy(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveCostPolicyMutationResult = NonNullable<Awaited<ReturnType<typeof approveCostPolicy>>>
+    export type ApproveCostPolicyMutationBody = BodyType<ApprovePolicyRequest>
+    export type ApproveCostPolicyMutationError = ErrorType<unknown>
+    export type ApproveCostPolicyMutationVariables = {data: BodyType<ApprovePolicyRequest>}
+
+    export const useApproveCostPolicy = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveCostPolicy>>, TError,ApproveCostPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof approveCostPolicy>>,
+        TError,
+        ApproveCostPolicyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getApproveCostPolicyMutationOptions(options), queryClient);
+    }
+
+export const getGetCostReportUrl = (params?: GetCostReportParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/cost-report?${stringifiedParams}` : `/api/cost-report`
+}
+
+export const getCostReport = async (params?: GetCostReportParams, options?: Parameters<typeof customFetch>[1]): Promise<CostReport> => {
+
+  return customFetch<CostReport>(getGetCostReportUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCostReportQueryKey = (params?: GetCostReportParams,) => {
+    return [
+    `/api/cost-report`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetCostReportQueryOptions = <TData = Awaited<ReturnType<typeof getCostReport>>, TError = ErrorType<unknown>>(params?: GetCostReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCostReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCostReport>>> = ({ signal }) => getCostReport(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCostReportQueryResult = NonNullable<Awaited<ReturnType<typeof getCostReport>>>
+export type GetCostReportQueryError = ErrorType<unknown>
+
+
+export function useGetCostReport<TData = Awaited<ReturnType<typeof getCostReport>>, TError = ErrorType<unknown>>(
+ params: undefined |  GetCostReportParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCostReport>>,
+          TError,
+          Awaited<ReturnType<typeof getCostReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCostReport<TData = Awaited<ReturnType<typeof getCostReport>>, TError = ErrorType<unknown>>(
+ params?: GetCostReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCostReport>>,
+          TError,
+          Awaited<ReturnType<typeof getCostReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCostReport<TData = Awaited<ReturnType<typeof getCostReport>>, TError = ErrorType<unknown>>(
+ params?: GetCostReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCostReport<TData = Awaited<ReturnType<typeof getCostReport>>, TError = ErrorType<unknown>>(
+ params?: GetCostReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCostReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCostReportQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

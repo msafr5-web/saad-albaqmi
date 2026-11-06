@@ -89,6 +89,7 @@ export const KINDS: Record<Kind, KindDef> = {
     fields: [
       { key: "roomId", label: "القاعة", type: "relation", relation: "room", required: true },
       { key: "serial", label: "الرقم التسلسلي", type: "text" },
+      { key: "purchaseDate", label: "تاريخ الشراء", type: "date", hint: "يلزم لاحتساب الإهلاك" },
       { key: "maintenanceDate", label: "موعد الصيانة", type: "date" },
       { key: "value", label: "القيمة", type: "number", required: true, money: true },
     ],
