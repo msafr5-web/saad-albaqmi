@@ -18,6 +18,7 @@ import {
 } from "@/pages/modules";
 import { AppShell, allowed } from "@/components/shell";
 import TeamPage from "@/pages/team";
+import AuditPage from "@/pages/audit";
 import { useWorkspace } from "@/hooks/use-data";
 
 const queryClient = new QueryClient({
@@ -171,7 +172,7 @@ const P = {
   dashboard: protect(DashboardPage, "dashboard"), branches: protect(BranchesPage, "branches"), rooms: protect(RoomsPage, "rooms"),
   assets: protect(AssetsPage, "assets"), diplomas: protect(DiplomasPage, "diplomas"), students: protect(StudentsPage, "students"),
   instructors: protect(InstructorsPage, "instructors"), finance: protect(FinancePage, "finance"), schedule: protect(SchedulePage, "schedule"),
-  reports: protect(ReportsPage, "reports"), settings: protect(SettingsPage, "settings"), nfc: protect(NfcPage, "nfc"), team: protect(TeamPage, "team"),
+  reports: protect(ReportsPage, "reports"), settings: protect(SettingsPage, "settings"), nfc: protect(NfcPage, "nfc"), team: protect(TeamPage, "team"), audit: protect(AuditPage, "audit"),
 };
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -224,6 +225,7 @@ function ClerkProviderWithRoutes() {
               <Route path="/reports" component={P.reports} />
               <Route path="/nfc" component={P.nfc} />
               <Route path="/team" component={P.team} />
+              <Route path="/audit" component={P.audit} />
               <Route path="/settings" component={P.settings} />
               <Route component={NotFound} />
             </Switch>

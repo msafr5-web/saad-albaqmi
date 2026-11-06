@@ -1,9 +1,10 @@
 import { Router, type IRouter, type Response } from "express";
-import { and, asc, eq, ne, sql } from "drizzle-orm";
-import { db, educationRecords, orgMembers, ORG_OWNER_ID } from "@workspace/db";
-import { InviteMemberBody, UpdateMemberBody, UpdateMemberParams, ListTeamResponse, InviteMemberResponse, UpdateMemberResponse } from "@workspace/api-zod";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
+import { db, educationRecords, educationAudit, orgMembers, ORG_OWNER_ID } from "@workspace/db";
+import { InviteMemberBody, UpdateMemberBody, UpdateMemberParams, ListTeamResponse, ListAuditResponse, InviteMemberResponse, UpdateMemberResponse } from "@workspace/api-zod";
 import { needsBranch, needsLink, ROLES, type Role } from "../lib/education-access";
 import { DomainError } from "../lib/education-validation";
+import { sendInviteEmail } from "../lib/invite-mail";
 import { accessOf, workspaceAccess } from "../middlewares/workspaceAccess";
 
 const router: IRouter = Router();
@@ -40,6 +41,13 @@ router.get("/team", async (_req, res: Response) => {
   res.json(ListTeamResponse.parse(rows.map(present)));
 });
 
+router.get("/team/audit", async (_req, res: Response) => {
+  const rows = await db.select({ id: educationAudit.id, action: educationAudit.action, recordId: educationAudit.recordId, actorId: educationAudit.actorId, createdAt: educationAudit.createdAt, actorEmail: orgMembers.email })
+    .from(educationAudit).leftJoin(orgMembers, eq(orgMembers.clerkUserId, educationAudit.actorId))
+    .where(eq(educationAudit.ownerId, ORG_OWNER_ID)).orderBy(desc(educationAudit.id)).limit(200);
+  res.json(ListAuditResponse.parse(rows.map(r => ({ ...r, actorEmail: r.actorEmail ?? null, createdAt: r.createdAt.toISOString() }))));
+});
+
 router.post("/team/invitations", async (req, res: Response) => {
   const parsed = InviteMemberBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "تحقق من البريد والدور" }); return; }
@@ -53,9 +61,11 @@ router.post("/team/invitations", async (req, res: Response) => {
     const [dup] = await tx.select().from(orgMembers).where(and(sql`lower(${orgMembers.email}) = ${email}`, ne(orgMembers.status, "revoked")));
     if (dup) throw new DomainError("يوجد عضو أو دعوة قائمة بهذا البريد", 409);
     const [row] = await tx.insert(orgMembers).values({ email, ...scope, status: "invited", invitedBy: a.kind === "org" ? a.userId : null }).returning();
+    await tx.insert(educationAudit).values({ ownerId: ORG_OWNER_ID, actorId: a.kind === "org" ? a.userId : null, action: `invite:${email}:${scope.role}`, recordId: row!.id });
     return row!;
   });
-  res.status(201).json(InviteMemberResponse.parse(present(created)));
+  const mail = await sendInviteEmail(created.email, created.role as Role);
+  res.status(201).json(InviteMemberResponse.parse({ ...present(created), emailSent: mail.sent, emailError: mail.sent ? null : mail.error }));
 });
 
 router.patch("/team/:id", async (req, res: Response) => {

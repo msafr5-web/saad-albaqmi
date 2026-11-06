@@ -541,9 +541,22 @@ export const ListTeamResponseItem = zod.object({
   "linkedRecordId": zod.number().int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
-  "activatedAt": zod.string().nullable()
+  "activatedAt": zod.string().nullable(),
+  "emailSent": zod.boolean().optional().describe('Only on invitation creation: whether the invitation email was delivered'),
+  "emailError": zod.string().nullish().describe('Only on invitation creation: why the email was not sent')
 })
 export const ListTeamResponse = zod.array(ListTeamResponseItem)
+
+
+export const ListAuditResponseItem = zod.object({
+  "id": zod.number().int(),
+  "action": zod.string(),
+  "recordId": zod.number().int(),
+  "actorId": zod.string().nullable(),
+  "actorEmail": zod.string().nullable(),
+  "createdAt": zod.string()
+})
+export const ListAuditResponse = zod.array(ListAuditResponseItem)
 
 
 export const inviteMemberBodyEmailMax = 200;
@@ -565,7 +578,9 @@ export const InviteMemberResponse = zod.object({
   "linkedRecordId": zod.number().int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
-  "activatedAt": zod.string().nullable()
+  "activatedAt": zod.string().nullable(),
+  "emailSent": zod.boolean().optional().describe('Only on invitation creation: whether the invitation email was delivered'),
+  "emailError": zod.string().nullish().describe('Only on invitation creation: why the email was not sent')
 })
 
 
@@ -588,7 +603,9 @@ export const UpdateMemberResponse = zod.object({
   "linkedRecordId": zod.number().int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
   "createdAt": zod.string(),
-  "activatedAt": zod.string().nullable()
+  "activatedAt": zod.string().nullable(),
+  "emailSent": zod.boolean().optional().describe('Only on invitation creation: whether the invitation email was delivered'),
+  "emailError": zod.string().nullish().describe('Only on invitation creation: why the email was not sent')
 })
 
 

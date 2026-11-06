@@ -187,6 +187,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TeamMember"
+  /team/audit:
+    get:
+      operationId: listAudit
+      responses:
+        "200":
+          description: Latest organization audit entries (top-level administrators only)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditEntry"
   /team/invitations:
     post:
       operationId: inviteMember
@@ -275,6 +287,18 @@ components:
         status: { type: string, enum: [invited, active, revoked] }
         createdAt: { type: string }
         activatedAt: { type: [string, "null"] }
+        emailSent: { type: boolean, description: "Only on invitation creation: whether the invitation email was delivered" }
+        emailError: { type: [string, "null"], description: "Only on invitation creation: why the email was not sent" }
+    AuditEntry:
+      type: object
+      required: [id, action, recordId, actorId, actorEmail, createdAt]
+      properties:
+        id: { type: integer }
+        action: { type: string }
+        recordId: { type: integer }
+        actorId: { type: [string, "null"] }
+        actorEmail: { type: [string, "null"] }
+        createdAt: { type: string }
     InviteInput:
       type: object
       required: [email, role]

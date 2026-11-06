@@ -7,6 +7,7 @@
  */
 
 export * from './approvePolicyRequest';
+export * from './auditEntry';
 export * from './branchSummary';
 export * from './costBranchRow';
 export * from './costComponents';

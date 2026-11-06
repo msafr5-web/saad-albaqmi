@@ -20,4 +20,11 @@ export interface TeamMember {
   createdAt: string;
   /** @nullable */
   activatedAt: string | null;
+  /** Only on invitation creation: whether the invitation email was delivered */
+  emailSent?: boolean;
+  /**
+     * Only on invitation creation: why the email was not sent
+     * @nullable
+     */
+  emailError?: string | null;
 }

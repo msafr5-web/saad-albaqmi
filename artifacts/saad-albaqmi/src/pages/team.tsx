@@ -41,7 +41,7 @@ export default function TeamPage() {
     invite.mutate(
       { data: { email, role, branchId: needsBranch || (role === "finance" && branch) ? Number(branch) || null : null, linkedRecordId: linkKind ? Number(link) || null : null } },
       {
-        onSuccess: () => { toast({ title: "تم إنشاء الدعوة", description: "يفعّل المدعو صلاحيته بالدخول بالبريد نفسه بعد التحقق منه." }); setEmail(""); setLink(""); refresh(); },
+        onSuccess: (m) => { m.emailSent ? toast({ title: "تم إنشاء الدعوة وإرسالها بالبريد", description: "يفعّل المدعو صلاحيته بالدخول بالبريد نفسه بعد التحقق منه." }) : toast({ title: "أُنشئت الدعوة لكن لم يُرسل البريد", description: `${m.emailError ?? "تعذر الإرسال"}. أبلغ المدعو يدويًا بالتسجيل بالبريد نفسه.`, variant: "destructive" }); setEmail(""); setLink(""); refresh(); },
         onError: (e) => toast({ title: "تعذر إنشاء الدعوة", description: errMessage(e), variant: "destructive" }),
       },
     );

@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
 import {
   LayoutDashboard, Building2, DoorOpen, Package, GraduationCap, Users, UserRound,
-  Wallet, CalendarClock, UsersRound, FileBarChart, Settings, Nfc, LogOut, Menu, X,
+  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/hooks/use-data";
@@ -23,6 +23,7 @@ export const NAV = [
   { href: "/reports", label: "التقارير", icon: FileBarChart },
   { href: "/nfc", label: "أدوات NFC", icon: Nfc },
   { href: "/team", label: "فريق العمل", icon: UsersRound },
+  { href: "/audit", label: "سجل التدقيق", icon: ScrollText },
   { href: "/settings", label: "الإعدادات والتثبيت", icon: Settings },
 ];
 
@@ -34,9 +35,9 @@ export const ROLE_LABELS: Record<string, string> = {
 /** Mirrors the server's page list; the server remains the enforcement point for data. */
 export function allowed(ws: { mode: string; pages: string[] } | undefined, href: string) {
   const page = href.slice(1);
-  if (!ws) return page !== "team";
+  if (!ws) return page !== "team" && page !== "audit";
   if (ws.mode === "organization") return ws.pages.includes(page);
-  return page !== "team";
+  return page !== "team" && page !== "audit";
 }
 
 function Brand() {

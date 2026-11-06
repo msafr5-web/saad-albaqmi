@@ -21,7 +21,7 @@ const WRITABLE: Record<Role, string[]> = {
 };
 
 const PAGES: Record<Role, string[]> = {
-  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team"],
+  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit"],
   branch_manager: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings"],
   finance: ["dashboard", "branches", "students", "instructors", "finance", "reports", "settings"],
   coordinator: ["dashboard", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings"],
