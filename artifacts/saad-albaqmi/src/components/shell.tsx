@@ -42,7 +42,7 @@ export function allowed(ws: { mode: string; pages: string[] } | undefined, href:
 function Brand() {
   return (
     <Link href="/dashboard" className="flex items-center gap-3" data-testid="link-brand">
-      <img src={`${basePath}/logo.svg`} alt="" className="h-10 w-10 rounded-xl" />
+      <img src={`${basePath}/logo-mark.svg`} alt="" className="h-10 w-10" />
       <div className="leading-tight">
         <div className="font-display text-[15px] text-sidebar-foreground">صرح د. سعد البقمي</div>
         <div className="text-[11px] text-sidebar-foreground/55">المنظومة التعليمية الموحدة</div>

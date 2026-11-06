@@ -19,8 +19,10 @@ export default function HomePage() {
       <header className="girih relative overflow-hidden bg-sidebar text-sidebar-foreground">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-5 md:px-8">
           <div className="flex items-center gap-3">
-            <img src={`${basePath}/logo.svg`} alt="" className="h-10 w-10 rounded-xl" />
-            <span className="font-display text-lg">صرح د. سعد البقمي التعليمي</span>
+            <img src={`${basePath}/logo-mark.svg`} alt="" className="h-10 w-10" />
+            <span className="font-display text-lg font-semibold">صرح د. سعد البقمي التعليمي</span>
+            <span className="mx-1 hidden h-6 w-px bg-sidebar-foreground/25 sm:block" />
+            <span className="hidden rounded-lg bg-white px-3 py-1.5 sm:block"><img src={`${basePath}/brand/lockup.png`} alt="معهد مهارات السعودية العالي للتدريب" className="h-8 w-auto" /></span>
           </div>
           <div className="flex gap-2">
             <Link href="/sign-in" className="rounded-lg px-3 py-2 text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground" data-testid="link-signin">دخول</Link>
@@ -59,7 +61,7 @@ export default function HomePage() {
       <main id="demo" className="mx-auto max-w-[1280px] px-4 py-14 md:px-8">
         <div className="mb-6 flex flex-col gap-2 border-b pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="text-xs text-[hsl(38_60%_38%)]">لوحة توضيحية</div>
+            <div className="text-xs text-[hsl(7_70%_42%)]">لوحة توضيحية</div>
             <h2 className="font-display text-3xl text-primary">النظرة التنفيذية</h2>
           </div>
           <p className="max-w-md text-xs leading-6 text-muted-foreground">الأرقام أدناه بيانات توضيحية مشتركة للقراءة فقط. عند تسجيل الدخول تحصل على مساحة عمل شخصية فارغة؛ مساحة المعهد المشتركة وأدوار الفريق غير مفعلة بعد.</p>

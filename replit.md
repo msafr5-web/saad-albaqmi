@@ -32,6 +32,8 @@ Arabic RTL educational branch and resource management web application with insta
 
 - NFC page (`/nfc`) uses Web NFC: Chrome on Android over HTTPS only. Reads UID and NDEF, writes text/URL/vCard/Wi-Fi (as `WIFI:` text), read-only lock only if `makeReadOnly` exists. No password lock, tag type/capacity, or background tasks. Scan history stays in localStorage.
 
+- Visual identity comes from the user's H. Saudi Skills Institute logo: near-black ink (#0e100f) with a pink-red-orange-yellow-green spectrum; accent is red-orange. Mark is redrawn as SVG (`public/logo-mark.svg`); the supplied 400px lockup is `public/brand/lockup.png` (low resolution, use on light backgrounds only). Default system fonts, no web fonts.
+
 ## Stack and conventions
 
 - pnpm, React/Vite, TypeScript, Tailwind, Express, PostgreSQL/Drizzle.
