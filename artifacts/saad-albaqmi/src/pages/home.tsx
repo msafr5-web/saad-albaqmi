@@ -16,39 +16,45 @@ export default function HomePage() {
   usePageTitle("");
   return (
     <div className="min-h-[100dvh] bg-background">
-      <header className="girih relative overflow-hidden bg-sidebar text-sidebar-foreground">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-5 md:px-8">
-          <div className="flex items-center gap-3">
-            <img src={`${basePath}/logo-mark.svg`} alt="" className="h-10 w-10" />
-            <span className="font-display text-lg font-semibold">صرح د. سعد البقمي التعليمي</span>
-            <span className="mx-1 hidden h-6 w-px bg-sidebar-foreground/25 sm:block" />
-            <span className="hidden rounded-lg bg-white px-3 py-1.5 sm:block"><img src={`${basePath}/brand/lockup.png`} alt="معهد مهارات السعودية العالي للتدريب" className="h-8 w-auto" /></span>
+      <div className="p-3 sm:p-5">
+        <header className="hero-frame relative overflow-hidden rounded-[2rem] text-white sm:rounded-[2.5rem]">
+          <nav className="relative z-10 mx-3 mt-3 flex items-center justify-between rounded-[1.5rem] bg-white px-4 py-3 text-foreground shadow-sm sm:mx-5 sm:mt-5 sm:px-6">
+            <div className="flex items-center gap-3">
+              <img src={`${basePath}/brand/lockup.png`} alt="معهد مهارات السعودية العالي للتدريب" className="h-9 w-auto" />
+              <span className="hidden h-6 w-px bg-border md:block" />
+              <span className="hidden text-sm font-semibold md:block">صرح د. سعد البقمي التعليمي</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/sign-in" className="rounded-full border border-accent px-4 py-1.5 text-sm text-accent transition-colors hover:bg-accent hover:text-accent-foreground" data-testid="link-signin">تسجيل الدخول</Link>
+              <Link href="/sign-up" className="rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground transition-transform hover:-translate-y-0.5" data-testid="link-signup">إنشاء حساب</Link>
+            </div>
+          </nav>
+          <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 pb-20 pt-16 text-center md:pb-28 md:pt-24">
+            <span className="rise inline-flex items-center gap-2 rounded-full border border-white/40 px-3.5 py-1 text-xs" data-testid="badge-demo">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> عرض توضيحي ببيانات غير حقيقية · للقراءة فقط
+            </span>
+            <h1 className="rise mt-6 text-4xl font-bold leading-[1.35] md:text-5xl" style={{ animationDelay: "80ms" }}>
+              صرحٌ واحد، وكل فروعه أمام عينيك
+            </h1>
+            <p className="rise mt-5 text-base leading-8 text-white/80" style={{ animationDelay: "160ms" }}>
+              مساحة تنفيذية تربط الفروع والقاعات والأصول والدبلومات والطلاب والمدربين بالتكاليف التشغيلية، لتقارن الفروع بأرقام محسوبة من السجلات لا بالتقدير.
+            </p>
+            <div className="rise mt-6 flex flex-wrap justify-center gap-2" style={{ animationDelay: "200ms" }}>
+              {["الفروع والمرافق", "الدبلومات والطلاب", "الجدولة", "التكاليف"].map((c) => (
+                <span key={c} className="rounded-full border border-white/35 px-4 py-1.5 text-sm">{c}</span>
+              ))}
+            </div>
+            <div className="rise mt-8 flex flex-wrap justify-center gap-3" style={{ animationDelay: "240ms" }}>
+              <Link href="/sign-up" className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:-translate-y-0.5" data-testid="link-hero-start">
+                ابدأ مساحتك الخاصة <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              </Link>
+              <a href="#demo" className="inline-flex items-center rounded-full border border-white/60 px-7 py-3 text-sm transition-colors hover:bg-white/10" data-testid="link-view-demo">استعرض اللوحة التوضيحية</a>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Link href="/sign-in" className="rounded-lg px-3 py-2 text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground" data-testid="link-signin">دخول</Link>
-            <Link href="/sign-up" className="rounded-lg bg-sidebar-primary px-4 py-2 text-sm font-medium text-sidebar-primary-foreground transition-transform hover:-translate-y-0.5" data-testid="link-signup">إنشاء حساب</Link>
-          </div>
-        </div>
-        <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-10 md:px-8 md:pb-24 md:pt-16">
-          <span className="rise inline-flex items-center gap-2 rounded-full border border-sidebar-primary/50 px-3 py-1 text-xs text-sidebar-primary" data-testid="badge-demo">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sidebar-primary" /> عرض توضيحي ببيانات غير حقيقية · للقراءة فقط
-          </span>
-          <h1 className="rise mt-6 max-w-3xl font-display text-4xl leading-[1.25] md:text-6xl" style={{ animationDelay: "80ms" }}>
-            صرحٌ واحد،<br /><span className="text-sidebar-primary">وكل فروعه</span> أمام عينيك.
-          </h1>
-          <p className="rise mt-6 max-w-2xl text-base leading-8 text-sidebar-foreground/75" style={{ animationDelay: "160ms" }}>
-            مساحة تنفيذية تربط الفروع والقاعات والأصول والدبلومات والطلاب والمدربين بالتكاليف التشغيلية، لتقارن الفروع بأرقام محسوبة من السجلات لا بالتقدير.
-          </p>
-          <div className="rise mt-8 flex flex-wrap gap-3" style={{ animationDelay: "240ms" }}>
-            <Link href="/sign-up" className="group inline-flex items-center gap-2 rounded-lg bg-sidebar-primary px-5 py-3 text-sm font-medium text-sidebar-primary-foreground" data-testid="link-hero-start">
-              ابدأ مساحتك الخاصة <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            </Link>
-            <a href="#demo" className="inline-flex items-center rounded-lg border border-sidebar-foreground/25 px-5 py-3 text-sm" data-testid="link-view-demo">استعرض اللوحة التوضيحية</a>
-          </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
-      <section className="mx-auto -mt-8 grid max-w-[1280px] gap-3 px-4 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
+      <section className="mx-auto mt-2 grid max-w-[1280px] gap-3 px-4 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
         {pillars.map((p, i) => (
           <div key={p.t} className="rise rounded-xl border bg-card p-5 transition-transform hover:-translate-y-1" style={{ animationDelay: `${300 + i * 70}ms` }}>
             <p.icon className="h-5 w-5 text-primary" />
@@ -61,7 +67,7 @@ export default function HomePage() {
       <main id="demo" className="mx-auto max-w-[1280px] px-4 py-14 md:px-8">
         <div className="mb-6 flex flex-col gap-2 border-b pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="text-xs text-[hsl(7_70%_42%)]">لوحة توضيحية</div>
+            <div className="text-xs text-[hsl(22_90%_38%)]">لوحة توضيحية</div>
             <h2 className="font-display text-3xl text-primary">النظرة التنفيذية</h2>
           </div>
           <p className="max-w-md text-xs leading-6 text-muted-foreground">الأرقام أدناه بيانات توضيحية مشتركة للقراءة فقط. عند تسجيل الدخول تحصل على مساحة عمل شخصية فارغة؛ مساحة المعهد المشتركة وأدوار الفريق غير مفعلة بعد.</p>

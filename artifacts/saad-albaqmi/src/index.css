@@ -84,14 +84,14 @@
   --card: 0 0% 100%;
   --card-foreground: 150 8% 7%;
   --card-border: 40 8% 89%;
-  --sidebar: 150 8% 7%;
+  --sidebar: 205 28% 19%;
   --sidebar-foreground: 40 14% 94%;
-  --sidebar-border: 150 5% 17%;
-  --sidebar-primary: 7 82% 62%;
+  --sidebar-border: 205 20% 27%;
+  --sidebar-primary: 22 92% 52%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 150 5% 14%;
+  --sidebar-accent: 205 24% 25%;
   --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-ring: 7 82% 62%;
+  --sidebar-ring: 22 92% 52%;
   --popover: 0 0% 100%;
   --popover-foreground: 150 8% 7%;
   --popover-border: 40 8% 87%;
@@ -101,14 +101,14 @@
   --secondary-foreground: 150 8% 12%;
   --muted: 40 10% 93%;
   --muted-foreground: 150 4% 38%;
-  --accent: 7 82% 58%;
+  --accent: 22 94% 48%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 44%;
   --destructive-foreground: 0 0% 98%;
   --input: 40 8% 80%;
-  --ring: 7 82% 58%;
+  --ring: 22 94% 48%;
   --chart-1: 338 80% 60%;
-  --chart-2: 7 80% 58%;
+  --chart-2: 22 90% 50%;
   --chart-3: 28 88% 54%;
   --chart-4: 55 62% 46%;
   --chart-5: 108 42% 44%;
@@ -207,14 +207,14 @@
   --card: 0 0% 100%;
   --card-foreground: 150 8% 7%;
   --card-border: 40 8% 89%;
-  --sidebar: 150 8% 7%;
+  --sidebar: 205 28% 19%;
   --sidebar-foreground: 40 14% 94%;
-  --sidebar-border: 150 5% 17%;
-  --sidebar-primary: 7 82% 62%;
+  --sidebar-border: 205 20% 27%;
+  --sidebar-primary: 22 92% 52%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 150 5% 14%;
+  --sidebar-accent: 205 24% 25%;
   --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-ring: 7 82% 62%;
+  --sidebar-ring: 22 92% 52%;
   --popover: 0 0% 100%;
   --popover-foreground: 150 8% 7%;
   --popover-border: 40 8% 87%;
@@ -224,14 +224,14 @@
   --secondary-foreground: 150 8% 12%;
   --muted: 40 10% 93%;
   --muted-foreground: 150 4% 38%;
-  --accent: 7 82% 58%;
+  --accent: 22 94% 48%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 44%;
   --destructive-foreground: 0 0% 98%;
   --input: 40 8% 80%;
-  --ring: 7 82% 58%;
+  --ring: 22 94% 48%;
   --chart-1: 338 80% 60%;
-  --chart-2: 7 80% 58%;
+  --chart-2: 22 90% 50%;
   --chart-3: 28 88% 54%;
   --chart-4: 55 62% 46%;
   --chart-5: 108 42% 44%;
@@ -401,3 +401,13 @@ body::before {
 @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .cl-formFieldInput::placeholder { color: hsl(150 4% 50%); opacity: 1; }
 .cl-formButtonPrimary:hover { background: hsl(150 8% 20%) !important; }
+
+.hero-frame {
+  background:
+    radial-gradient(120% 80% at 50% 0%, hsl(205 30% 32% / .9), transparent 60%),
+    linear-gradient(180deg, hsl(205 28% 24%), hsl(205 30% 17%));
+}
+.hero-frame::before {
+  content: ''; position: absolute; inset: 0; opacity: .5; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M28 4l6 10 11-2-2 11 10 5-10 5 2 11-11-2-6 10-6-10-11 2 2-11-10-5 10-5-2-11 11 2z' fill='none' stroke='%23ffffff' stroke-opacity='.07'/%3E%3C/svg%3E");
+}

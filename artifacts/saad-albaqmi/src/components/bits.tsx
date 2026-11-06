@@ -12,7 +12,7 @@ export function PageHeader({ eyebrow, title, desc, actions }: { eyebrow: string;
       <div>
         <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold tracking-wide text-accent-foreground/70">
           <span className="h-px w-6 bg-accent" />
-          <span className="text-[hsl(7_70%_42%)]">{eyebrow}</span>
+          <span className="text-[hsl(22_90%_38%)]">{eyebrow}</span>
         </div>
         <h1 className="font-display text-3xl leading-tight text-primary md:text-4xl" data-testid="text-page-title">{title}</h1>
         {desc && <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">{desc}</p>}
@@ -107,7 +107,7 @@ export function ReadOnlyNotice() {
   return (
     <div className="mb-5 flex flex-col gap-3 rounded-xl border border-accent/40 bg-accent/10 p-4 text-sm sm:flex-row sm:items-center sm:justify-between" data-testid="status-readonly">
       <div className="flex items-start gap-2">
-        <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(7_70%_42%)]" />
+        <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(22_90%_38%)]" />
         <span>هذه بيانات توضيحية للقراءة فقط. سجّل الدخول لإنشاء مساحة عمل خاصة بك وحفظ سجلاتك.</span>
       </div>
       <Link href="/sign-in" className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground" data-testid="link-signin-save">
