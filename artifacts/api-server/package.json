@@ -8,6 +8,7 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check:costing": "esbuild tests/costing.check.ts --bundle --platform=node --format=esm --outfile=dist/costing.check.mjs --log-level=error && node dist/costing.check.mjs",
     "check:access": "esbuild tests/access.check.ts --bundle --platform=node --format=esm --outfile=dist/access.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && node dist/access.check.mjs"
   },
   "dependencies": {
