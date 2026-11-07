@@ -66,3 +66,5 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:fiscal
       - name: Digital cards and attendance
         run: pnpm --filter @workspace/api-server run check:cards
+      - name: Legacy importer
+        run: pnpm --filter @workspace/db run check:import

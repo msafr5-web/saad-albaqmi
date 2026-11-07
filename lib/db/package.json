@@ -15,7 +15,9 @@
     "push": "drizzle-kit push --config ./drizzle.config.ts",
     "push-force": "drizzle-kit push --force --config ./drizzle.config.ts",
     "er": "node ./scripts/er.mjs",
-    "bundle-sql": "node ./scripts/bundle-sql.mjs"
+    "bundle-sql": "node ./scripts/bundle-sql.mjs",
+    "import-legacy": "node ./scripts/import-legacy.mjs",
+    "check:import": "node ./tests/import.check.mjs"
   },
   "dependencies": {
     "drizzle-orm": "catalog:",
