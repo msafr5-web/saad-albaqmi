@@ -5,6 +5,7 @@ import {
   addQuotation, approveAward, approvePurchaseOrder, approveSupplier, canReadProcurement, createPurchaseRequest, createRfq, createSupplier, evaluateQuotation,
   getComparison, listPurchaseOrders, listPurchaseRequests, listSuppliers, preparePurchaseOrder, purchaseRequestDetail, recommendAward,
 } from "../lib/procurement";
+import { approveSupplierInvoice, createSupplierInvoice, listSupplierInvoices, orderDetail, paySupplierInvoice, receiveGoods, renderPoHtml, sendPurchaseOrder } from "../lib/procurement-fulfilment";
 
 const router: IRouter = Router();
 
@@ -35,5 +36,18 @@ router.post("/procurement/rfqs/:id/purchase-order", async (req, res) => { res.st
 
 router.get("/procurement/orders", async (_req, res) => { res.json(await listPurchaseOrders(member(res))); });
 router.post("/procurement/orders/:id/approve", async (req, res) => { res.json(await approvePurchaseOrder(member(res), id(req), otp(req))); });
+
+router.get("/procurement/orders/:id", async (req, res) => { res.json(await orderDetail(member(res), id(req))); });
+/** Printable order (save as PDF from the browser). Inline styles are allowed for this one self-contained, fully escaped page. */
+router.get("/procurement/orders/:id/print", async (req, res) => {
+  const html = await renderPoHtml(member(res), id(req));
+  res.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'").type("html").send(html);
+});
+router.post("/procurement/orders/:id/send", async (req, res) => { res.json(await sendPurchaseOrder(member(res), id(req), otp(req))); });
+router.post("/procurement/orders/:id/receipts", async (req, res) => { res.status(201).json(await receiveGoods(member(res), id(req), req.body ?? {}, otp(req))); });
+router.post("/procurement/orders/:id/invoices", async (req, res) => { res.status(201).json(await createSupplierInvoice(member(res), id(req), req.body ?? {})); });
+router.get("/procurement/invoices", async (_req, res) => { res.json(await listSupplierInvoices(member(res))); });
+router.post("/procurement/invoices/:id/approve", async (req, res) => { res.json(await approveSupplierInvoice(member(res), id(req), req.body ?? {}, otp(req))); });
+router.post("/procurement/invoices/:id/pay", async (req, res) => { res.status(201).json(await paySupplierInvoice(member(res), id(req), req.body ?? {}, otp(req))); });
 
 export default router;

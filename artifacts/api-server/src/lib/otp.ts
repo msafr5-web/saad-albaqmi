@@ -22,6 +22,9 @@ export const OTP_ACTIONS: Record<string, string> = {
   "procurement.award.approve": "اعتماد ترسية عرض سعر",
   "procurement.po.prepare": "إعداد أمر شراء",
   "procurement.po.approve": "اعتماد أمر شراء",
+  "procurement.grn.confirm": "تأكيد استلام بضاعة",
+  "procurement.invoice.approve": "اعتماد فاتورة مورد",
+  "procurement.payment": "سداد فاتورة مورد",
 };
 
 export type OtpContext = { ip: string | null; userAgent: string | null };

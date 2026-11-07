@@ -12,7 +12,8 @@
     "check:access": "esbuild tests/access.check.ts --bundle --platform=node --format=esm --outfile=dist/access.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && node dist/access.check.mjs",
     "check:otp": "esbuild tests/otp.check.ts --bundle --platform=node --format=esm --outfile=dist/otp.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/otp.check.mjs",
     "check:inventory": "esbuild tests/inventory.check.ts --bundle --platform=node --format=esm --outfile=dist/inventory.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/inventory.check.mjs",
-    "check:procurement": "esbuild tests/procurement.check.ts --bundle --platform=node --format=esm --outfile=dist/procurement.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/procurement.check.mjs"
+    "check:procurement": "esbuild tests/procurement.check.ts --bundle --platform=node --format=esm --outfile=dist/procurement.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/procurement.check.mjs",
+    "check:fulfilment": "esbuild tests/fulfilment.check.ts --bundle --platform=node --format=esm --outfile=dist/fulfilment.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/fulfilment.check.mjs"
   },
   "dependencies": {
     "@clerk/express": "^2.1.87",

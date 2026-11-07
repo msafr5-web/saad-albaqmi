@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { PageHeader, ErrorState, LoadingRows, EmptyState } from "@/components/bits";
 import { PurchaseRequestDialog } from "@/components/purchase-request-dialog";
 import { RfqPanel } from "@/components/rfq-panel";
+import { OrderPanel } from "@/components/order-panel";
 import { usePageTitle } from "@/hooks/use-data";
-import { api, PO_STATUS, PR_STATUS, SUPPLIER_STATUS, useAct, useOps, useRole, type Catalogue, type PurchaseOrder, type PurchaseRequest, type Supplier } from "@/hooks/use-ops";
+import { api, PO_STATUS, PR_STATUS, SUPPLIER_STATUS, useAct, useOps, useRole, INVOICE_STATUS, type InvoiceRow, type Catalogue, type PurchaseOrder, type PurchaseRequest, type Supplier } from "@/hooks/use-ops";
 import { fmtSAR } from "@/lib/domain";
 
 const when = (s: string) => new Date(s).toLocaleDateString("ar-SA");
@@ -32,6 +33,8 @@ export default function ProcurementPage() {
   const requests = useOps<PurchaseRequest[]>(["requests"], "/procurement/requests");
   const suppliers = useOps<Supplier[]>(["suppliers"], "/procurement/suppliers");
   const orders = useOps<PurchaseOrder[]>(["orders"], "/procurement/orders");
+  const invoices = useOps<InvoiceRow[]>(["invoices"], "/procurement/invoices");
+  const [orderId, setOrderId] = useState<number | null>(null);
   const act = useAct();
   const [newPr, setNewPr] = useState(false);
   const [rfqFor, setRfqFor] = useState<PurchaseRequest | null>(null);
@@ -47,6 +50,7 @@ export default function ProcurementPage() {
         <TabsList className="mb-4 flex-wrap">
           <TabsTrigger value="requests" data-testid="tab-requests">طلبات الشراء</TabsTrigger>
           <TabsTrigger value="orders" data-testid="tab-orders">أوامر الشراء</TabsTrigger>
+          <TabsTrigger value="invoices" data-testid="tab-invoices">فواتير الموردين</TabsTrigger>
           <TabsTrigger value="suppliers" data-testid="tab-suppliers">الموردون</TabsTrigger>
         </TabsList>
 
@@ -80,12 +84,27 @@ export default function ProcurementPage() {
                   <td className="px-4 py-3 num" dir="ltr">{o.po_no}</td><td className="px-4 py-3 font-medium">{o.supplier}</td>
                   <td className="px-4 py-3 num">{fmtSAR(o.net_halalas / 100)}</td><td className="px-4 py-3 num">{fmtSAR(o.vat_halalas / 100)}</td><td className="px-4 py-3 num">{fmtSAR(o.gross_halalas / 100)}</td>
                   <td className="px-4 py-3"><span className="rounded-full bg-secondary px-2 py-0.5 text-[11px]">{PO_STATUS[o.status] ?? o.status}</span>{o.via_delegation && <span className="mr-1 text-[10px] text-muted-foreground">بتفويض</span>}</td>
-                  <td className="px-4 py-3 text-left">{o.status === "prepared" && canApprove && <Button size="sm" className="gap-1.5" onClick={() => act.run(() => api(`/procurement/orders/${o.id}/approve`, { method: "POST" }), { success: "اعتُمد أمر الشراء", refresh: ["orders", "requests"] })} data-testid={`button-po-approve-${o.id}`}><ShieldCheck className="h-3.5 w-3.5" /> اعتماد</Button>}</td>
+                  <td className="px-4 py-3 text-left"><Button size="sm" variant="ghost" onClick={() => setOrderId(o.id)} data-testid={`button-open-po-${o.id}`}>التفاصيل</Button>{o.status === "prepared" && canApprove && <Button size="sm" className="gap-1.5" onClick={() => act.run(() => api(`/procurement/orders/${o.id}/approve`, { method: "POST" }), { success: "اعتُمد أمر الشراء", refresh: ["orders", "requests"] })} data-testid={`button-po-approve-${o.id}`}><ShieldCheck className="h-3.5 w-3.5" /> اعتماد</Button>}</td>
                 </tr>
               ))}
             </Table>
           )}
           <p className="mt-3 text-xs text-muted-foreground">لا يعتمد الشخص أمرًا أعدّه بنفسه. عند غياب مدير الفرع يعتمد من فوّضته الإدارة العليا بتفويض معتمد. إرسال الأمر للمورد بالبريد (PDF) والاستلام وفاتورة المورد في المرحلة التالية.</p>
+        </TabsContent>
+
+        <TabsContent value="invoices">
+          {invoices.isLoading ? <LoadingRows /> : !invoices.data?.length ? <EmptyState title="لا توجد فواتير موردين" desc="تُسجَّل الفاتورة من أمر الشراء بعد الاستلام، وتُطابَق تلقائيًا مع الأمر والاستلام." /> : (
+            <Table testId="table-invoices" head={["الفاتورة", "المورد", "أمر الشراء", "الإجمالي", "المسدَّد", "الحالة"]}>
+              {invoices.data.map((v) => (
+                <tr key={v.id} className="border-b border-border/60 last:border-0" data-testid={`row-invoice-${v.id}`}>
+                  <td className="px-4 py-3 num" dir="ltr">{v.supplier_invoice_no}</td><td className="px-4 py-3">{v.supplier}</td><td className="px-4 py-3 num" dir="ltr">{v.po_no}</td>
+                  <td className="px-4 py-3 num">{fmtSAR(v.gross_halalas / 100)}</td><td className="px-4 py-3 num">{fmtSAR(v.paid_halalas / 100)}</td>
+                  <td className="px-4 py-3"><span className="rounded-full bg-secondary px-2 py-0.5 text-[11px]">{INVOICE_STATUS[v.status] ?? v.status}</span></td>
+                </tr>
+              ))}
+            </Table>
+          )}
+          <p className="mt-3 text-xs text-muted-foreground">الاعتماد والسداد من تفاصيل أمر الشراء. ضريبة المدخلات تظهر في كل فاتورة وتُجمَّع في التقارير الضريبية.</p>
         </TabsContent>
 
         <TabsContent value="suppliers">
@@ -107,6 +126,7 @@ export default function ProcurementPage() {
 
       <PurchaseRequestDialog open={newPr} onOpenChange={setNewPr} cat={cat.data} />
       {rfqFor && <RfqDialog pr={rfqFor} suppliers={(suppliers.data ?? []).filter((s) => s.status === "approved")} onClose={() => setRfqFor(null)} />}
+      {orderId != null && <OrderPanel poId={orderId} onClose={() => setOrderId(null)} />}
       {panel && <RfqPanel rfqId={panel.rfqId} prId={panel.prId} onClose={() => setPanel(null)} />}
       {supplierOpen && <SupplierDialog onClose={() => setSupplierOpen(false)} />}
       {act.dialog}

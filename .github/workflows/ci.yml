@@ -56,3 +56,5 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:inventory
       - name: Procurement cycle
         run: pnpm --filter @workspace/api-server run check:procurement
+      - name: Fulfilment (receipt, invoice match, payment)
+        run: pnpm --filter @workspace/api-server run check:fulfilment

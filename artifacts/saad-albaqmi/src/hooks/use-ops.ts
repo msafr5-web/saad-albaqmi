@@ -83,3 +83,11 @@ export type PrDetail = { request: { id: number; prNo: string; status: string; br
 export const PR_STATUS: Record<string, string> = { draft: "مسودة", submitted: "مقدَّم", rfq: "طلب عروض", awarded: "تمت الترسية", po_issued: "صدر أمر الشراء", closed: "مغلق", cancelled: "ملغى" };
 export const PO_STATUS: Record<string, string> = { draft: "مسودة", prepared: "بانتظار الاعتماد", approved: "معتمد", sent: "مُرسَل", acknowledged: "أكّده المورد", partially_received: "استلام جزئي", received: "مستلم", closed: "مغلق", cancelled: "ملغى" };
 export const SUPPLIER_STATUS: Record<string, string> = { pending: "بانتظار الاعتماد", approved: "معتمد", suspended: "موقوف", blocked: "محظور" };
+
+export type OrderLine = { id: number; line_no: number; item_id: number; item_code: string; name: string; unit: string; qty: number; unit_price_halalas: number; vat_rate: number; net_halalas: number; vat_halalas: number; received: number; invoiced: number };
+export type InvoiceRow = { id: number; supplier_invoice_no: string; status: string; invoice_date: string; net_halalas: number; vat_halalas: number; gross_halalas: number; paid_halalas: number; match_result?: { lines?: { ok: boolean; reasons: string[] }[] } | null; supplier?: string; po_no?: string | null };
+export type OrderDetail = { po: { id: number; poNo: string; status: string; supplierId: number; netHalalas: number; vatHalalas: number; grossHalalas: number; branchId: number }; lines: OrderLine[]; receipts: { id: number; grn_no: string; received_at: string; delivery_note_no: string | null }[]; invoices: InvoiceRow[] };
+export const INVOICE_STATUS: Record<string, string> = { received: "مستلمة", matched: "مطابقة", mismatch: "بفروقات", approved: "معتمدة", paid: "مسدّدة", disputed: "متنازع عليها" };
+export const INVOICE_WRITERS = ["super_admin", "finance", "procurement_officer"];
+export const INVOICE_APPROVERS = ["super_admin", "finance", "branch_manager"];
+export const PAYERS = ["super_admin", "finance"];
