@@ -18,6 +18,6 @@ const out = fs.readFileSync(source, "utf8").split(/\r?\n/).map((line) => {
   return line;
 }).join("\n");
 fs.writeFileSync(target, out, { mode: 0o600 });
-const missing = out.split("\n").filter((l) => /^(DOMAIN|LETSENCRYPT_EMAIL|SSH_KEY_PATH|CLERK_SECRET_KEY|CLERK_PUBLISHABLE_KEY|VITE_CLERK_PUBLISHABLE_KEY|ORG_OWNER_EMAIL|RESEND_API_KEY|RESEND_FROM_EMAIL)=\s*$/.test(l)).map((l) => l.split("=")[0]);
+const missing = out.split("\n").filter((l) => /^(DOMAIN|LETSENCRYPT_EMAIL|SSH_KEY_PATH|SMTP_PASSWORD|CLERK_SECRET_KEY|CLERK_PUBLISHABLE_KEY|VITE_CLERK_PUBLISHABLE_KEY|ORG_OWNER_EMAIL|RESEND_API_KEY|RESEND_FROM_EMAIL)=\s*$/.test(l)).map((l) => l.split("=")[0]);
 console.log(`deploy/secrets.env ready. Generated now: ${filled.join(", ") || "(none, already present)"}`);
 console.log(missing.length ? `Still to fill by you: ${missing.join(", ")}` : "All required values are filled.");
