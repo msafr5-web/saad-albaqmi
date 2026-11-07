@@ -3,6 +3,7 @@ import healthRouter from "./health";
 import educationRouter from "./education";
 import teamRouter from "./team";
 import otpRouter from "./otp";
+import inventoryRouter from "./inventory";
 
 const router: IRouter = Router();
 
@@ -10,5 +11,6 @@ router.use(healthRouter);
 router.use(educationRouter);
 router.use(teamRouter);
 router.use(otpRouter);
+router.use(inventoryRouter);
 
 export default router;

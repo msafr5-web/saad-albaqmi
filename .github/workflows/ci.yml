@@ -52,3 +52,5 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:costing
       - name: OTP service and audit ledger
         run: pnpm --filter @workspace/api-server run check:otp
+      - name: Inventory service
+        run: pnpm --filter @workspace/api-server run check:inventory
