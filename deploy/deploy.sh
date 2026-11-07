@@ -4,7 +4,7 @@
 set -euo pipefail
 APP=/opt/saad-albaqmi; RUN_USER=saad; ETC=/etc/saad-albaqmi
 set -a; . "$ETC/api.env"; . "$ETC/web-build.env"; set +a
-as_app() { sudo -u "$RUN_USER" --preserve-env=DATABASE_URL,VITE_CLERK_PUBLISHABLE_KEY,VITE_CLERK_PROXY_URL,NODE_ENV,PORT,BASE_PATH bash -lc "cd $APP && $*"; }
+as_app() { sudo -u "$RUN_USER" --preserve-env=DATABASE_URL,VITE_CLERK_PUBLISHABLE_KEY,VITE_AUTH_MODE,VITE_CLERK_PROXY_URL,NODE_ENV,PORT,BASE_PATH bash -lc "cd $APP && $*"; }
 if [ "${1:-}" != "--first-run" ]; then
   install -d -m 700 /var/backups/saad-albaqmi
   sudo -u postgres pg_dump -Fc "${DB_NAME:-saad_albaqmi}" > "/var/backups/saad-albaqmi/pre-deploy-$(date +%F-%H%M).dump"
