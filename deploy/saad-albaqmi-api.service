@@ -1,0 +1,20 @@
+[Unit]
+Description=Saad Al-Baqmi API (Node.js)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=saad
+Group=saad
+WorkingDirectory=/opt/saad-albaqmi/artifacts/api-server
+EnvironmentFile=/etc/saad-albaqmi/api.env
+ExecStart=/usr/bin/node --enable-source-maps dist/index.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

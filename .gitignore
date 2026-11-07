@@ -53,3 +53,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Deployment secrets (never commit)
+deploy/secrets.env

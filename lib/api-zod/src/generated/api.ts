@@ -12,7 +12,7 @@ export const GetWorkspaceResponse = zod.object({
   "mode": zod.enum(['demo', 'personal', 'organization']),
   "canWrite": zod.boolean(),
   "label": zod.string(),
-  "role": zod.union([zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),zod.null()]),
+  "role": zod.union([zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']),zod.null()]),
   "branchId": zod.int().nullable(),
   "pages": zod.array(zod.string()),
   "writableKinds": zod.array(zod.string()),
@@ -536,7 +536,7 @@ export const GetCostReportResponse = zod.object({
 export const ListTeamResponseItem = zod.object({
   "id": zod.int(),
   "email": zod.string(),
-  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']),
   "branchId": zod.int().nullable(),
   "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
@@ -565,7 +565,7 @@ export const inviteMemberBodyEmailMax = 200;
 
 export const InviteMemberBody = zod.object({
   "email": zod.string().max(inviteMemberBodyEmailMax),
-  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']),
   "branchId": zod.int().nullish(),
   "linkedRecordId": zod.int().nullish()
 })
@@ -573,7 +573,7 @@ export const InviteMemberBody = zod.object({
 export const InviteMemberResponse = zod.object({
   "id": zod.int(),
   "email": zod.string(),
-  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']),
   "branchId": zod.int().nullable(),
   "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),
@@ -589,7 +589,7 @@ export const UpdateMemberParams = zod.object({
 })
 
 export const UpdateMemberBody = zod.object({
-  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']).optional(),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']).optional(),
   "branchId": zod.int().nullish(),
   "linkedRecordId": zod.int().nullish(),
   "status": zod.enum(['revoked']).optional()
@@ -598,7 +598,7 @@ export const UpdateMemberBody = zod.object({
 export const UpdateMemberResponse = zod.object({
   "id": zod.int(),
   "email": zod.string(),
-  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student']),
+  "role": zod.enum(['super_admin', 'branch_manager', 'finance', 'coordinator', 'instructor', 'student', 'warehouse_keeper', 'procurement_officer', 'hr_officer']),
   "branchId": zod.int().nullable(),
   "linkedRecordId": zod.int().nullable(),
   "status": zod.enum(['invited', 'active', 'revoked']),

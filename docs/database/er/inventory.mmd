@@ -1,0 +1,144 @@
+%% المخزون - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  item_categories {
+    bigint id PK
+    bigint parent_id FK
+    text code UK
+    text name
+  }
+  items {
+    bigint id PK
+    text item_code UK
+    text name
+    bigint category_id FK
+    bigint unit_id FK
+    text item_type
+    text valuation_method
+    text description
+    bool is_active
+    int created_by FK
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  reorder_alerts {
+    bigint id PK
+    bigint warehouse_id FK
+    bigint item_id FK
+    numeric_14_3_ qty_at_trigger
+    numeric_14_3_ min_qty
+    text status
+    timestamptz opened_at
+    timestamptz escalated_at
+    timestamptz closed_at
+    bigint purchase_request_id FK
+  }
+  stock_count_lines {
+    bigint count_id PK, FK
+    bigint item_id PK, FK
+    numeric_14_3_ system_qty
+    numeric_14_3_ counted_qty
+    text reason
+  }
+  stock_counts {
+    bigint id PK
+    bigint warehouse_id FK
+    date count_date
+    text status
+    int counted_by FK
+    timestamptz closed_at
+  }
+  stock_levels {
+    bigint warehouse_id PK, FK
+    bigint item_id PK, FK
+    numeric_14_3_ min_qty
+    numeric_14_3_ max_qty
+    numeric_14_3_ reorder_qty
+    int lead_time_days
+    int set_by FK
+    timestamptz updated_at
+  }
+  stock_movements {
+    bigint id PK
+    text movement_no UK
+    bigint warehouse_id FK
+    bigint item_id FK
+    text movement_type
+    numeric_14_3_ qty_delta
+    bigint unit_cost_halalas
+    timestamptz occurred_at
+    text ref_type
+    bigint ref_id
+    bigint issued_to_room_id FK
+    bigint issued_to_department_id FK
+    text purpose
+    int created_by FK
+    uuid otp_challenge_id FK
+    timestamptz created_at
+  }
+  stock_transfer_lines {
+    bigint transfer_id PK, FK
+    bigint item_id PK, FK
+    numeric_14_3_ qty
+    numeric_14_3_ received_qty
+  }
+  stock_transfers {
+    bigint id PK
+    text transfer_no UK
+    bigint from_warehouse_id FK
+    bigint to_warehouse_id FK
+    text status
+    int requested_by FK
+    timestamptz shipped_at
+    timestamptz received_at
+    timestamptz created_at
+  }
+  units {
+    bigint id PK
+    text code UK
+    text name
+  }
+  warehouses {
+    bigint id PK
+    bigint branch_id FK
+    text code UK
+    text name
+    int keeper_member_id FK
+    text status
+    timestamptz created_at
+  }
+  purchase_requests {
+    bigint id PK
+  }
+  departments {
+    bigint id PK
+  }
+  rooms {
+    bigint id PK
+  }
+  otp_challenges {
+    uuid id PK
+  }
+  branches {
+    bigint id PK
+  }
+  item_categories |o--o{ item_categories : "parent_id"
+  item_categories ||--o{ items : "category_id"
+  units ||--o{ items : "unit_id"
+  items ||--o{ reorder_alerts : "item_id"
+  purchase_requests |o--o{ reorder_alerts : "purchase_request_id"
+  warehouses ||--o{ reorder_alerts : "warehouse_id"
+  stock_counts ||--o{ stock_count_lines : "count_id"
+  items ||--o{ stock_count_lines : "item_id"
+  warehouses ||--o{ stock_counts : "warehouse_id"
+  items ||--o{ stock_levels : "item_id"
+  warehouses ||--o{ stock_levels : "warehouse_id"
+  departments |o--o{ stock_movements : "issued_to_department_id"
+  rooms |o--o{ stock_movements : "issued_to_room_id"
+  items ||--o{ stock_movements : "item_id"
+  otp_challenges |o--o{ stock_movements : "otp_challenge_id"
+  warehouses ||--o{ stock_movements : "warehouse_id"
+  items ||--o{ stock_transfer_lines : "item_id"
+  stock_transfers ||--o{ stock_transfer_lines : "transfer_id"
+  warehouses ||--o{ stock_transfers : "from_warehouse_id"
+  warehouses ||--o{ stock_transfers : "to_warehouse_id"
+  branches ||--o{ warehouses : "branch_id"

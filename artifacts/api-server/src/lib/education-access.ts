@@ -1,7 +1,7 @@
 import type { EducationRow } from "./education-demo";
 import { DomainError } from "./education-validation";
 
-export const ROLES = ["super_admin", "branch_manager", "finance", "coordinator", "instructor", "student"] as const;
+export const ROLES = ["super_admin", "branch_manager", "finance", "coordinator", "instructor", "student", "warehouse_keeper", "procurement_officer", "hr_officer"] as const;
 export type Role = (typeof ROLES)[number];
 
 export type Member = { id: number; clerkUserId: string; email: string; role: Role; branchId: number | null; linkedRecordId: number | null };
@@ -18,20 +18,27 @@ const WRITABLE: Record<Role, string[]> = {
   coordinator: ["room", "asset", "student", "session", "attendance", "grade"],
   instructor: ["attendance", "grade"],
   student: [],
+  warehouse_keeper: [],
+  procurement_officer: [],
+  hr_officer: [],
 };
 
 const PAGES: Record<Role, string[]> = {
-  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit"],
-  branch_manager: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings"],
-  finance: ["dashboard", "branches", "students", "instructors", "finance", "reports", "settings"],
-  coordinator: ["dashboard", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings"],
-  instructor: ["dashboard", "students", "schedule", "settings"],
-  student: ["dashboard", "schedule", "finance", "settings"],
+  super_admin: ["dashboard", "card", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit", "inventory", "procurement", "hr", "fiscal", "attendance"],
+  branch_manager: ["dashboard", "card", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "inventory", "procurement", "hr", "fiscal", "attendance"],
+  finance: ["dashboard", "card", "branches", "students", "instructors", "finance", "reports", "settings", "inventory", "procurement", "hr", "fiscal"],
+  coordinator: ["dashboard", "card", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings", "inventory", "attendance"],
+  instructor: ["dashboard", "card", "students", "schedule", "settings"],
+  student: ["dashboard", "card", "schedule", "finance", "settings"],
+  warehouse_keeper: ["dashboard", "card", "inventory", "settings"],
+  procurement_officer: ["dashboard", "card", "inventory", "procurement", "settings"],
+  hr_officer: ["dashboard", "card", "hr", "settings", "attendance"],
 };
 
 /** Roles whose scope is a single branch (finance may also be organization-wide with a null branch). */
 export const branchScoped = (r: Role) => r !== "super_admin";
-export const needsBranch = (r: Role) => r !== "super_admin" && r !== "finance";
+/** Finance and procurement officers may work organization-wide (no branch); every other non-admin role belongs to one branch. */
+export const needsBranch = (r: Role) => r !== "super_admin" && r !== "finance" && r !== "procurement_officer" && r !== "hr_officer";
 export const needsLink = (r: Role) => r === "instructor" || r === "student";
 export const sensitiveFinanceRead = (r: Role) => r === "super_admin" || r === "branch_manager" || r === "finance";
 export const canViewPayroll = (r: Role) => sensitiveFinanceRead(r) || r === "instructor";

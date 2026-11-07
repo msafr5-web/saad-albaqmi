@@ -1,0 +1,55 @@
+%% المؤسسة والإعدادات - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  branches {
+    bigint id PK
+    text code UK
+    text name
+    text city
+    bool is_head_office
+    text status
+    text vat_number
+    text commercial_reg_no
+    text address
+    text phone
+    text email
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz archived_at
+  }
+  document_sequences {
+    text prefix
+    int year
+    bigint last_value
+  }
+  documents {
+    bigint id PK
+    text owner_type
+    bigint owner_id
+    text file_name
+    text mime_type
+    bigint size_bytes
+    text storage_key UK
+    text sha256
+    int uploaded_by FK
+    timestamptz created_at
+  }
+  notifications {
+    bigint id PK
+    int member_id FK
+    text type
+    text title
+    text body
+    text link
+    text subject_type
+    bigint subject_id
+    timestamptz created_at
+    timestamptz read_at
+    timestamptz email_sent_at
+  }
+  org_settings {
+    text key PK
+    text value
+    text description
+    int updated_by FK
+    timestamptz updated_at
+  }

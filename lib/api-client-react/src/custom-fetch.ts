@@ -44,6 +44,16 @@ export function setAuthTokenGetter(getter: AuthTokenGetter | null): void {
   _authTokenGetter = getter;
 }
 
+let _otpChallenge: string | null = null;
+
+/**
+ * Attaches a verified OTP challenge id (header X-OTP-Challenge) to the NEXT write request only, then forgets it.
+ * Used after the user confirmed a financial operation with the code emailed to them.
+ */
+export function withOtpChallenge(challengeId: string | null): void {
+  _otpChallenge = challengeId;
+}
+
 function isRequest(input: RequestInfo | URL): input is Request {
   return typeof Request !== "undefined" && input instanceof Request;
 }
@@ -347,6 +357,11 @@ export async function customFetch<T = unknown>(
 
   if (responseType === "json" && !headers.has("accept")) {
     headers.set("accept", DEFAULT_JSON_ACCEPT);
+  }
+
+  if (_otpChallenge && method !== "GET" && method !== "HEAD" && !headers.has("x-otp-challenge")) {
+    headers.set("x-otp-challenge", _otpChallenge);
+    _otpChallenge = null;
   }
 
   // Attach bearer token when an auth getter is configured and no

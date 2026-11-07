@@ -1,0 +1,615 @@
+%% Every table and relationship (key columns only)
+erDiagram
+  approval_delegations {
+    bigint id PK
+    int delegator_member_id FK
+    int delegate_member_id FK
+    bigint leave_request_id FK
+    int proposed_by FK
+    int approved_by FK
+  }
+  asset_categories {
+    bigint id PK
+    bigint parent_id FK
+  }
+  asset_maintenance {
+    bigint id PK
+    bigint asset_id FK
+  }
+  assets {
+    bigint id PK
+    text asset_tag UK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint category_id FK
+    bigint source_supplier_invoice_line_id FK
+  }
+  attendance_records {
+    bigint id PK
+    bigint session_id FK
+    bigint student_id FK
+    int recorded_by FK
+  }
+  audit_events {
+    bigint id PK
+    int actor_member_id FK
+    bigint branch_id FK
+    uuid otp_challenge_id FK
+  }
+  branch_budgets {
+    bigint id PK
+    bigint branch_id FK
+    bigint category_id FK
+    int approved_by FK
+  }
+  branches {
+    bigint id PK
+    text code UK
+  }
+  class_sessions {
+    bigint id PK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint instructor_id FK
+    bigint diploma_id FK
+    bigint subject_id FK
+    bigint recurrence_id FK
+  }
+  cost_policies {
+    text owner_id PK
+  }
+  cost_report_snapshots {
+    bigint id PK
+    int created_by FK
+  }
+  departments {
+    bigint id PK
+    bigint branch_id FK
+    bigint parent_id FK
+    text code UK
+    bigint manager_employee_id FK
+  }
+  diplomas {
+    bigint id PK
+    text code UK
+  }
+  direct_purchase_policies {
+    bigint id PK
+    int set_by FK
+  }
+  document_sequences {
+
+  }
+  documents {
+    bigint id PK
+    text storage_key UK
+    int uploaded_by FK
+  }
+  education_audit {
+    int id PK
+  }
+  education_records {
+    int id PK
+  }
+  electricity_meters {
+    bigint id PK
+    bigint branch_id FK
+  }
+  employee_shifts {
+    bigint employee_id PK, FK
+    bigint shift_id FK
+    date valid_from PK
+  }
+  employees {
+    bigint id PK
+    text employee_no UK
+    bigint branch_id FK
+    bigint department_id FK
+    bigint job_title_id FK
+    int org_member_id FK
+  }
+  expense_categories {
+    bigint id PK
+    bigint parent_id FK
+    text code UK
+  }
+  expenses {
+    bigint id PK
+    text expense_no UK
+    bigint branch_id FK
+    bigint category_id FK
+    bigint supplier_invoice_id FK
+    int created_by FK
+    bigint reverses_expense_id FK
+  }
+  goods_receipt_lines {
+    bigint id PK
+    bigint grn_id FK
+    bigint po_line_id FK
+  }
+  goods_receipts {
+    bigint id PK
+    text grn_no UK
+    bigint po_id FK
+    bigint warehouse_id FK
+    int received_by FK
+  }
+  grades {
+    bigint id PK
+    bigint student_id FK
+    bigint subject_id FK
+    int recorded_by FK
+  }
+  identity_cards {
+    bigint id PK
+    text token_hash UK
+    int issued_by FK
+  }
+  installments {
+    bigint id PK
+    bigint student_id FK
+    bigint sales_invoice_id FK
+  }
+  instructor_evaluations {
+    bigint id PK
+    bigint instructor_id FK
+    int evaluated_by FK
+  }
+  instructor_subjects {
+    bigint instructor_id PK, FK
+    bigint subject_id PK, FK
+  }
+  instructors {
+    bigint id PK
+    text instructor_no UK
+    bigint branch_id FK
+    bigint employee_id FK
+    int org_member_id FK
+  }
+  item_categories {
+    bigint id PK
+    bigint parent_id FK
+    text code UK
+  }
+  items {
+    bigint id PK
+    text item_code UK
+    bigint category_id FK
+    bigint unit_id FK
+    int created_by FK
+  }
+  job_titles {
+    bigint id PK
+    text name UK
+  }
+  leave_requests {
+    bigint id PK
+    bigint employee_id FK
+    bigint leave_type_id FK
+    int requested_by FK
+    int decided_by FK
+  }
+  leave_types {
+    bigint id PK
+    text code UK
+  }
+  levels {
+    bigint id PK
+    bigint diploma_id FK
+  }
+  match_tolerances {
+    bigint id PK
+    bigint category_id FK
+    int set_by FK
+  }
+  notifications {
+    bigint id PK
+    int member_id FK
+  }
+  org_members {
+    int id PK
+  }
+  org_settings {
+    text key PK
+    int updated_by FK
+  }
+  otp_challenges {
+    uuid id PK
+    int member_id FK
+  }
+  payment_allocations {
+    bigint payment_id PK, FK
+    bigint installment_id PK, FK
+  }
+  payments {
+    bigint id PK
+    text receipt_no UK
+    bigint branch_id FK
+    bigint student_id FK
+    int collected_by FK
+    bigint reverses_payment_id FK
+  }
+  payroll_lines {
+    bigint id PK
+    bigint run_id FK
+    bigint employee_id FK
+  }
+  payroll_runs {
+    bigint id PK
+    bigint branch_id FK
+    int approved_by FK
+  }
+  presence_events {
+    bigint id PK
+    bigint card_id FK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint session_id FK
+    int device_member_id FK
+  }
+  procurement_exceptions {
+    bigint id PK
+    bigint pr_id FK
+    int requested_by FK
+    int approved_by FK
+  }
+  purchase_limits {
+    bigint id PK
+    bigint branch_id FK
+    int set_by FK
+  }
+  purchase_order_lines {
+    bigint id PK
+    bigint po_id FK
+    bigint item_id FK
+  }
+  purchase_orders {
+    bigint id PK
+    bigint supersedes_po_id FK
+    bigint pr_id FK
+    bigint rfq_id FK
+    bigint exception_id FK
+    bigint branch_id FK
+    bigint warehouse_id FK
+    bigint supplier_id FK
+    int prepared_by FK
+    int approved_by FK
+    bigint approved_via_delegation_id FK
+  }
+  purchase_request_lines {
+    bigint id PK
+    bigint pr_id FK
+    bigint item_id FK
+  }
+  purchase_requests {
+    bigint id PK
+    text pr_no UK
+    bigint branch_id FK
+    bigint warehouse_id FK
+    bigint alert_id FK
+    int requested_by FK
+  }
+  quotation_evaluations {
+    bigint id PK
+    bigint quotation_id FK
+    int evaluated_by FK
+  }
+  quotation_lines {
+    bigint id PK
+    bigint quotation_id FK
+    bigint item_id FK
+  }
+  quotations {
+    bigint id PK
+    bigint rfq_id FK
+    bigint supplier_id FK
+    int entered_by FK
+  }
+  reorder_alerts {
+    bigint id PK
+    bigint warehouse_id FK
+    bigint item_id FK
+    bigint purchase_request_id FK
+  }
+  rfq_awards {
+    bigint rfq_id PK, FK
+    bigint quotation_id FK
+    bigint exception_id FK
+    int recommended_by FK
+    int approved_by FK
+  }
+  rfq_suppliers {
+    bigint rfq_id PK, FK
+    bigint supplier_id PK, FK
+  }
+  rfqs {
+    bigint id PK
+    text rfq_no UK
+    bigint pr_id FK
+    int created_by FK
+  }
+  rooms {
+    bigint id PK
+    bigint branch_id FK
+    bigint meter_id FK
+  }
+  sales_invoice_lines {
+    bigint id PK
+    bigint invoice_id FK
+    bigint diploma_id FK
+    bigint subject_id FK
+  }
+  sales_invoices {
+    bigint id PK
+    text invoice_no UK
+    uuid invoice_uuid UK
+    bigint branch_id FK
+    bigint student_id FK
+    int created_by FK
+  }
+  session_recurrences {
+    bigint id PK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint instructor_id FK
+    bigint diploma_id FK
+    bigint subject_id FK
+    int created_by FK
+  }
+  session_students {
+    bigint session_id PK, FK
+    bigint student_id PK, FK
+  }
+  shifts {
+    bigint id PK
+    text name UK
+  }
+  stock_count_lines {
+    bigint count_id PK, FK
+    bigint item_id PK, FK
+  }
+  stock_counts {
+    bigint id PK
+    bigint warehouse_id FK
+    int counted_by FK
+  }
+  stock_levels {
+    bigint warehouse_id PK, FK
+    bigint item_id PK, FK
+    int set_by FK
+  }
+  stock_movements {
+    bigint id PK
+    text movement_no UK
+    bigint warehouse_id FK
+    bigint item_id FK
+    bigint issued_to_room_id FK
+    bigint issued_to_department_id FK
+    int created_by FK
+    uuid otp_challenge_id FK
+  }
+  stock_transfer_lines {
+    bigint transfer_id PK, FK
+    bigint item_id PK, FK
+  }
+  stock_transfers {
+    bigint id PK
+    text transfer_no UK
+    bigint from_warehouse_id FK
+    bigint to_warehouse_id FK
+    int requested_by FK
+  }
+  student_subjects {
+    bigint id PK
+    bigint student_id FK
+    bigint subject_id FK
+  }
+  students {
+    bigint id PK
+    text student_no UK
+    bigint branch_id FK
+    bigint diploma_id FK
+    bigint current_level_id FK
+    int org_member_id FK
+  }
+  subject_prerequisites {
+    bigint subject_id PK, FK
+    bigint prerequisite_id PK, FK
+  }
+  subjects {
+    bigint id PK
+    text code UK
+    bigint diploma_id FK
+    bigint level_id FK
+  }
+  supplier_categories {
+    bigint supplier_id PK, FK
+    bigint category_id PK, FK
+  }
+  supplier_invoice_lines {
+    bigint id PK
+    bigint invoice_id FK
+    bigint po_line_id FK
+    bigint item_id FK
+  }
+  supplier_invoices {
+    bigint id PK
+    bigint supplier_id FK
+    bigint po_id FK
+    bigint branch_id FK
+    int approved_by FK
+    int created_by FK
+  }
+  supplier_payments {
+    bigint id PK
+    bigint supplier_invoice_id FK
+    int paid_by FK
+  }
+  suppliers {
+    bigint id PK
+    text supplier_no UK
+    int approved_by FK
+  }
+  tax_rates {
+    bigint id PK
+  }
+  units {
+    bigint id PK
+    text code UK
+  }
+  utility_invoices {
+    bigint id PK
+    bigint branch_id FK
+    bigint meter_id FK
+  }
+  warehouses {
+    bigint id PK
+    bigint branch_id FK
+    text code UK
+    int keeper_member_id FK
+  }
+  leave_requests |o--o{ approval_delegations : "leave_request_id"
+  asset_categories |o--o{ asset_categories : "parent_id"
+  assets ||--o{ asset_maintenance : "asset_id"
+  branches ||--o{ assets : "branch_id"
+  asset_categories |o--o{ assets : "category_id"
+  rooms |o--o{ assets : "room_id"
+  supplier_invoice_lines |o--o{ assets : "source_supplier_invoice_line_id"
+  class_sessions ||--o{ attendance_records : "session_id"
+  students ||--o{ attendance_records : "student_id"
+  branches |o--o{ audit_events : "branch_id"
+  otp_challenges |o--o{ audit_events : "otp_challenge_id"
+  branches ||--o{ branch_budgets : "branch_id"
+  expense_categories |o--o{ branch_budgets : "category_id"
+  branches ||--o{ class_sessions : "branch_id"
+  diplomas ||--o{ class_sessions : "diploma_id"
+  instructors ||--o{ class_sessions : "instructor_id"
+  session_recurrences |o--o{ class_sessions : "recurrence_id"
+  rooms ||--o{ class_sessions : "room_id"
+  subjects |o--o{ class_sessions : "subject_id"
+  branches |o--o{ departments : "branch_id"
+  employees |o--o{ departments : "manager_employee_id"
+  departments |o--o{ departments : "parent_id"
+  branches ||--o{ electricity_meters : "branch_id"
+  employees ||--o{ employee_shifts : "employee_id"
+  shifts ||--o{ employee_shifts : "shift_id"
+  branches ||--o{ employees : "branch_id"
+  departments |o--o{ employees : "department_id"
+  job_titles |o--o{ employees : "job_title_id"
+  expense_categories |o--o{ expense_categories : "parent_id"
+  branches ||--o{ expenses : "branch_id"
+  expense_categories ||--o{ expenses : "category_id"
+  expenses |o--o{ expenses : "reverses_expense_id"
+  supplier_invoices |o--o{ expenses : "supplier_invoice_id"
+  goods_receipts ||--o{ goods_receipt_lines : "grn_id"
+  purchase_order_lines ||--o{ goods_receipt_lines : "po_line_id"
+  purchase_orders ||--o{ goods_receipts : "po_id"
+  warehouses ||--o{ goods_receipts : "warehouse_id"
+  students ||--o{ grades : "student_id"
+  subjects ||--o{ grades : "subject_id"
+  sales_invoices |o--o{ installments : "sales_invoice_id"
+  students ||--o{ installments : "student_id"
+  instructors ||--o{ instructor_evaluations : "instructor_id"
+  instructors ||--o{ instructor_subjects : "instructor_id"
+  subjects ||--o{ instructor_subjects : "subject_id"
+  branches ||--o{ instructors : "branch_id"
+  employees |o--o{ instructors : "employee_id"
+  item_categories |o--o{ item_categories : "parent_id"
+  item_categories ||--o{ items : "category_id"
+  units ||--o{ items : "unit_id"
+  employees ||--o{ leave_requests : "employee_id"
+  leave_types ||--o{ leave_requests : "leave_type_id"
+  diplomas ||--o{ levels : "diploma_id"
+  item_categories |o--o{ match_tolerances : "category_id"
+  installments ||--o{ payment_allocations : "installment_id"
+  payments ||--o{ payment_allocations : "payment_id"
+  branches ||--o{ payments : "branch_id"
+  payments |o--o{ payments : "reverses_payment_id"
+  students ||--o{ payments : "student_id"
+  employees ||--o{ payroll_lines : "employee_id"
+  payroll_runs ||--o{ payroll_lines : "run_id"
+  branches ||--o{ payroll_runs : "branch_id"
+  branches ||--o{ presence_events : "branch_id"
+  identity_cards |o--o{ presence_events : "card_id"
+  rooms |o--o{ presence_events : "room_id"
+  class_sessions |o--o{ presence_events : "session_id"
+  purchase_requests ||--o{ procurement_exceptions : "pr_id"
+  branches |o--o{ purchase_limits : "branch_id"
+  items ||--o{ purchase_order_lines : "item_id"
+  purchase_orders ||--o{ purchase_order_lines : "po_id"
+  branches ||--o{ purchase_orders : "branch_id"
+  approval_delegations |o--o{ purchase_orders : "approved_via_delegation_id"
+  procurement_exceptions |o--o{ purchase_orders : "exception_id"
+  purchase_requests ||--o{ purchase_orders : "pr_id"
+  rfqs |o--o{ purchase_orders : "rfq_id"
+  purchase_orders |o--o{ purchase_orders : "supersedes_po_id"
+  suppliers ||--o{ purchase_orders : "supplier_id"
+  warehouses ||--o{ purchase_orders : "warehouse_id"
+  items ||--o{ purchase_request_lines : "item_id"
+  purchase_requests ||--o{ purchase_request_lines : "pr_id"
+  reorder_alerts |o--o{ purchase_requests : "alert_id"
+  branches ||--o{ purchase_requests : "branch_id"
+  warehouses ||--o{ purchase_requests : "warehouse_id"
+  quotations ||--o{ quotation_evaluations : "quotation_id"
+  items ||--o{ quotation_lines : "item_id"
+  quotations ||--o{ quotation_lines : "quotation_id"
+  rfqs ||--o{ quotations : "rfq_id"
+  suppliers ||--o{ quotations : "supplier_id"
+  items ||--o{ reorder_alerts : "item_id"
+  purchase_requests |o--o{ reorder_alerts : "purchase_request_id"
+  warehouses ||--o{ reorder_alerts : "warehouse_id"
+  procurement_exceptions |o--o{ rfq_awards : "exception_id"
+  quotations ||--o{ rfq_awards : "quotation_id"
+  rfqs ||--o| rfq_awards : "rfq_id"
+  rfqs ||--o{ rfq_suppliers : "rfq_id"
+  suppliers ||--o{ rfq_suppliers : "supplier_id"
+  purchase_requests ||--o{ rfqs : "pr_id"
+  branches ||--o{ rooms : "branch_id"
+  electricity_meters |o--o{ rooms : "meter_id"
+  diplomas |o--o{ sales_invoice_lines : "diploma_id"
+  sales_invoices ||--o{ sales_invoice_lines : "invoice_id"
+  subjects |o--o{ sales_invoice_lines : "subject_id"
+  branches ||--o{ sales_invoices : "branch_id"
+  students |o--o{ sales_invoices : "student_id"
+  branches ||--o{ session_recurrences : "branch_id"
+  diplomas ||--o{ session_recurrences : "diploma_id"
+  instructors ||--o{ session_recurrences : "instructor_id"
+  rooms ||--o{ session_recurrences : "room_id"
+  subjects |o--o{ session_recurrences : "subject_id"
+  class_sessions ||--o{ session_students : "session_id"
+  students ||--o{ session_students : "student_id"
+  stock_counts ||--o{ stock_count_lines : "count_id"
+  items ||--o{ stock_count_lines : "item_id"
+  warehouses ||--o{ stock_counts : "warehouse_id"
+  items ||--o{ stock_levels : "item_id"
+  warehouses ||--o{ stock_levels : "warehouse_id"
+  departments |o--o{ stock_movements : "issued_to_department_id"
+  rooms |o--o{ stock_movements : "issued_to_room_id"
+  items ||--o{ stock_movements : "item_id"
+  otp_challenges |o--o{ stock_movements : "otp_challenge_id"
+  warehouses ||--o{ stock_movements : "warehouse_id"
+  items ||--o{ stock_transfer_lines : "item_id"
+  stock_transfers ||--o{ stock_transfer_lines : "transfer_id"
+  warehouses ||--o{ stock_transfers : "from_warehouse_id"
+  warehouses ||--o{ stock_transfers : "to_warehouse_id"
+  students ||--o{ student_subjects : "student_id"
+  subjects ||--o{ student_subjects : "subject_id"
+  branches ||--o{ students : "branch_id"
+  levels |o--o{ students : "current_level_id"
+  diplomas ||--o{ students : "diploma_id"
+  subjects ||--o{ subject_prerequisites : "prerequisite_id"
+  subjects ||--o{ subject_prerequisites : "subject_id"
+  diplomas ||--o{ subjects : "diploma_id"
+  levels ||--o{ subjects : "level_id"
+  item_categories ||--o{ supplier_categories : "category_id"
+  suppliers ||--o{ supplier_categories : "supplier_id"
+  supplier_invoices ||--o{ supplier_invoice_lines : "invoice_id"
+  items |o--o{ supplier_invoice_lines : "item_id"
+  purchase_order_lines |o--o{ supplier_invoice_lines : "po_line_id"
+  branches ||--o{ supplier_invoices : "branch_id"
+  purchase_orders |o--o{ supplier_invoices : "po_id"
+  suppliers ||--o{ supplier_invoices : "supplier_id"
+  supplier_invoices ||--o{ supplier_payments : "supplier_invoice_id"
+  branches ||--o{ utility_invoices : "branch_id"
+  electricity_meters ||--o{ utility_invoices : "meter_id"
+  branches ||--o{ warehouses : "branch_id"

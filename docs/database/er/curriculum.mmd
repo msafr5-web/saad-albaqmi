@@ -1,0 +1,47 @@
+%% الدبلومات والمناهج - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  diplomas {
+    bigint id PK
+    text code UK
+    text name
+    int duration_months
+    numeric_8_1_ total_hours
+    text admission_requirements
+    bigint price_halalas
+    bool price_includes_vat
+    numeric_6_3_ vat_rate
+    bigint net_price_halalas "generated"
+    bigint gross_price_halalas "generated"
+    text status
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  levels {
+    bigint id PK
+    bigint diploma_id FK
+    int level_no
+    text name
+  }
+  subject_prerequisites {
+    bigint subject_id PK, FK
+    bigint prerequisite_id PK, FK
+  }
+  subjects {
+    bigint id PK
+    text code UK
+    bigint diploma_id FK
+    bigint level_id FK
+    text name
+    bigint price_halalas
+    bool price_includes_vat
+    numeric_6_3_ vat_rate
+    bigint net_price_halalas "generated"
+    bigint gross_price_halalas "generated"
+    numeric_6_1_ hours
+    text status
+  }
+  diplomas ||--o{ levels : "diploma_id"
+  subjects ||--o{ subject_prerequisites : "prerequisite_id"
+  subjects ||--o{ subject_prerequisites : "subject_id"
+  diplomas ||--o{ subjects : "diploma_id"
+  levels ||--o{ subjects : "level_id"

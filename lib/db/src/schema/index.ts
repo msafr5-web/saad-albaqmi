@@ -1,20 +1,11 @@
-// Export your models here. Add one export per file
-// export * from "./posts";
-//
-// Each model/table should ideally be split into different files.
-// Each model/table should define a Drizzle table, insert schema, and types:
-//
-//   import { pgTable, text, serial } from "drizzle-orm/pg-core";
-//   import { createInsertSchema } from "drizzle-zod";
-//   import { z } from "zod/v4";
-//
-//   export const postsTable = pgTable("posts", {
-//     id: serial("id").primaryKey(),
-//     title: text("title").notNull(),
-//   });
-//
-//   export const insertPostSchema = createInsertSchema(postsTable).omit({ id: true });
-//   export type InsertPost = z.infer<typeof insertPostSchema>;
-//   export type Post = typeof postsTable.$inferSelect;
-
+// Legacy (JSONB) tables used by the running application. Do not remove until the data migration to the relational schema is done.
 export * from "./education";
+
+// Relational schema (database "saad_albaqmi"): constraints, foreign keys and money in halalas.
+export * from "./core";
+export * from "./hr";
+export * from "./academic";
+export * from "./finance";
+export * from "./inventory";
+export * from "./procurement";
+export * from "./security";

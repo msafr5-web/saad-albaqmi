@@ -1,0 +1,150 @@
+%% المشتريات: الموردون وعروض الأسعار - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  procurement_exceptions {
+    bigint id PK
+    bigint pr_id FK
+    text exception_type
+    text reason
+    int requested_by FK
+    int approved_by FK
+    timestamptz approved_at
+    timestamptz created_at
+  }
+  purchase_request_lines {
+    bigint id PK
+    bigint pr_id FK
+    bigint item_id FK
+    numeric_14_3_ qty
+    text notes
+  }
+  purchase_requests {
+    bigint id PK
+    text pr_no UK
+    bigint branch_id FK
+    bigint warehouse_id FK
+    text path
+    text source
+    bigint alert_id FK
+    text reason
+    text status
+    int requested_by FK
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  quotation_evaluations {
+    bigint id PK
+    bigint quotation_id FK
+    int evaluated_by FK
+    int technical_score
+    int quality_score
+    int commercial_score
+    text notes
+    timestamptz created_at
+  }
+  quotation_lines {
+    bigint id PK
+    bigint quotation_id FK
+    bigint item_id FK
+    numeric_14_3_ quantity
+    bigint unit_price_halalas
+    numeric_6_3_ vat_rate
+    bigint net_halalas "generated"
+    bigint vat_halalas "generated"
+  }
+  quotations {
+    bigint id PK
+    bigint rfq_id FK
+    bigint supplier_id FK
+    text supplier_vat_number
+    text quote_ref
+    date quote_date
+    date valid_until
+    int delivery_days
+    text payment_terms
+    text quality_notes
+    int entered_by FK
+    text status
+    timestamptz created_at
+  }
+  rfq_awards {
+    bigint rfq_id PK, FK
+    bigint quotation_id FK
+    bool is_lowest_price
+    text justification
+    bigint exception_id FK
+    int recommended_by FK
+    int approved_by FK
+    timestamptz approved_at
+    timestamptz created_at
+  }
+  rfq_suppliers {
+    bigint rfq_id PK, FK
+    bigint supplier_id PK, FK
+    timestamptz sent_at
+    timestamptz declined_at
+  }
+  rfqs {
+    bigint id PK
+    text rfq_no UK
+    bigint pr_id FK
+    text status
+    timestamptz deadline_at
+    int created_by FK
+    timestamptz created_at
+  }
+  supplier_categories {
+    bigint supplier_id PK, FK
+    bigint category_id PK, FK
+  }
+  suppliers {
+    bigint id PK
+    text supplier_no UK
+    text legal_name
+    text vat_number
+    text commercial_reg_no
+    text address
+    text city
+    text email
+    text phone
+    text iban
+    text status
+    int approved_by FK
+    timestamptz approved_at
+    numeric_3_2_ rating
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  items {
+    bigint id PK
+  }
+  reorder_alerts {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  warehouses {
+    bigint id PK
+  }
+  item_categories {
+    bigint id PK
+  }
+  purchase_requests ||--o{ procurement_exceptions : "pr_id"
+  items ||--o{ purchase_request_lines : "item_id"
+  purchase_requests ||--o{ purchase_request_lines : "pr_id"
+  reorder_alerts |o--o{ purchase_requests : "alert_id"
+  branches ||--o{ purchase_requests : "branch_id"
+  warehouses ||--o{ purchase_requests : "warehouse_id"
+  quotations ||--o{ quotation_evaluations : "quotation_id"
+  items ||--o{ quotation_lines : "item_id"
+  quotations ||--o{ quotation_lines : "quotation_id"
+  rfqs ||--o{ quotations : "rfq_id"
+  suppliers ||--o{ quotations : "supplier_id"
+  procurement_exceptions |o--o{ rfq_awards : "exception_id"
+  quotations ||--o{ rfq_awards : "quotation_id"
+  rfqs ||--o| rfq_awards : "rfq_id"
+  rfqs ||--o{ rfq_suppliers : "rfq_id"
+  suppliers ||--o{ rfq_suppliers : "supplier_id"
+  purchase_requests ||--o{ rfqs : "pr_id"
+  item_categories ||--o{ supplier_categories : "category_id"
+  suppliers ||--o{ supplier_categories : "supplier_id"

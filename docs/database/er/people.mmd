@@ -1,0 +1,84 @@
+%% الطلاب والمدربون - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  instructor_evaluations {
+    bigint id PK
+    bigint instructor_id FK
+    date period_start
+    date period_end
+    int teaching_score
+    int punctuality_score
+    int student_feedback_score
+    text notes
+    int evaluated_by FK
+    timestamptz created_at
+  }
+  instructor_subjects {
+    bigint instructor_id PK, FK
+    bigint subject_id PK, FK
+  }
+  instructors {
+    bigint id PK
+    text instructor_no UK
+    bigint branch_id FK
+    bigint employee_id FK
+    text full_name
+    text qualification
+    bigint hourly_rate_halalas
+    numeric_5_1_ weekly_hours
+    int org_member_id FK
+    text status
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  student_subjects {
+    bigint id PK
+    bigint student_id FK
+    bigint subject_id FK
+    timestamptz enrolled_at
+    text status
+  }
+  students {
+    bigint id PK
+    text student_no UK
+    bigint branch_id FK
+    bigint diploma_id FK
+    bigint current_level_id FK
+    text full_name
+    text national_id
+    text nationality
+    date date_of_birth
+    text email
+    text phone
+    text guardian_name
+    text guardian_phone
+    int org_member_id FK
+    text status
+    date enrolled_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  subjects {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  employees {
+    bigint id PK
+  }
+  levels {
+    bigint id PK
+  }
+  diplomas {
+    bigint id PK
+  }
+  instructors ||--o{ instructor_evaluations : "instructor_id"
+  instructors ||--o{ instructor_subjects : "instructor_id"
+  subjects ||--o{ instructor_subjects : "subject_id"
+  branches ||--o{ instructors : "branch_id"
+  employees |o--o{ instructors : "employee_id"
+  students ||--o{ student_subjects : "student_id"
+  subjects ||--o{ student_subjects : "subject_id"
+  branches ||--o{ students : "branch_id"
+  levels |o--o{ students : "current_level_id"
+  diplomas ||--o{ students : "diploma_id"

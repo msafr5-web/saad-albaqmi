@@ -1,0 +1,23 @@
+# Local PostgreSQL named after the project. DEVELOPMENT ONLY: the password below is public, never reuse it elsewhere.
+#   docker compose up -d db
+#   export DATABASE_URL=postgres://saad:saad_dev_password@localhost:5432/saad_albaqmi
+#   pnpm --filter @workspace/db run migrate
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: saad_albaqmi
+      POSTGRES_USER: saad
+      POSTGRES_PASSWORD: saad_dev_password
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - saad_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saad -d saad_albaqmi"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  saad_pgdata:

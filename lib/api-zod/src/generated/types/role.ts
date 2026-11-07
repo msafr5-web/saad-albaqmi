@@ -16,4 +16,7 @@ export const Role = {
   coordinator: 'coordinator',
   instructor: 'instructor',
   student: 'student',
+  warehouse_keeper: 'warehouse_keeper',
+  procurement_officer: 'procurement_officer',
+  hr_officer: 'hr_officer',
 } as const;
