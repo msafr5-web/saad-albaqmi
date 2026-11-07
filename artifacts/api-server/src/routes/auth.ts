@@ -6,6 +6,8 @@ import { clientIp, inetOrNull, rateLimit } from "../middlewares/security";
 import { accessOf, sameOrigin, workspaceAccess } from "../middlewares/workspaceAccess";
 import { DomainError } from "../lib/education-validation";
 import { ownerEmail } from "../lib/org-membership";
+import { requestLoginCode, verifyLoginCode } from "../lib/login-code";
+import { smtpConfigured } from "../lib/smtp";
 import {
   SESSION_COOKIE, authenticate, checkPasswordPolicy, clearCookieHeader, cookieHeader, createSession, destroyAllSessions, destroySession,
   hashPassword, localAuthEnabled, normalizeEmail, parseCookie, sessionAccount, verifyPassword,
@@ -16,7 +18,7 @@ const secureCookie = (req: Request) => req.secure || req.get("x-forwarded-proto"
 const ctx = (req: Request) => ({ ip: inetOrNull(clientIp(req)), ua: req.get("user-agent") ?? null });
 const strict = rateLimit({ name: "auth", windowMs: 60_000, max: Number(process.env.AUTH_RATE_LIMIT_PER_MINUTE ?? 10), key: (req) => clientIp(req) });
 
-router.get("/auth/mode", (_req, res) => { res.json({ mode: localAuthEnabled() ? "local" : "clerk" }); });
+router.get("/auth/mode", (_req, res) => { res.json({ mode: localAuthEnabled() ? "local" : "clerk", emailCode: smtpConfigured() }); });
 
 router.use("/auth", (req, res, next) => {
   if (!localAuthEnabled()) { res.status(404).json({ error: "الدخول المحلي غير مفعّل" }); return; }
@@ -55,6 +57,21 @@ router.post("/auth/setup-owner", strict, async (req, res) => {
   if (!created) throw new DomainError("حساب المالك أُنشئ مسبقًا؛ سجّل الدخول", 409);
   await startSession(req, res, created.id);
   res.status(201).json({ ok: true });
+});
+
+/** E-mail code sign-in: request (always answers ok) then verify. No password needed. */
+router.post("/auth/code/request", strict, async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  if (!smtpConfigured()) throw new DomainError("الدخول برمز البريد غير مهيأ", 503);
+  await requestLoginCode(email, ctx(req).ip);
+  res.json({ ok: true });
+});
+
+router.post("/auth/code/verify", strict, async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  const accountId = await verifyLoginCode(email, String(req.body?.code ?? ""), ctx(req).ip);
+  await startSession(req, res, accountId);
+  res.json({ ok: true });
 });
 
 router.post("/auth/login", strict, async (req, res) => {

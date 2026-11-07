@@ -63,6 +63,11 @@ PORT=$PORT
 DATABASE_URL=$DATABASE_URL
 AUTH_MODE=$AUTH_MODE
 OTP_CHANNEL=${OTP_CHANNEL:-$([ "$AUTH_MODE" = local ] && echo app || echo email)}
+SMTP_HOST=${SMTP_HOST:-smtp.hostinger.com}
+SMTP_PORT=${SMTP_PORT:-465}
+SMTP_USER=${SMTP_USER:-}
+SMTP_FROM=${SMTP_FROM:-}
+SMTP_PASSWORD=${SMTP_PASSWORD:-}
 OWNER_SETUP_TOKEN=${OWNER_SETUP_TOKEN:-$(head -c 24 /dev/urandom | base64 | tr -dc A-Za-z0-9)}
 CLERK_SECRET_KEY=${CLERK_SECRET_KEY:-}
 CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY:-${VITE_CLERK_PUBLISHABLE_KEY:-}}
@@ -91,6 +96,7 @@ chown root:"$RUN_USER" "$ETC/api.env" "$ETC/web-build.env"
 
 echo "== services"
 install -m 755 "$APP/deploy/deploy.sh" /usr/local/bin/saad-deploy
+install -m 755 "$APP/deploy/set-smtp-password.sh" /usr/local/bin/saad-set-smtp
 install -m 644 "$APP/deploy/saad-albaqmi-api.service" /etc/systemd/system/saad-albaqmi-api.service
 sed -e "s#__DOMAIN__#${DOMAIN:-_}#g" -e "s#__APP__#$APP#g" -e "s#__PORT__#$PORT#g" "$APP/deploy/nginx.conf.template" > /etc/nginx/sites-available/saad-albaqmi
 ln -sf /etc/nginx/sites-available/saad-albaqmi /etc/nginx/sites-enabled/saad-albaqmi

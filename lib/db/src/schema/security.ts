@@ -154,3 +154,21 @@ export const localSessions = pgTable("local_sessions", {
   ip: inet("ip"),
   userAgent: text("user_agent"),
 }, (t) => [index("local_sessions_account_idx").on(t.accountId), index("local_sessions_expiry_idx").on(t.expiresAt)]);
+
+/** One-time sign-in codes sent by e-mail. Only an HMAC of (id, e-mail, code) is stored; a code works once and expires. */
+export const loginCodes = pgTable("login_codes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  codeHmac: text("code_hmac").notNull(),
+  status: text("status").notNull().default("pending"),
+  attempts: integer("attempts").notNull().default(0),
+  requestedAt: timestamp("requested_at", { withTimezone: true }).defaultNow().notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  requestedIp: inet("requested_ip"),
+  usedIp: inet("used_ip"),
+}, (t) => [
+  index("login_codes_email_idx").on(sql`lower(${t.email})`, t.requestedAt),
+  check("login_codes_status_ck", sql`${t.status} in ('pending','used','expired','failed')`),
+  check("login_codes_used_ck", sql`(${t.status} = 'used') = (${t.usedAt} is not null)`),
+]);

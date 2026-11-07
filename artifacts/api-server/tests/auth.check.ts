@@ -97,6 +97,43 @@ async function main() {
     const good = await verifyChallenge({ challengeId: ch.challengeId, memberId: owner!.id, code: item.code, ctx: { ip: "10.0.0.1", userAgent: "t" } });
     assert.equal(good.ok, true);
     assert.equal((await inboxFor(owner!.id)).some((i) => i.challengeId === ch.challengeId), false, "verified code leaves the inbox");
+    // 10. e-mail code sign-in through the organization mailbox (transport replaced by a capture)
+    const { setMailTransport } = await import("../src/lib/smtp");
+    const mails: { to: string; html: string }[] = [];
+    setMailTransport(async (m) => { mails.push({ to: m.to, html: m.html }); });
+    const codeOf = () => /letter-spacing[^>]*>(\d{6})</.exec(mails.at(-1)!.html)![1]!;
+    assert.equal((await call("GET", "/api/auth/mode")).body.emailCode, true);
+    const stranger = `stranger-${stamp}@example.test`;
+    assert.equal((await call("POST", "/api/auth/code/request", { email: stranger })).status, 200);
+    assert.equal(mails.length, 0, "no mail for an uninvited address (and the answer looks the same)");
+    const newcomer = `new-${stamp}@example.test`;
+    await db.insert(orgMembers).values({ email: newcomer, role: "coordinator", status: "invited" });
+    assert.equal((await call("POST", "/api/auth/code/request", { email: newcomer })).status, 200);
+    assert.equal(mails.length, 1); assert.equal(mails[0]!.to, newcomer);
+    assert.equal((await call("POST", "/api/auth/code/request", { email: newcomer })).status, 200); assert.equal(mails.length, 1, "cooldown: no second mail within a minute");
+    const right = codeOf();
+    const wrong = right === "000000" ? "000001" : "000000";
+    assert.equal((await call("POST", "/api/auth/code/verify", { email: newcomer, code: wrong }, "N")).status, 401);
+    assert.equal((await call("GET", "/api/auth/me", undefined, "N")).body.signedIn, false);
+    assert.equal((await call("POST", "/api/auth/code/verify", { email: newcomer, code: right }, "N")).status, 200);
+    assert.equal((await call("GET", "/api/auth/me", undefined, "N")).body.email, newcomer);
+    assert.equal((await call("GET", "/api/workspace", undefined, "N")).status, 200);
+    assert.equal((await call("POST", "/api/auth/code/verify", { email: newcomer, code: right }, "N2")).status, 401, "a code works once");
+    const [codeRow] = await db.execute(sql`select code_hmac from login_codes where lower(email) = ${newcomer} limit 1`).then((r) => r.rows as { code_hmac: string }[]);
+    assert.ok(codeRow && !codeRow.code_hmac.includes(right), "code not stored");
+    // lock after repeated wrong codes
+    await db.execute(sql`update login_codes set requested_at = now() - interval '2 minutes' where lower(email) = ${newcomer}`);
+    await call("POST", "/api/auth/code/request", { email: newcomer }); assert.equal(mails.length, 2);
+    for (let i = 0; i < 5; i++) await call("POST", "/api/auth/code/verify", { email: newcomer, code: codeOf() === "111111" ? "222222" : "111111" }, "N3");
+    assert.equal((await call("POST", "/api/auth/code/verify", { email: newcomer, code: codeOf() }, "N3")).status, 401, "five wrong codes burn the challenge");
+    // revoked members get nothing
+    await db.update(orgMembers).set({ status: "revoked" }).where(sql`lower(${orgMembers.email}) = ${newcomer}`);
+    await db.execute(sql`update login_codes set requested_at = now() - interval '2 minutes' where lower(email) = ${newcomer}`);
+    await call("POST", "/api/auth/code/request", { email: newcomer }); assert.equal(mails.length, 2);
+    // transaction OTP over the same mailbox
+    process.env.OTP_CHANNEL = "email"; process.env.SMTP_HOST = "x"; process.env.SMTP_USER = "x"; process.env.SMTP_PASSWORD = "x";
+    const em = await issueChallenge({ member: { id: owner!.id, email: owner!.email }, action: "record.update", subjectType: "payment", subject: doc, ctx: { ip: null, userAgent: null } });
+    assert.match(em.destination, /\*\*\*@/); assert.equal(mails.at(-1)!.to, owner!.email); setMailTransport(null);
     console.log("auth.check: all assertions passed");
   } finally { server.close(); }
 }

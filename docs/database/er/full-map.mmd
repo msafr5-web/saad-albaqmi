@@ -204,6 +204,9 @@ erDiagram
     text token_hash PK
     bigint account_id FK
   }
+  login_codes {
+    uuid id PK
+  }
   match_tolerances {
     bigint id PK
     bigint category_id FK

@@ -88,3 +88,11 @@ provider's secret store, never in the repository.
   deliberate second step, not a second device; use the phone for real separation.
 - Forgotten password: an administrator re-issues it. Lost administrator access: re-run `saad-deploy` after deleting the owner's row in `local_accounts`.
 - Switch back to Clerk by setting `AUTH_MODE=clerk`/`VITE_AUTH_MODE` empty and the Clerk keys; accounts are not migrated between modes.
+
+### E-mail sign-in code (organization mailbox)
+
+With `SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD` set (Hostinger: `smtp.hostinger.com:465`) the sign-in page asks for the e-mail and sends a
+6-digit code (5 minutes, single use, 5 attempts, 60 s cooldown, HMAC only stored in `login_codes`). Only the owner address and invited/active
+members receive a code; everyone gets the same answer. The account is created at the first successful code (the mailbox is the proof).
+`OTP_CHANNEL=email` sends transaction-confirmation codes through the same mailbox. Set the password on the server with `saad-set-smtp`
+(hidden prompt), never in chat. If the mailbox is down, the owner can still sign in with password at `/sign-in` → "الدخول بكلمة المرور".

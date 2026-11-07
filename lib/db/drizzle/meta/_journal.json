@@ -43,6 +43,13 @@
       "when": 1794066865203,
       "tag": "0005_local_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794077800384,
+      "tag": "0006_login_codes",
+      "breakpoints": true
     }
   ]
 }

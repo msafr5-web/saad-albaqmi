@@ -1,4 +1,4 @@
-// 87 tables. Generated from the live database by lib/db/scripts/er.mjs — do not edit by hand.
+// 88 tables. Generated from the live database by lib/db/scripts/er.mjs — do not edit by hand.
 Project saad_albaqmi { database_type: 'PostgreSQL' }
 
 TableGroup org { branches document_sequences documents notifications org_settings } // المؤسسة والإعدادات
@@ -12,7 +12,7 @@ TableGroup expenses { branch_budgets cost_report_snapshots expense_categories ex
 TableGroup inventory { item_categories items reorder_alerts stock_count_lines stock_counts stock_levels stock_movements stock_transfer_lines stock_transfers units warehouses } // المخزون
 TableGroup sourcing { procurement_exceptions purchase_request_lines purchase_requests quotation_evaluations quotation_lines quotations rfq_awards rfq_suppliers rfqs supplier_categories suppliers } // المشتريات: الموردون وعروض الأسعار
 TableGroup orders { direct_purchase_policies goods_receipt_lines goods_receipts match_tolerances purchase_limits purchase_order_lines purchase_orders supplier_invoice_lines supplier_invoices supplier_payments } // المشتريات: الأوامر والاستلام والفواتير
-TableGroup security { audit_events identity_cards local_accounts local_sessions otp_challenges presence_events } // الأمان والهوية والحضور
+TableGroup security { audit_events identity_cards local_accounts local_sessions login_codes otp_challenges presence_events } // الأمان والهوية والحضور
 TableGroup legacy { cost_policies education_audit education_records org_members } // الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا
 
 Table approval_delegations {
@@ -525,6 +525,20 @@ Table local_sessions {
   ip inet
   user_agent text
   Note: 'جلسات المتصفح؛ تُخزَّن بصمة الرمز فقط ولا يُخزَّن الرمز نفسه'
+}
+
+Table login_codes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  email text [not null]
+  code_hmac text [not null]
+  status text [not null, default: `'pending'::text`]
+  attempts int [not null, default: `0`]
+  requested_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null]
+  used_at timestamptz
+  requested_ip inet
+  used_ip inet
+  Note: 'رموز الدخول المرسلة بالبريد: بصمة الرمز فقط، صالحة مرة واحدة ولمدة قصيرة'
 }
 
 Table match_tolerances {

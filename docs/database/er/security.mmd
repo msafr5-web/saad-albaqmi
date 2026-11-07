@@ -55,6 +55,18 @@ erDiagram
     inet ip
     text user_agent
   }
+  login_codes {
+    uuid id PK
+    text email
+    text code_hmac
+    text status
+    int attempts
+    timestamptz requested_at
+    timestamptz expires_at
+    timestamptz used_at
+    inet requested_ip
+    inet used_ip
+  }
   otp_challenges {
     uuid id PK
     int member_id FK

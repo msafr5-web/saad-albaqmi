@@ -82,24 +82,44 @@ function useSubmit(action: () => Promise<void>) {
   return { busy, error, submit };
 }
 
-/** Self-hosted sign-in. "?setup=1" opens the one-time owner setup (needs the setup token printed by the server installer). */
+/**
+ * Self-hosted sign-in. Default: e-mail + a 6-digit code sent to that mailbox. "?setup=1" is the one-time owner setup
+ * (password + the setup token from the server), and the password form stays available as an emergency path.
+ */
 export function LocalSignIn() {
   const { refresh } = useContext(LocalCtx); const qc = useQueryClient();
   const setupMode = new URLSearchParams(window.location.search).has("setup");
-  const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [token, setToken] = useState("");
+  const [emailCode, setEmailCode] = useState<boolean | null>(null);
+  const [usePassword, setUsePassword] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [token, setToken] = useState(""); const [code, setCode] = useState("");
+  useEffect(() => { api<{ emailCode?: boolean }>("GET", "/api/auth/mode").then((m) => setEmailCode(!!m.emailCode)).catch(() => setEmailCode(false)); }, []);
+  const codeFlow = emailCode === true && !setupMode && !usePassword;
+  const done = async () => { qc.clear(); await refresh(); window.location.assign(`${basePath}/dashboard`); };
   const { busy, error, submit } = useSubmit(async () => {
+    if (codeFlow) {
+      if (!sent) { await api("POST", "/api/auth/code/request", { email }); setSent(true); return; }
+      await api("POST", "/api/auth/code/verify", { email, code }); await done(); return;
+    }
     await api("POST", setupMode ? "/api/auth/setup-owner" : "/api/auth/login", setupMode ? { email, password, setupToken: token } : { email, password });
-    qc.clear(); await refresh(); window.location.assign(`${basePath}/dashboard`);
+    await done();
   });
+  const title = setupMode ? "إعداد حساب المالك" : "مرحبًا بعودتك";
+  const subtitle = setupMode ? "أول مرة فقط: أدخل رمز الإعداد الذي أعطاك إياه مسؤول الخادم"
+    : codeFlow ? (sent ? "أرسلنا رمزًا من 6 أرقام إلى بريدك" : "اكتب بريدك وسنرسل لك رمز الدخول") : "سجّل الدخول إلى مساحة عملك";
+  if (emailCode === null) return <Card title={title}><p className="text-center text-sm text-[#5a5f5c]">جارٍ التحميل...</p></Card>;
   return (
-    <Card title={setupMode ? "إعداد حساب المالك" : "مرحبًا بعودتك"} subtitle={setupMode ? "أول مرة فقط: أدخل رمز الإعداد الذي أعطاك إياه مسؤول الخادم" : "سجّل الدخول إلى مساحة عملك"}>
+    <Card title={title} subtitle={subtitle}>
       <form onSubmit={submit} className="space-y-3">
-        <label className="block text-sm text-[#0e100f]">البريد الإلكتروني<input className={field} type="email" autoComplete="username" required dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-email" /></label>
-        <label className="block text-sm text-[#0e100f]">كلمة المرور<input className={field} type="password" autoComplete={setupMode ? "new-password" : "current-password"} required dir="ltr" value={password} onChange={(e) => setPassword(e.target.value)} data-testid="input-password" /></label>
+        <label className="block text-sm text-[#0e100f]">البريد الإلكتروني<input className={field} type="email" autoComplete="username" required dir="ltr" value={email} disabled={codeFlow && sent} onChange={(e) => setEmail(e.target.value)} data-testid="input-email" /></label>
+        {codeFlow ? (sent ? <label className="block text-sm text-[#0e100f]">رمز الدخول<input className={field} inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" maxLength={6} required dir="ltr" autoFocus value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} data-testid="input-code" /></label> : null) : (
+          <label className="block text-sm text-[#0e100f]">كلمة المرور<input className={field} type="password" autoComplete={setupMode ? "new-password" : "current-password"} required dir="ltr" value={password} onChange={(e) => setPassword(e.target.value)} data-testid="input-password" /></label>)}
         {setupMode ? <label className="block text-sm text-[#0e100f]">رمز الإعداد<input className={field} type="password" required dir="ltr" value={token} onChange={(e) => setToken(e.target.value)} /></label> : null}
         {error ? <p role="alert" className="rounded-lg border border-[#e3e1dc] bg-[#f4f3f0] p-3 text-sm text-[#c0392b]">{error}</p> : null}
-        <button className={btn} disabled={busy} data-testid="button-login">{busy ? "جارٍ التحقق..." : setupMode ? "إنشاء حساب المالك" : "تسجيل الدخول"}</button>
-        <p className="pt-2 text-center text-xs text-[#5a5f5c]">الحسابات تُصدرها الإدارة العليا؛ لا يوجد تسجيل ذاتي.</p>
+        <button className={btn} disabled={busy} data-testid="button-login">{busy ? "جارٍ التحقق..." : setupMode ? "إنشاء حساب المالك" : codeFlow ? (sent ? "دخول" : "إرسال الرمز") : "تسجيل الدخول"}</button>
+        {codeFlow && sent ? <button type="button" className="w-full text-center text-xs text-[#5a5f5c] underline" onClick={() => { setSent(false); setCode(""); }}>إعادة إرسال الرمز / تغيير البريد</button> : null}
+        {emailCode && !setupMode ? <button type="button" className="w-full text-center text-xs text-[#5a5f5c] underline" onClick={() => { setUsePassword((v) => !v); setSent(false); }}>{usePassword ? "الدخول برمز البريد" : "الدخول بكلمة المرور"}</button> : null}
+        <p className="pt-2 text-center text-xs text-[#5a5f5c]">الدخول للمدعوين من الإدارة العليا فقط؛ لا يوجد تسجيل ذاتي.</p>
       </form>
     </Card>
   );

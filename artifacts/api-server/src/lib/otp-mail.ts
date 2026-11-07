@@ -1,4 +1,5 @@
 import { logger } from "./logger";
+import { sendMail, smtpConfigured } from "./smtp";
 
 export type OtpMailResult = { sent: true } | { sent: false; error: string };
 
@@ -14,6 +15,13 @@ export function maskEmail(email: string): string {
 export async function sendOtpEmail(to: string, code: string, actionLabel: string, ttlMinutes: number): Promise<OtpMailResult> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
+  if (smtpConfigured() && !(key && from)) {
+    const html = `<div dir="rtl" style="font-family:system-ui,sans-serif;line-height:1.9"><h2>رمز تأكيد العملية</h2><p>العملية: <b>${esc(actionLabel)}</b></p>
+<p style="font-size:30px;letter-spacing:8px;font-weight:700;direction:ltr;text-align:right">${esc(code)}</p>
+<p>الرمز صالح لمدة ${ttlMinutes} دقائق ويُستخدم مرة واحدة. إن لم تطلب هذه العملية فتجاهل الرسالة وأبلغ الإدارة، ولا تشارك الرمز مع أحد.</p></div>`;
+    const r = await sendMail({ to, subject: "رمز تأكيد العملية — صرح د. سعد البقمي التعليمي", html });
+    return r.sent ? { sent: true } : { sent: false, error: r.error };
+  }
   if (!key || !from) return { sent: false, error: "خدمة البريد غير مهيأة (RESEND_API_KEY / RESEND_FROM_EMAIL)" };
   const html = `<div dir="rtl" style="font-family:system-ui,sans-serif;line-height:1.9"><h2>رمز تأكيد العملية</h2>
 <p>العملية: <b>${esc(actionLabel)}</b></p>

@@ -14,6 +14,7 @@ if [ "${1:-}" != "--first-run" ]; then
   chown -R "$RUN_USER":"$RUN_USER" "$APP"
 fi
 as_app "pnpm install --frozen-lockfile --config.strict-dep-builds=false"
+install -m 755 "$APP/deploy/deploy.sh" /usr/local/bin/saad-deploy; install -m 755 "$APP/deploy/set-smtp-password.sh" /usr/local/bin/saad-set-smtp   # keep the installed copies current
 as_app "pnpm --filter @workspace/db run migrate"
 export PORT=3000 BASE_PATH=/
 as_app "pnpm --filter @workspace/api-server run build"

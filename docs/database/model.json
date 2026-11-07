@@ -1,6 +1,6 @@
 {
  "stats": {
-  "tables": 87,
+  "tables": 88,
   "relationships": 196,
   "views": [
    "v_audit_workflow",
@@ -823,6 +823,12 @@
      "references": [
       "local_accounts"
      ]
+    },
+    {
+     "name": "login_codes",
+     "comment": "رموز الدخول المرسلة بالبريد: بصمة الرمز فقط، صالحة مرة واحدة ولمدة قصيرة",
+     "columns": 10,
+     "references": []
     },
     {
      "name": "otp_challenges",
