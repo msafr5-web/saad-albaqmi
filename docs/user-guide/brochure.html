@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>دليل استخدام منظومة صرح د. سعد البقمي التعليمي</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #121513; --muted: #5a5f5c; --paper: #f7f6f3; --card: #ffffff; --line: #e3e1dc;
+    --navy: #233644; --navy2: #2d4556; --orange: #f0661a; --orange-soft: #fde9dc; --green: #2f7d4f; --blue: #2c6aa0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", Arial, sans-serif; color: var(--ink); background: #888; line-height: 1.75; font-size: 11.5pt; }
+  .page { width: 210mm; height: 297mm; background: var(--paper); position: relative; overflow: hidden; page-break-after: always; break-after: page; padding: 16mm 15mm 18mm; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  .pattern { position: absolute; inset: 0; opacity: .07; background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 14px 14px; pointer-events: none; }
+  h1, h2, h3 { line-height: 1.35; }
+  h2 { font-size: 21pt; color: var(--navy); margin-bottom: 4mm; display: flex; align-items: center; gap: 10px; }
+  h2 .no { background: var(--orange); color: #fff; width: 11mm; height: 11mm; border-radius: 50%; display: inline-grid; place-items: center; font-size: 14pt; flex: none; }
+  h3 { font-size: 13.5pt; color: var(--navy); margin: 5mm 0 2mm; }
+  p { margin-bottom: 2.5mm; }
+  .lead { color: var(--muted); font-size: 12pt; margin-bottom: 5mm; }
+  .foot { position: absolute; bottom: 8mm; inset-inline: 15mm; display: flex; justify-content: space-between; font-size: 8.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 2.5mm; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 4mm; padding: 4.5mm 5mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3.5mm; }
+  .tip { background: var(--orange-soft); border-inline-start: 1.6mm solid var(--orange); border-radius: 2.5mm; padding: 3.5mm 4.5mm; margin: 4mm 0; font-size: 10.5pt; }
+  .tip b { color: #b94a0d; }
+  .warn { background: #fdeceb; border-inline-start: 1.6mm solid #c0392b; border-radius: 2.5mm; padding: 3.5mm 4.5mm; margin: 4mm 0; font-size: 10.5pt; }
+  .pill { display: inline-block; background: var(--navy); color: #fff; border-radius: 99px; padding: 0 3mm; font-size: 9pt; margin-inline-end: 1.5mm; }
+  ol.steps { list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; position: relative; padding-inline-start: 12mm; margin-bottom: 4mm; }
+  ol.steps li::before { content: counter(s); position: absolute; inset-inline-start: 0; top: 0; width: 8.5mm; height: 8.5mm; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  ol.steps li b { color: var(--navy); }
+  ul.dots { list-style: none; } ul.dots li { position: relative; padding-inline-start: 5mm; margin-bottom: 1.5mm; }
+  ul.dots li::before { content: ""; position: absolute; inset-inline-start: 0; top: 3.2mm; width: 2mm; height: 2mm; border-radius: 50%; background: var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; background: #fff; border-radius: 3mm; overflow: hidden; }
+  th { background: var(--navy); color: #fff; padding: 2.2mm 2.5mm; text-align: start; font-weight: 600; }
+  td { border-top: 1px solid var(--line); padding: 2mm 2.5mm; vertical-align: top; }
+  tr:nth-child(even) td { background: #fbfaf8; }
+  .tick { color: var(--green); font-weight: 700; } .dash { color: #b9b6ae; }
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .node { display: grid; grid-template-columns: 11mm 1fr auto; gap: 3mm; align-items: start; background: #fff; border: 1px solid var(--line); border-radius: 3mm; padding: 2.8mm 3.5mm; }
+  .node .n { width: 8.5mm; height: 8.5mm; border-radius: 50%; background: var(--orange); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .node b { color: var(--navy); } .node small { color: var(--muted); display: block; font-size: 9.3pt; line-height: 1.55; }
+  .who { font-size: 8.5pt; background: var(--navy); color: #fff; border-radius: 99px; padding: 0.5mm 3mm; white-space: nowrap; }
+  .arrow { text-align: center; color: var(--orange); font-size: 11pt; line-height: 1; height: 4mm; }
+  .phone { width: 62mm; margin-inline: auto; background: var(--navy); border-radius: 9mm; padding: 3mm; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .screen { background: var(--paper); border-radius: 6.5mm; padding: 4mm 3.5mm; min-height: 106mm; }
+  .idcard { background: linear-gradient(135deg, #233644, #3a5469); color: #fff; border-radius: 3.5mm; padding: 3.5mm; margin-bottom: 3mm; }
+  .idcard .nm { font-size: 11pt; font-weight: 700; } .idcard .sub { font-size: 8pt; opacity: .75; }
+  .qr { width: 24mm; height: 24mm; margin: 2.5mm auto 1mm; background:
+      conic-gradient(#fff 25%, transparent 0 50%, #fff 0 75%, transparent 0) 0 0/4mm 4mm, #121513; border: 2mm solid #fff; border-radius: 1.5mm; }
+  .tabs { display: flex; justify-content: space-around; border-top: 1px solid var(--line); margin-top: 3mm; padding-top: 2mm; font-size: 7.5pt; color: var(--muted); }
+  .tabs .on { color: var(--orange); font-weight: 700; }
+  .cover { background: var(--navy); color: #fff; padding: 0; }
+  .cover .inner { position: relative; padding: 22mm 18mm; height: 100%; display: flex; flex-direction: column; }
+  .cover h1 { font-size: 36pt; margin: 14mm 0 4mm; } .cover h1 span { color: var(--orange); }
+  .cover .sub { font-size: 15pt; opacity: .85; max-width: 150mm; }
+  .cover .chips { margin-top: auto; display: flex; gap: 3mm; flex-wrap: wrap; }
+  .chip { border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 1.5mm 5mm; font-size: 10.5pt; }
+  .cover .url { font-family: Consolas, monospace; direction: ltr; font-size: 17pt; color: var(--orange); margin-top: 8mm; }
+  .badge-row { display: flex; gap: 2mm; flex-wrap: wrap; }
+  .mod { background: #fff; border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3.5mm; }
+  .mod h4 { font-size: 11pt; color: var(--navy); margin-bottom: 1mm; } .mod p { font-size: 9.5pt; color: var(--muted); margin: 0; line-height: 1.6; }
+  .mod .tag { font-size: 8pt; color: var(--orange); font-weight: 700; }
+  .code { font-family: Consolas, monospace; direction: ltr; letter-spacing: 4px; font-size: 20pt; font-weight: 700; text-align: center; color: var(--navy); background: #fff; border: 1px dashed var(--navy); border-radius: 3mm; padding: 3mm; }
+  .faq dt { font-weight: 700; color: var(--navy); margin-top: 3mm; } .faq dd { color: #333; font-size: 10.5pt; }
+  .num { direction: ltr; unicode-bidi: isolate; font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover">
+  <div class="pattern"></div>
+  <div class="inner">
+    <div style="display:flex;align-items:center;gap:5mm"><img src="../../artifacts/saad-albaqmi/public/logo-mark.svg" width="62" height="62" alt=""><div><div style="font-size:15pt;font-weight:700">صرح د. سعد البقمي</div><div style="font-size:10.5pt;opacity:.7">المنظومة التعليمية الموحدة</div></div></div>
+    <h1>دليل استخدام<br><span>المنظومة</span></h1>
+    <p class="sub">من تسجيل الدخول إلى البطاقة الرقمية والحضور، ومن المخزون إلى دورة المشتريات الكاملة: كل ما تحتاجه لتبدأ العمل بثقة، في دليل مختصر وواضح.</p>
+    <div class="url">drsaad.tech</div>
+    <div class="chips"><span class="chip">للموظفين والمدراء</span><span class="chip">للمدربين</span><span class="chip">للطلاب</span><span class="chip">يعمل على الجوال والحاسوب</span></div>
+    <div style="margin-top:8mm;font-size:9.5pt;opacity:.6">الإصدار الأول · نوفمبر 2026</div>
+  </div>
+</section>
+
+<!-- 2. QUICK START -->
+<section class="page">
+  <h2><span class="no">1</span> ابدأ في دقيقة</h2>
+  <p class="lead">الدخول بدون كلمة مرور تحفظها: يصلك رمز على بريدك في كل مرة، فلا شيء يُسرق أو يُنسى.</p>
+  <div class="grid2" style="align-items:start">
+    <div>
+      <ol class="steps">
+        <li><b>افتح الموقع</b><br>اكتب العنوان <span class="num">drsaad.tech</span> في المتصفح، ثم اختر «تسجيل الدخول».</li>
+        <li><b>اكتب بريدك</b> الذي سجّلته الإدارة، ثم اضغط «إرسال الرمز».</li>
+        <li><b>افتح بريدك</b> وانسخ الرمز المكوّن من 6 أرقام (تفقّد الرسائل المزعجة إن تأخر).</li>
+        <li><b>اكتب الرمز</b> واضغط «دخول». تظهر لك «النظرة التنفيذية» ويظهر دورك أسفل القائمة الجانبية.</li>
+      </ol>
+      <div class="code">4 8 1 9 0 2</div>
+      <p style="text-align:center;font-size:9.5pt;color:var(--muted);margin-top:1.5mm">مثال لشكل الرمز · صالح 5 دقائق ويُستخدم مرة واحدة</p>
+    </div>
+    <div>
+      <div class="card">
+        <h3 style="margin-top:0">لا أجد رسالة الرمز؟</h3>
+        <ul class="dots">
+          <li>انتظر دقيقة؛ لا يُرسل رمز ثانٍ قبل مرور 60 ثانية.</li>
+          <li>راجع الرسائل المزعجة (Spam).</li>
+          <li>تأكد أن بريدك هو الذي سجّلته الإدارة بالضبط.</li>
+          <li>بعد 5 محاولات خاطئة يُلغى الرمز؛ اطلب رمزًا جديدًا.</li>
+        </ul>
+      </div>
+      <div class="card" style="margin-top:4mm">
+        <h3 style="margin-top:0">لا يوجد تسجيل ذاتي</h3>
+        <p style="font-size:10.5pt;margin:0">الدخول للمدعوين فقط. إن لم تكن مسجّلًا فاطلب من الإدارة العليا دعوتك من صفحة «فريق العمل» بدورك المناسب.</p>
+      </div>
+    </div>
+  </div>
+  <h3>ثبّت الموقع كتطبيق على جوالك</h3>
+  <div class="grid2">
+    <div class="card"><b>آيفون (Safari)</b><p style="font-size:10.5pt;margin:1mm 0 0">اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</p></div>
+    <div class="card"><b>أندرويد (Chrome)</b><p style="font-size:10.5pt;margin:1mm 0 0">القائمة ⋮ ثم «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</p></div>
+  </div>
+  <div class="tip"><b>بدون متجر وبدون رسوم:</b> هذا تطبيق ويب يعمل على جميع الهواتف. بعد التثبيت يفتح من أيقونته مباشرة وبملء الشاشة.</div>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">2</span></div>
+</section>
+
+<!-- 3. ROLES -->
+<section class="page">
+  <h2><span class="no">2</span> ماذا ترى؟ حسب دورك</h2>
+  <p class="lead">القائمة الجانبية تعرض لك الصفحات المسموحة لدورك فقط، وتظهر بيانات فرعك وحده. هذا مقصود لحماية البيانات.</p>
+  <table>
+    <tr><th style="width:23%">الدور</th><th>أهم ما يفعله</th><th style="width:23%">نطاقه</th></tr>
+    <tr><td><b>الإدارة العليا</b></td><td>كل الصفحات، دعوة الأعضاء وتحديد أدوارهم، سجل التدقيق، اعتماد التفويض.</td><td>كل الفروع</td></tr>
+    <tr><td><b>مدير فرع</b></td><td>إدارة فرعه، اعتماد طلبات الشراء وأوامرها، الجداول والقاعات والطلاب.</td><td>فرعه</td></tr>
+    <tr><td><b>المالية</b></td><td>المدفوعات والمصروفات والأقساط، الميزانية والضريبة، الرواتب والتقارير.</td><td>فرع أو كل الفروع</td></tr>
+    <tr><td><b>منسق</b></td><td>الجدولة، القاعات والأصول، الطلاب والمدربون، الحضور.</td><td>فرعه</td></tr>
+    <tr><td><b>مدرب</b></td><td>جدوله، طلابه، تسجيل حضوره في القاعة، بطاقته.</td><td>حصصه</td></tr>
+    <tr><td><b>طالب</b></td><td>جدوله، وضعه المالي، بطاقته الرقمية.</td><td>بياناته فقط</td></tr>
+    <tr><td><b>أمين مستودع</b></td><td>الاستلام والصرف والنقل والجرد في مستودع فرعه.</td><td>مستودع فرعه</td></tr>
+    <tr><td><b>مختص مشتريات</b></td><td>طلبات عروض الأسعار، المقارنة الفنية، إعداد أوامر الشراء.</td><td>فرع أو المركز</td></tr>
+    <tr><td><b>مسؤول موارد بشرية</b></td><td>سجلات الموظفين، الإجازات، الورديات، اقتراح التفويض، الحضور.</td><td>فرعه</td></tr>
+  </table>
+  <div class="tip"><b>لا ترى صفحة تحتاجها؟</b> لا تبحث عن حل بديل؛ اطلب من الإدارة العليا تعديل دورك أو فرعك من «فريق العمل».</div>
+  <h3>قواعد تحمي الجميع</h3>
+  <ul class="dots">
+    <li><b>لا يعتمد أحد ما أعدّه بنفسه:</b> من يُعدّ أمر الشراء لا يعتمده.</li>
+    <li><b>السجلات المالية المؤكدة لا تُعدّل:</b> التصحيح يتم بقيد عكسي موثّق، فلا يضيع الأثر.</li>
+    <li><b>كل عملية حساسة تُسجَّل:</b> من، ومتى، ومن أي جهاز، في سجل التدقيق.</li>
+  </ul>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">3</span></div>
+</section>
+
+<!-- 4. MAP -->
+<section class="page">
+  <h2><span class="no">3</span> خريطة المنظومة</h2>
+  <p class="lead">عشرون صفحة في ستة محاور. تظهر لك منها ما يخص دورك فقط.</p>
+  <div class="grid2">
+    <div class="mod"><span class="tag">الإدارة</span><h4>النظرة التنفيذية</h4><p>لوحة الأرقام الرئيسية للفرع أو المؤسسة، وهي أول ما تراه بعد الدخول.</p></div>
+    <div class="mod"><span class="tag">الأكاديمي</span><h4>الفروع · القاعات · الدبلومات</h4><p>الفروع وقاعاتها ومعاملها، والدبلومات وموادها وأسعارها (شاملة أو غير شاملة الضريبة).</p></div>
+    <div class="mod"><span class="tag">الأكاديمي</span><h4>الطلاب · المدربون · الجدولة</h4><p>سجلات الطلاب والمدربين وجدولة الحصص دون تعارض في القاعة أو المدرب.</p></div>
+    <div class="mod"><span class="tag">المالي</span><h4>المالية · الميزانية والضريبة</h4><p>المحصّل والمصروف والأقساط، والميزانية الشهرية لكل فرع مع متابعة أسبوعية.</p></div>
+    <div class="mod"><span class="tag">المخزون والمشتريات</span><h4>المخزون · المشتريات</h4><p>مستودع لكل فرع، حد أدنى للأصناف، وتنبيه تلقائي يبدأ دورة الشراء حتى الدفع.</p></div>
+    <div class="mod"><span class="tag">الموارد البشرية</span><h4>الموارد البشرية</h4><p>الموظفون والإجازات والورديات والتفويض والرواتب.</p></div>
+    <div class="mod"><span class="tag">الهوية</span><h4>بطاقتي · الحضور والبطاقات</h4><p>بطاقتك الرقمية بشكل بطاقة الصراف، ومسح الدخول والحضور بالـQR وNFC.</p></div>
+    <div class="mod"><span class="tag">المتابعة</span><h4>التقارير · سجل التدقيق</h4><p>تقارير التكلفة، وسجل الأحداث الحساسة الذي لا يُعدَّل.</p></div>
+    <div class="mod"><span class="tag">الأدوات</span><h4>أدوات NFC · الإعدادات</h4><p>كتابة وقراءة وسوم القاعات، وتثبيت التطبيق وإعدادات حسابك.</p></div>
+    <div class="mod"><span class="tag">الإدارة العليا</span><h4>فريق العمل</h4><p>دعوة الأعضاء وتحديد دورهم وفرعهم وإيقاف صلاحياتهم.</p></div>
+  </div>
+  <h3>أسلوب العمل الموحّد في كل الصفحات</h3>
+  <ul class="dots">
+    <li>البيانات تُحفظ على الخادم فورًا، وتصلك رسالة تأكيد أو رسالة خطأ مكتوبة بالعربية بسبب واضح.</li>
+    <li>الأرقام المالية تُحفظ بالهللة دون كسور عائمة، فلا فروق تراكمية.</li>
+    <li>على الجوال تتحول القائمة الجانبية إلى قائمة منسدلة، وصفحة «بطاقتي» لها شريط تبويب سفلي.</li>
+  </ul>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">4</span></div>
+</section>
+
+<!-- 5. CARD -->
+<section class="page">
+  <h2><span class="no">4</span> بطاقتي الرقمية والحضور</h2>
+  <div class="grid2" style="align-items:start">
+    <div>
+      <p class="lead">لكل طالب وموظف ومدرب بطاقة واحدة بشكل بطاقة الصراف. تفتحها من «بطاقتي» في أي وقت.</p>
+      <h3 style="margin-top:0">كيف تستخدمها؟</h3>
+      <ul class="dots">
+        <li><b>رمز QR دوّار:</b> يتجدد كل 30 ثانية، فلا ينفع تصويره ولا إرساله لغيرك.</li>
+        <li><b>NFC:</b> قرّب جوالك من القارئ (أندرويد مع Chrome).</li>
+        <li><b>آيفون:</b> لا يدعم NFC من المتصفح، فيُستخدم QR والكاميرا بدلًا منه.</li>
+        <li>تُظهر بطاقتك اسمك ورقمك ونوعك (طالب، موظف، مدرب)، وسجل حضورك.</li>
+      </ul>
+      <h3>أين تسجّل الحضور؟</h3>
+      <div class="card" style="margin-bottom:3mm"><b>بوابة الفرع</b><p style="font-size:10pt;margin:0">يمسح مسؤول البوابة بطاقتك فيُسجَّل الدخول أو الخروج.</p></div>
+      <div class="card" style="margin-bottom:3mm"><b>القاعة (المدرب)</b><p style="font-size:10pt;margin:0">يمسح المدرب وسم القاعة (QR أو NFC) فيبدأ حضوره في الحصة.</p></div>
+      <div class="card"><b>الحصة (الطالب)</b><p style="font-size:10pt;margin:0">يُسجَّل حضورك في سجل الحضور ويراه المنسق والمدرب.</p></div>
+    </div>
+    <div>
+      <div class="phone"><div class="screen">
+        <div style="font-size:9.5pt;font-weight:700;color:var(--navy);margin-bottom:2mm">بطاقتي</div>
+        <div class="idcard"><div class="sub">صرح د. سعد البقمي</div><div class="nm">اسم حامل البطاقة</div><div class="sub">طالب · <span class="num">SQ-000123</span></div><div class="qr"></div><div class="sub" style="text-align:center">يتجدد خلال <span class="num">18s</span></div></div>
+        <div style="font-size:8pt;color:var(--muted)">آخر حركة: دخول · 08:02 ص</div>
+        <div class="tabs"><span class="on">بطاقتي</span><span>المسح</span><span>السجل</span></div>
+      </div></div>
+      <p style="text-align:center;font-size:9pt;color:var(--muted);margin-top:2.5mm">شكل توضيحي للبطاقة وشريط التبويب</p>
+    </div>
+  </div>
+  <div class="warn"><b>ضاع جوالك أو بطاقتك؟</b> أبلغ الإدارة فورًا. تُلغى البطاقة من الخادم فيتوقف عملها في اللحظة نفسها، وتُصدر لك بطاقة بديلة.</div>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">5</span></div>
+</section>
+
+<!-- 6. INVENTORY + PROCUREMENT -->
+<section class="page">
+  <h2><span class="no">5</span> المخزون ودورة المشتريات</h2>
+  <p class="lead">كل فرع له مستودعه. عندما يصل صنف إلى حده الأدنى يُنبَّه المشتريات تلقائيًا، وتمضي الدورة بخطوات مضبوطة.</p>
+  <div class="flow">
+    <div class="node"><span class="n">1</span><div><b>تنبيه الحد الأدنى</b><small>كل صنف له كود وتصنيف وحد أدنى يحدده مدير الفرع. عند النزول عنه يُفتح تنبيه واحد فقط لكل صنف ومستودع.</small></div><span class="who">أمين المستودع</span></div>
+    <div class="arrow">▼</div>
+    <div class="node"><span class="n">2</span><div><b>طلب شراء</b><small>من التنبيه أو يدويًا. يرفض النظام الطلب إذا كان رصيد الصنف في المستودع أعلى من حده الأدنى، لتقليل النثريات.</small></div><span class="who">أمين المستودع / مدير الفرع</span></div>
+    <div class="arrow">▼</div>
+    <div class="node"><span class="n">3</span><div><b>ثلاثة عروض أسعار</b><small>يدخل المختص ثلاثة عروض على الأقل لكل طلب، ومعها الرقم الضريبي للمورد (إلزامي)، ويقيّمها فنيًا ومن حيث الجودة والسعر.</small></div><span class="who">مختص المشتريات</span></div>
+    <div class="arrow">▼</div>
+    <div class="node"><span class="n">4</span><div><b>الترسية والاعتماد</b><small>اختيار غير الأقل سعرًا يتطلب مبررًا مكتوبًا. يعتمد مدير الفرع، وعند غيابه يعتمد مشتريات المركز الرئيسي وفق تفويض مقترح من الموارد البشرية ومعتمد من المدير العام.</small></div><span class="who">مدير الفرع</span></div>
+    <div class="arrow">▼</div>
+    <div class="node"><span class="n">5</span><div><b>أمر الشراء</b><small>يصدر باسم الجهة بترقيم متسلسل، ويُجمَّد بعد التجهيز. من أعدّه لا يعتمده.</small></div><span class="who">المختص + المدير</span></div>
+    <div class="arrow">▼</div>
+    <div class="node"><span class="n">6</span><div><b>الاستلام والفاتورة والدفع</b><small>يسجّل أمين المستودع الكميات المقبولة والمرفوضة. تُطابَق الفاتورة مع أمر الشراء والاستلام ضمن نسب تسامح للسعر والكمية. وتُحمَّل المستهلكات على الفرع عند الاستلام.</small></div><span class="who">أمين المستودع / المالية</span></div>
+  </div>
+  <div class="tip"><b>الحركات في المخزون:</b> إضافة وصرف ونقل بين المستودعات وجرد فعلي، وكلها تُسجَّل في دفتر لا يُعدَّل، والرصيد لا يصير سالبًا أبدًا.</div>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">6</span></div>
+</section>
+
+<!-- 7. HR + FISCAL -->
+<section class="page">
+  <h2><span class="no">6</span> الموارد البشرية والميزانية</h2>
+  <div class="grid2" style="align-items:start">
+    <div>
+      <h3 style="margin-top:0">الموارد البشرية</h3>
+      <ul class="dots">
+        <li><b>الموظفون:</b> سجل لكل موظف بفرعه وقسمه ومسماه.</li>
+        <li><b>الإجازات:</b> تُرفع الطلبات وتُعتمد، ولا يسمح النظام بإجازتين متداخلتين للموظف نفسه.</li>
+        <li><b>الورديات:</b> تحديد وردية الدوام وفترة السماح لكل موظف.</li>
+        <li><b>التفويض:</b> عند غياب مدير الفرع تقترح الموارد البشرية بديلًا بمدة محددة، ويعتمده المدير العام.</li>
+        <li><b>الرواتب:</b> دورة شهرية لكل فرع: مسودة ثم معتمدة ثم مصروفة، وتُقفل بنودها بعد الاعتماد.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">الميزانية والضريبة</h3>
+      <ul class="dots">
+        <li><b>ميزانية شهرية</b> لكل فرع (إجمالية أو حسب فئة مصروف)، مع عرض أسبوعي للتكلفة.</li>
+        <li><b>تنبيه الاقتراب:</b> يُنبَّه المسؤول عند بلوغ نسبة تحددها الإدارة من الميزانية.</li>
+        <li><b>ضريبة القيمة المضافة:</b> تُحسب لكل فاتورة وعرض سعر، ويظهر الصافي والإجمالي. سعر الدبلوم يُعرض شاملًا الضريبة أو غير شامل مع بيان الفرق.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>رمز تأكيد العمليات المالية</h3>
+  <div class="card">
+    <p style="margin:0 0 2mm">عند تفعيل الإدارة لخاصية التأكيد، تحتاج كل عملية تحصيل أو صرف أو اعتماد إلى رمز من 6 أرقام يصل إلى بريدك. يرتبط الرمز بك وبالعملية وبالمستند نفسه، فلو تغيّر المبلغ بعد إرسال الرمز لا يصلح.</p>
+    <ul class="dots" style="margin:0">
+      <li>يُستخدم الرمز مرة واحدة، وصالح 5 دقائق.</li>
+      <li>يُسجَّل وقت الإرسال ووقت التأكيد وعنوان الاتصال في سجل التدقيق.</li>
+      <li>لا تشارك الرمز مع أحد مهما كان، حتى لو قال إنه من الإدارة.</li>
+    </ul>
+  </div>
+  <div class="tip"><b>تنبيه:</b> الرمز يثبت أن صاحب البريد أكّد العملية، وهو ليس توقيعًا إلكترونيًا بمفهوم النظام القانوني. للمنازعات ذات الوزن القانوني استشر مستشارًا قانونيًا.</div>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">7</span></div>
+</section>
+
+<!-- 8. FAQ -->
+<section class="page">
+  <h2><span class="no">7</span> أسئلة شائعة وأمان حسابك</h2>
+  <dl class="faq">
+    <dt>لماذا لا أرى بعض الصفحات؟</dt><dd>لأنها ليست ضمن صلاحيات دورك. اطلب من الإدارة العليا تعديل دورك.</dd>
+    <dt>هل أحتاج كلمة مرور؟</dt><dd>لا. الدخول برمز يصل إلى بريدك في كل مرة، وهو صالح 5 دقائق ولمرة واحدة.</dd>
+    <dt>انتهت جلستي فجأة، هل هذا طبيعي؟</dt><dd>نعم، الجلسة تنتهي بعد مدة أو عند تسجيل الخروج. سجّل الدخول من جديد.</dd>
+    <dt>أخطأت في بيان مالي مؤكد، كيف أصححه؟</dt><dd>لا يُعدَّل السجل المؤكد؛ تُسجَّل عملية تصحيح عكسية موثّقة، ويرى المدقق الأمرين معًا.</dd>
+    <dt>غيّرت بريدي، فماذا أفعل؟</dt><dd>اطلب من الإدارة العليا دعوة بريدك الجديد وإيقاف القديم.</dd>
+    <dt>هل بياناتي وسجل حضوري سريّان؟</dt><dd>نعم. يرى كل مستخدم ما يخص دوره وفرعه فقط، وسجل التدقيق متاح للإدارة العليا فقط.</dd>
+  </dl>
+  <h3>سبع قواعد ذهبية</h3>
+  <div class="grid2">
+    <div class="card"><ul class="dots" style="margin:0">
+      <li>لا تشارك رمز الدخول مع أحد.</li>
+      <li>سجّل الخروج من الأجهزة المشتركة.</li>
+      <li>تأكد من العنوان <span class="num">drsaad.tech</span> وقفل HTTPS.</li>
+      <li>أبلغ فورًا عن أي رمز لم تطلبه.</li></ul></div>
+    <div class="card"><ul class="dots" style="margin:0">
+      <li>لا تُدخل رقمًا ضريبيًا لمورد غير مؤكد.</li>
+      <li>راجع المبلغ والمستند قبل أن تدخل رمز التأكيد.</li>
+      <li>أبلغ الإدارة عند فقد الجوال لإلغاء بطاقتك.</li></ul></div>
+  </div>
+  <div class="card" style="margin-top:6mm;background:var(--navy);color:#fff;border:0">
+    <h3 style="color:#fff;margin-top:0">تحتاج مساعدة؟</h3>
+    <p style="margin:0;font-size:11pt">تواصل مع الإدارة العليا لطلب دعوة أو تعديل دور أو إصدار بطاقة بديلة. وللملاحظات الفنية أرسل لمسؤول المنظومة وصفًا للمشكلة ولقطة شاشة إن أمكن.</p>
+    <p class="num" style="margin:3mm 0 0;font-size:13pt;color:var(--orange)">drsaad.tech</p>
+  </div>
+  <div class="foot"><span>دليل استخدام المنظومة</span><span class="num">8</span></div>
+</section>
+
+</body>
+</html>
