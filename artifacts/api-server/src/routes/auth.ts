@@ -16,9 +16,11 @@ import {
 const router: IRouter = Router();
 const secureCookie = (req: Request) => req.secure || req.get("x-forwarded-proto") === "https";
 const ctx = (req: Request) => ({ ip: inetOrNull(clientIp(req)), ua: req.get("user-agent") ?? null });
+/** AUTH_PASSWORD_LOGIN=false makes the e-mail code the only way in (passwords stop working until an administrator re-enables them on the server). */
+const passwordLoginAllowed = () => process.env.AUTH_PASSWORD_LOGIN !== "false";
 const strict = rateLimit({ name: "auth", windowMs: 60_000, max: Number(process.env.AUTH_RATE_LIMIT_PER_MINUTE ?? 10), key: (req) => clientIp(req) });
 
-router.get("/auth/mode", (_req, res) => { res.json({ mode: localAuthEnabled() ? "local" : "clerk", emailCode: smtpConfigured() }); });
+router.get("/auth/mode", (_req, res) => { res.json({ mode: localAuthEnabled() ? "local" : "clerk", emailCode: smtpConfigured(), passwordLogin: passwordLoginAllowed() }); });
 
 router.use("/auth", (req, res, next) => {
   if (!localAuthEnabled()) { res.status(404).json({ error: "الدخول المحلي غير مفعّل" }); return; }
@@ -40,6 +42,7 @@ const safeEqual = (a: string, b: string) => {
 
 /** First administrator: the owner e-mail plus the one-time setup token generated on the server (OWNER_SETUP_TOKEN). */
 router.post("/auth/setup-owner", strict, async (req, res) => {
+  if (!passwordLoginAllowed()) throw new DomainError("إنشاء الحساب يتم بالدخول برمز البريد", 403);
   const owner = ownerEmail();
   const token = process.env.OWNER_SETUP_TOKEN;
   if (!owner || !token || token.length < 16) throw new DomainError("إعداد المالك غير مهيأ على الخادم", 503);
@@ -75,6 +78,7 @@ router.post("/auth/code/verify", strict, async (req, res) => {
 });
 
 router.post("/auth/login", strict, async (req, res) => {
+  if (!passwordLoginAllowed()) throw new DomainError("الدخول بكلمة المرور متوقف؛ استخدم رمز البريد", 403);
   const acc = await authenticate(req.body?.email, req.body?.password);
   await startSession(req, res, acc.id);
   res.json({ ok: true, mustChange: acc.mustChange });

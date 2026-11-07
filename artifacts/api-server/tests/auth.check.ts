@@ -134,6 +134,11 @@ async function main() {
     process.env.OTP_CHANNEL = "email"; process.env.SMTP_HOST = "x"; process.env.SMTP_USER = "x"; process.env.SMTP_PASSWORD = "x";
     const em = await issueChallenge({ member: { id: owner!.id, email: owner!.email }, action: "record.update", subjectType: "payment", subject: doc, ctx: { ip: null, userAgent: null } });
     assert.match(em.destination, /\*\*\*@/); assert.equal(mails.at(-1)!.to, owner!.email); setMailTransport(null);
+    // 11. e-mail code as the only way in: passwords stop working
+    process.env.AUTH_PASSWORD_LOGIN = "false";
+    assert.equal((await call("GET", "/api/auth/mode")).body.passwordLogin, false);
+    assert.equal((await call("POST", "/api/auth/login", { email: OWNER, password: "Owner-pass-12345" }, "P")).status, 403);
+    process.env.AUTH_PASSWORD_LOGIN = "true";
     console.log("auth.check: all assertions passed");
   } finally { server.close(); }
 }
