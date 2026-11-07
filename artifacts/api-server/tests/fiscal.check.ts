@@ -21,7 +21,7 @@ const notes = async (m: Member, type: string) => Number((await pool.query("selec
 async function main() {
   const [brA] = await db.insert(branches).values({ code: `FA${stamp}`, name: "فرع أ", city: "الرياض" }).returning();
   const [brB] = await db.insert(branches).values({ code: `FB${stamp}`, name: "فرع ب", city: "جدة" }).returning();
-  const fin = await mk("fin", "finance", null), gm = await mk("gm", "super_admin", null), mgrA = await mk("mgrA", "branch_manager", brA!.id), mgrB = await mk("mgrB", "branch_manager", brB!.id), coord = await mk("coord", "coordinator", brA!.id);
+  const fin = await mk("fin", "finance", null), finA = await mk("finA", "finance", brA!.id), gm = await mk("gm", "super_admin", null), mgrA = await mk("mgrA", "branch_manager", brA!.id), mgrB = await mk("mgrB", "branch_manager", brB!.id), coord = await mk("coord", "coordinator", brA!.id);
   const cat = (await pool.query("select id::int from expense_categories where code='PAPER'")).rows[0].id as number;
   const expense = (net: number, vat: number, date: string, branchId = brA!.id) => pool.query("insert into expenses (expense_no,branch_id,category_id,expense_date,description,net_halalas,vat_halalas,status,confirmed_at,created_by) values ($1,$2,$3,$4,'x',$5,$6,'confirmed',now(),$7)", [`EX-${Math.random()}`, branchId, cat, date, net, vat, gm.id]);
 
@@ -73,7 +73,7 @@ async function main() {
   // VAT report: output VAT from issued sales, input VAT from approved supplier invoices, net position
   const sup = (await pool.query("insert into suppliers (supplier_no,legal_name,vat_number,status,approved_by) values ($1,'مورد','3' || lpad($2::text, 13, '0') || '3','approved',$3) returning id::int", [`S-${stamp}`, String(stamp).slice(-12), gm.id])).rows[0].id;
   await pool.query("insert into supplier_invoices (supplier_id,supplier_invoice_no,supplier_vat_number,branch_id,invoice_date,net_halalas,vat_halalas,status,approved_by,created_by) values ($1,'V-1',(select vat_number from suppliers where id=$1),$2,'2026-12-06',40000,6000,'approved',$3,$3)", [sup, brA!.id, gm.id]);
-  const rep = await vatReport(fin, { from: "2026-12", to: "2026-12" });
+  const rep = await vatReport(finA, { from: "2026-12", to: "2026-12" });   // finance scoped to this branch: other suites share the database
   assert.equal(rep.totals.outputVat, 3000 + 1500 + 7500); assert.equal(rep.totals.inputVat, 6000); assert.equal(rep.totals.netVatPayable, 12000 - 6000);
   assert.equal(rep.mode, "display_only");
   assert.equal((await vatReport(mgrB, { from: "2026-12", to: "2026-12" })).sales.length, 0, "other branch sees none");
