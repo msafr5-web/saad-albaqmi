@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ComponentType, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
 import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from "wouter";
@@ -26,12 +26,13 @@ import FiscalPage from "@/pages/fiscal";
 import CardPage from "@/pages/card";
 import AttendancePage from "@/pages/attendance";
 import { useWorkspace } from "@/hooks/use-data";
+import { LOCAL_AUTH, LocalAuthProvider, LocalSignIn, Show } from "@/lib/auth";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: true, retry: 1 } },
 });
 
-const clerkPubKey = publishableKeyFromHost(
+const clerkPubKey = LOCAL_AUTH ? "" : publishableKeyFromHost(
   window.location.hostname,
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
@@ -46,7 +47,7 @@ function stripBase(path: string): string {
     : path;
 }
 
-if (!clerkPubKey) {
+if (!LOCAL_AUTH && !clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
 }
 
@@ -117,11 +118,13 @@ function AuthFrame({ children }: { children: ReactNode }) {
 
 function SignInPage() {
   useEffect(() => { document.title = "تسجيل الدخول | صرح د. سعد البقمي التعليمي"; }, []);
+  if (LOCAL_AUTH) return <AuthFrame><LocalSignIn /></AuthFrame>;
   return <AuthFrame><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></AuthFrame>;
 }
 
 function SignUpPage() {
   useEffect(() => { document.title = "إنشاء حساب | صرح د. سعد البقمي التعليمي"; }, []);
+  if (LOCAL_AUTH) return <Redirect to="/sign-in" />;
   return <AuthFrame><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></AuthFrame>;
 }
 
@@ -187,33 +190,15 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 
-function ClerkProviderWithRoutes() {
-  const [, setLocation] = useLocation();
+function AuthBoundary({ children }: { children: ReactNode }) {
+  return LOCAL_AUTH ? <LocalAuthProvider>{children}</LocalAuthProvider> : <>{children}</>;
+}
 
+function AppRoutes({ children }: { children?: ReactNode }) {
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      appearance={clerkAppearance}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      localization={{
-        locale: "ar-SA",
-        signIn: { start: { title: "مرحبًا بعودتك", subtitle: "سجّل الدخول إلى مساحة عملك", actionText: "ليس لديك حساب؟", actionLink: "أنشئ حسابًا" } },
-        signUp: { start: { title: "إنشاء حساب", subtitle: "استخدم البريد الذي وصلته به الدعوة إن كانت لديك دعوة", actionText: "لديك حساب؟", actionLink: "سجّل الدخول" } },
-        formFieldLabel__emailAddress: "البريد الإلكتروني",
-        formFieldLabel__password: "كلمة المرور",
-        formFieldLabel__firstName: "الاسم الأول",
-        formFieldLabel__lastName: "اسم العائلة",
-        formButtonPrimary: "متابعة",
-        dividerText: "أو",
-        socialButtonsBlockButton: "المتابعة عبر {{provider|titleize}}",
-      }}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ClerkQueryClientCacheInvalidator />
+    <QueryClientProvider client={queryClient}>
+      <AuthBoundary>
+        {children}
         <TooltipProvider>
           <RoutedErrorBoundary>
             <Switch>
@@ -245,7 +230,37 @@ function ClerkProviderWithRoutes() {
           </RoutedErrorBoundary>
           <Toaster />
         </TooltipProvider>
-      </QueryClientProvider>
+      </AuthBoundary>
+    </QueryClientProvider>
+  );
+}
+
+function ClerkProviderWithRoutes() {
+  const [, setLocation] = useLocation();
+
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      appearance={clerkAppearance}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      localization={{
+        locale: "ar-SA",
+        signIn: { start: { title: "مرحبًا بعودتك", subtitle: "سجّل الدخول إلى مساحة عملك", actionText: "ليس لديك حساب؟", actionLink: "أنشئ حسابًا" } },
+        signUp: { start: { title: "إنشاء حساب", subtitle: "استخدم البريد الذي وصلته به الدعوة إن كانت لديك دعوة", actionText: "لديك حساب؟", actionLink: "سجّل الدخول" } },
+        formFieldLabel__emailAddress: "البريد الإلكتروني",
+        formFieldLabel__password: "كلمة المرور",
+        formFieldLabel__firstName: "الاسم الأول",
+        formFieldLabel__lastName: "اسم العائلة",
+        formButtonPrimary: "متابعة",
+        dividerText: "أو",
+        socialButtonsBlockButton: "المتابعة عبر {{provider|titleize}}",
+      }}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <AppRoutes><ClerkQueryClientCacheInvalidator /></AppRoutes>
     </ClerkProvider>
   );
 }
@@ -253,7 +268,7 @@ function ClerkProviderWithRoutes() {
 function App() {
   return (
     <WouterRouter base={basePath}>
-      <ClerkProviderWithRoutes />
+      {LOCAL_AUTH ? <AppRoutes /> : <ClerkProviderWithRoutes />}
     </WouterRouter>
   );
 }

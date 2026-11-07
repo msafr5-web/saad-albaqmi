@@ -5,6 +5,13 @@ import { DomainError } from "./education-validation";
 import { maskEmail, sendOtpEmail } from "./otp-mail";
 
 /** Financial operations require an OTP only when this flag is on (turn it on after RESEND_* and OTP_HMAC_SECRET are set). */
+/**
+ * Delivery channel. "app" (default when AUTH_MODE=local) needs no e-mail provider: the code is derived from the server secret
+ * and shown inside the signed-in member's own app (card screen), ideally opened on their phone. "email" uses Resend.
+ */
+export const otpChannel = (): "app" | "email" =>
+  process.env.OTP_CHANNEL === "email" ? "email" : process.env.OTP_CHANNEL === "app" || process.env.AUTH_MODE === "local" ? "app" : "email";
+
 export const otpEnabled = () => process.env.OTP_FINANCE_REQUIRED === "true";
 
 const intEnv = (name: string, fallback: number) => { const n = Number(process.env[name]); return Number.isInteger(n) && n > 0 ? n : fallback; };
@@ -49,6 +56,12 @@ export const hashSubject = (v: unknown) => crypto.createHash("sha256").update(ca
 const codeHmac = (id: string, memberId: number, action: string, subjectHash: string, code: string) =>
   crypto.createHmac("sha256", secret()).update(`${id}|${memberId}|${action}|${subjectHash}|${code}`).digest("hex");
 
+/** Deterministic 6-digit code for the in-app channel: nothing about the code is stored, it is recomputed for the owner on demand. */
+const appCode = (id: string, memberId: number, action: string, subjectHash: string) => {
+  const d = crypto.createHmac("sha256", secret()).update(`app|${id}|${memberId}|${action}|${subjectHash}`).digest();
+  return String(d.readUInt32BE(0) % 1_000_000).padStart(6, "0");
+};
+
 const equalHex = (a: string, b: string) => a.length === b.length && crypto.timingSafeEqual(Buffer.from(a, "hex"), Buffer.from(b, "hex"));
 
 /** Creates a challenge bound to (member, action, exact document) and emails the code. Fails closed if the email cannot be sent. */
@@ -60,21 +73,23 @@ export async function issueChallenge(input: { member: OtpMember; action: string;
   if (recent[0] && Date.now() - recent[0].sentAt.getTime() < cooldownSeconds() * 1000) throw new DomainError("انتظر قليلًا قبل طلب رمز جديد", 429);
 
   const id = crypto.randomUUID();
-  const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
   const subjectHash = hashSubject(input.subject);
+  const channel = otpChannel();
+  const code = channel === "app" ? appCode(id, input.member.id, input.action, subjectHash) : String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
   const expiresAt = new Date(Date.now() + otpTtlSeconds() * 1000);
-  const masked = maskEmail(input.member.email);
+  const masked = channel === "app" ? "داخل التطبيق" : maskEmail(input.member.email);
   await db.insert(otpChallenges).values({
     id, memberId: input.member.id, action: input.action, subjectType: input.subjectType, subjectId: input.subjectId ?? null, subjectHash,
-    codeHmac: codeHmac(id, input.member.id, input.action, subjectHash, code), channel: "email", destinationMasked: masked, expiresAt,
+    codeHmac: codeHmac(id, input.member.id, input.action, subjectHash, code), channel, destinationMasked: masked, expiresAt,
     maxAttempts: maxAttempts(), sentIp: input.ctx.ip, sentUserAgent: input.ctx.userAgent?.slice(0, 300) ?? null,
   });
+  if (channel === "app") return { challengeId: id, expiresAt: expiresAt.toISOString(), destination: masked, channel };
   const mail = await sendOtpEmail(input.member.email, code, OTP_ACTIONS[input.action]!, Math.round(otpTtlSeconds() / 60));
   if (!mail.sent) {
     await db.update(otpChallenges).set({ status: "cancelled" }).where(eq(otpChallenges.id, id));
     throw new DomainError(`تعذر إرسال رمز التأكيد: ${mail.error}`, 503);
   }
-  return { challengeId: id, expiresAt: expiresAt.toISOString(), destination: masked };
+  return { challengeId: id, expiresAt: expiresAt.toISOString(), destination: masked, channel };
 }
 
 /** Checks a submitted code. Wrong codes count against max_attempts; expired or exhausted challenges are closed. */
@@ -123,4 +138,15 @@ export async function consumeChallenge(tx: Tx, input: { challengeId: string | un
   const c = rows[0];
   if (!c) throw otpRequired("رمز التأكيد غير صالح لهذه العملية أو سبق استخدامه", input);
   return { challengeId: c.id, sentAt: c.sentAt, verifiedAt: c.verifiedAt, sentIp: c.sentIp, verifiedIp: c.verifiedIp, subjectHash: c.subjectHash };
+}
+
+/** Pending in-app codes of one member (what the card screen shows). Only the owner's own session can read them. */
+export async function inboxFor(memberId: number) {
+  const rows = await db.select().from(otpChallenges).where(and(
+    eq(otpChallenges.memberId, memberId), eq(otpChallenges.status, "pending"), eq(otpChallenges.channel, "app"), sql`${otpChallenges.expiresAt} > now()`,
+  )).orderBy(desc(otpChallenges.sentAt)).limit(5);
+  return rows.map((r) => ({
+    challengeId: r.id, action: r.action, actionLabel: OTP_ACTIONS[r.action] ?? r.action, subjectType: r.subjectType,
+    code: appCode(r.id, r.memberId, r.action, r.subjectHash), expiresAt: r.expiresAt.toISOString(),
+  }));
 }

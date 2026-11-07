@@ -85,7 +85,7 @@ function OtpDialog({ pending, onClose }: { pending: Pending | null; onClose: () 
         <DialogHeader className="text-right">
           <DialogTitle className="flex items-center gap-2 font-display text-xl text-primary"><ShieldCheck className="h-5 w-5" /> تأكيد العملية</DialogTitle>
           <DialogDescription>
-            {challengeId ? `أرسلنا رمزًا من 6 أرقام إلى ${destination}. أدخله لتأكيد العملية؛ الرمز صالح لخمس دقائق.` : busy ? "جارٍ إرسال رمز التأكيد..." : "تعذر إرسال الرمز."}
+            {challengeId ? (destination === "داخل التطبيق" ? "افتح «بطاقتي» (يفضّل من جوالك) لتجد رمز التأكيد من 6 أرقام ثم أدخله هنا؛ الرمز صالح لخمس دقائق." : `أرسلنا رمزًا من 6 أرقام إلى ${destination}. أدخله لتأكيد العملية؛ الرمز صالح لخمس دقائق.`) : busy ? "جارٍ إرسال رمز التأكيد..." : "تعذر إرسال الرمز."}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center py-2" dir="ltr">

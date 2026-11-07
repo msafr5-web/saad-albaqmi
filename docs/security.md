@@ -72,3 +72,19 @@ own audit entry for the day email is down.
 
 See `.env.example`. Secrets (`CLERK_SECRET_KEY`, `RESEND_API_KEY`, `OTP_HMAC_SECRET`, `DATABASE_URL`) live only in the hosting
 provider's secret store, never in the repository.
+
+## Self-hosted mode (no Clerk, no e-mail provider)
+
+`AUTH_MODE=local` (API) with `VITE_AUTH_MODE=local` (web build) replaces the two external services:
+
+- **Sign-in:** e-mail + password stored as a scrypt hash (`local_accounts`), HttpOnly SameSite=Lax session cookie whose SHA-256 is stored
+  in `local_sessions` (14 days), 5 wrong passwords lock the account for 15 minutes, same-origin check on every write.
+- **No self-registration.** The first administrator is created at `/sign-in?setup=1` with `ORG_OWNER_EMAIL` and the one-time
+  `OWNER_SETUP_TOKEN` (server-side secret). Other members are invited in the Team page, then the administrator presses
+  "إصدار/إعادة كلمة مرور" and hands over a random temporary password (shown once; the member must change it at first sign-in).
+- **OTP without e-mail** (`OTP_CHANNEL=app`, default in local mode): the code is derived from `OTP_HMAC_SECRET`, never stored, and shown
+  only in the member's own **بطاقتي** screen (open it on the phone, type the code on the computer). Same binding to user, action and exact
+  document, same single use, same audit trail. If the request and the code are viewed in the same browser session the code proves a
+  deliberate second step, not a second device; use the phone for real separation.
+- Forgotten password: an administrator re-issues it. Lost administrator access: re-run `saad-deploy` after deleting the owner's row in `local_accounts`.
+- Switch back to Clerk by setting `AUTH_MODE=clerk`/`VITE_AUTH_MODE` empty and the Clerk keys; accounts are not migrated between modes.

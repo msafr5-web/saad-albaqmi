@@ -34,14 +34,14 @@ app.use(
     },
   }),
 );
-app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());   // proxied Clerk assets keep their own headers
+if (process.env.AUTH_MODE !== "local") app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());   // proxied Clerk assets keep their own headers
 app.use(securityHeaders());
 app.use(cors(corsOptions()));
 app.use("/api", rateLimit({ name: "api", windowMs: 60_000, max: Number(process.env.RATE_LIMIT_PER_MINUTE ?? 300) }));
 app.use("/api", (req, res, next) => (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS" ? next() : writeLimiter(req, res, next)));
 app.use(express.json({limit:"64kb"}));
 app.use(express.urlencoded({ extended: true }));
-app.use(clerkMiddleware((req) => ({
+if (process.env.AUTH_MODE !== "local") app.use(clerkMiddleware((req) => ({
   publishableKey: publishableKeyFromHost(
     getClerkProxyHost(req) ?? "",
     process.env.CLERK_PUBLISHABLE_KEY,

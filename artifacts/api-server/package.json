@@ -16,7 +16,8 @@
     "check:fulfilment": "esbuild tests/fulfilment.check.ts --bundle --platform=node --format=esm --outfile=dist/fulfilment.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/fulfilment.check.mjs",
     "check:hr": "esbuild tests/hr.check.ts --bundle --platform=node --format=esm --outfile=dist/hr.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/hr.check.mjs",
     "check:fiscal": "esbuild tests/fiscal.check.ts --bundle --platform=node --format=esm --outfile=dist/fiscal.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/fiscal.check.mjs",
-    "check:cards": "esbuild tests/cards.check.ts --bundle --platform=node --format=esm --outfile=dist/cards.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/cards.check.mjs"
+    "check:cards": "esbuild tests/cards.check.ts --bundle --platform=node --format=esm --outfile=dist/cards.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/cards.check.mjs",
+    "check:auth": "esbuild tests/auth.check.ts --bundle --platform=node --format=esm --outfile=dist/auth.check.mjs --log-level=error --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\" && NODE_ENV=production node dist/auth.check.mjs"
   },
   "dependencies": {
     "@clerk/express": "^2.1.87",

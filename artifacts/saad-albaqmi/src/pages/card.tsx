@@ -9,6 +9,7 @@ import { ScanSheet } from "@/components/scanner";
 import { usePageTitle } from "@/hooks/use-data";
 import { api, useOps, useRole } from "@/hooks/use-ops";
 import { errorText } from "@/lib/domain";
+import { OtpInbox } from "@/components/otp-inbox";
 
 type Mine = { card: { id: number; number: string; type: string; status: string }; holder: { name: string; number: string; label: string; type: string }; qr: string; qrStepSeconds: number; secondsLeft: number };
 type Presence = { id: number; eventType: string; method: string; occurredAt: string; holderType: string };
@@ -30,7 +31,7 @@ export default function CardPage() {
   return (
     <div className="pb-24 lg:pb-0">
       <PageHeader eyebrow="الهوية الرقمية" title={tab === "card" ? "بطاقتي" : tab === "scan" ? "المسح والحضور" : "سجل الحضور"} desc={tab === "card" ? "اضغط البطاقة لتقلبها وإظهار رمز QR المتجدد. تعمل على أي جوال دون تثبيت من المتجر." : undefined} />
-      {tab === "card" && <MyCard />}
+      {tab === "card" && <><MyCard /><OtpInbox /></>}
       {tab === "scan" && (isInstructor ? <InstructorScan /> : <GateScan />)}
       {tab === "log" && <Log gate={isGate} />}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:static lg:mt-8 lg:rounded-xl lg:border lg:pb-0" aria-label="تبويبات التطبيق" data-testid="app-tabs">

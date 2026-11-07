@@ -1,6 +1,6 @@
 # قاموس بيانات قاعدة `saad_albaqmi`
 
-مولَّد آليًا من القاعدة الحية بواسطة `lib/db/scripts/er.mjs`؛ لا يُعدَّل يدويًا. **85 جدولًا، 195 علاقة (مفتاح أجنبي)، 9 عروضًا، 34 محفّزًا.**
+مولَّد آليًا من القاعدة الحية بواسطة `lib/db/scripts/er.mjs`؛ لا يُعدَّل يدويًا. **87 جدولًا، 196 علاقة (مفتاح أجنبي)، 9 عروضًا، 34 محفّزًا.**
 
 الرموز: **PK** مفتاح أساسي، **FK** مفتاح أجنبي، **UK** فريد. المبالغ بالهللات (`*_halalas`) والكميات `numeric(14,3)`.
 
@@ -19,7 +19,7 @@
 | المخزون | [`item_categories`](#item_categories)، [`items`](#items)، [`reorder_alerts`](#reorder_alerts)، [`stock_count_lines`](#stock_count_lines)، [`stock_counts`](#stock_counts)، [`stock_levels`](#stock_levels)، [`stock_movements`](#stock_movements)، [`stock_transfer_lines`](#stock_transfer_lines)، [`stock_transfers`](#stock_transfers)، [`units`](#units)، [`warehouses`](#warehouses) |
 | المشتريات: الموردون وعروض الأسعار | [`procurement_exceptions`](#procurement_exceptions)، [`purchase_request_lines`](#purchase_request_lines)، [`purchase_requests`](#purchase_requests)، [`quotation_evaluations`](#quotation_evaluations)، [`quotation_lines`](#quotation_lines)، [`quotations`](#quotations)، [`rfq_awards`](#rfq_awards)، [`rfq_suppliers`](#rfq_suppliers)، [`rfqs`](#rfqs)، [`supplier_categories`](#supplier_categories)، [`suppliers`](#suppliers) |
 | المشتريات: الأوامر والاستلام والفواتير | [`direct_purchase_policies`](#direct_purchase_policies)، [`goods_receipt_lines`](#goods_receipt_lines)، [`goods_receipts`](#goods_receipts)، [`match_tolerances`](#match_tolerances)، [`purchase_limits`](#purchase_limits)، [`purchase_order_lines`](#purchase_order_lines)، [`purchase_orders`](#purchase_orders)، [`supplier_invoice_lines`](#supplier_invoice_lines)، [`supplier_invoices`](#supplier_invoices)، [`supplier_payments`](#supplier_payments) |
-| الأمان والهوية والحضور | [`audit_events`](#audit_events)، [`identity_cards`](#identity_cards)، [`otp_challenges`](#otp_challenges)، [`presence_events`](#presence_events) |
+| الأمان والهوية والحضور | [`audit_events`](#audit_events)، [`identity_cards`](#identity_cards)، [`local_accounts`](#local_accounts)، [`local_sessions`](#local_sessions)، [`otp_challenges`](#otp_challenges)، [`presence_events`](#presence_events) |
 | الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا | [`cost_policies`](#cost_policies)، [`education_audit`](#education_audit)، [`education_records`](#education_records)، [`org_members`](#org_members) |
 
 ## المؤسسة والإعدادات
@@ -1927,6 +1927,44 @@
 **الفهارس:**
 - `فريد btree (holder_type, holder_id) WHERE (status = 'active'::text)`
 - `فريد btree (token_hash)`
+
+### local_accounts
+
+حسابات الدخول المحلية: بريد وبصمة كلمة المرور (scrypt) بلا مزود هوية خارجي
+
+| العمود | النوع | فارغ؟ | افتراضي / مولَّد | مفاتيح | يشير إلى |
+|---|---|---|---|---|---|
+| `id` | bigint | لا | هوية تلقائية | PK |  |
+| `email` | text | لا |  |  |  |
+| `password_hash` | text | لا |  |  |  |
+| `must_change` | bool | لا | `false` |  |  |
+| `failed_attempts` | int | لا | `0` |  |  |
+| `locked_until` | timestamptz | نعم |  |  |  |
+| `created_at` | timestamptz | لا | `now()` |  |  |
+| `last_login_at` | timestamptz | نعم |  |  |  |
+
+**قيود التحقق:**
+- `local_accounts_email_ck`: `((email ~~ '%_@_%'::text))`
+
+**الفهارس:**
+- `فريد btree (lower(email))`
+
+### local_sessions
+
+جلسات المتصفح؛ تُخزَّن بصمة الرمز فقط ولا يُخزَّن الرمز نفسه
+
+| العمود | النوع | فارغ؟ | افتراضي / مولَّد | مفاتيح | يشير إلى |
+|---|---|---|---|---|---|
+| `token_hash` | text | لا |  | PK |  |
+| `account_id` | bigint | لا |  | FK | `local_accounts.id` (CASCADE) |
+| `created_at` | timestamptz | لا | `now()` |  |  |
+| `expires_at` | timestamptz | لا |  |  |  |
+| `ip` | inet | نعم |  |  |  |
+| `user_agent` | text | نعم |  |  |  |
+
+**الفهارس:**
+- `btree (account_id)`
+- `btree (expires_at)`
 
 ### otp_challenges
 

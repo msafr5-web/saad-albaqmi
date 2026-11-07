@@ -125,3 +125,32 @@ export const presenceEvents = pgTable("presence_events", {
   check("presence_events_method_ck", sql`${t.method} in ('nfc','qr','manual','geofence')`),
 ]);
 
+
+/**
+ * Self-hosted sign-in (no external identity provider). One account per e-mail; the password is stored only as a scrypt hash.
+ * Accounts are created by the owner setup token or by an administrator (temporary password, change forced at first sign-in),
+ * so the e-mail on an account is trusted without an e-mail round trip.
+ */
+export const localAccounts = pgTable("local_accounts", {
+  id: pk(),
+  email: text("email").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  mustChange: boolean("must_change").notNull().default(false),
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  createdAt: createdAt(),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+}, (t) => [
+  uniqueIndex("local_accounts_email_idx").on(sql`lower(${t.email})`),
+  check("local_accounts_email_ck", sql`${t.email} like '%_@_%'`),
+]);
+
+/** Browser sessions: only the SHA-256 of the cookie token is stored, so a database leak does not expose live sessions. */
+export const localSessions = pgTable("local_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  accountId: fkCol("account_id").notNull().references(() => localAccounts.id, { onDelete: "cascade" }),
+  createdAt: createdAt(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  ip: inet("ip"),
+  userAgent: text("user_agent"),
+}, (t) => [index("local_sessions_account_idx").on(t.accountId), index("local_sessions_expiry_idx").on(t.expiresAt)]);

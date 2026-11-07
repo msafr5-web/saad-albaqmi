@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { useClerk, useUser } from "@clerk/react";
+import { useAuthUser, useSignOutAction } from "@/lib/auth";
 import {
   LayoutDashboard, Building2, DoorOpen, Package, GraduationCap, Users, UserRound,
   Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase, Receipt, CreditCard, ScanLine,
@@ -61,8 +61,8 @@ function Brand() {
 
 function SideContent({ onNavigate }: { onNavigate?: () => void }) {
   const [loc] = useLocation();
-  const { signOut } = useClerk();
-  const { user } = useUser();
+  const signOut = useSignOutAction();
+  const user = useAuthUser();
   const ws = useWorkspace();
   return (
     <div className="girih flex h-full flex-col bg-sidebar p-4 text-sidebar-foreground">
@@ -100,11 +100,11 @@ function SideContent({ onNavigate }: { onNavigate?: () => void }) {
         </div>
         <div className="flex items-center justify-between gap-2 px-1">
           <div className="min-w-0 text-xs">
-            <div className="truncate text-sidebar-foreground/85" data-testid="text-user-email">{user?.primaryEmailAddress?.emailAddress ?? ""}</div>
+            <div className="truncate text-sidebar-foreground/85" data-testid="text-user-email">{user.email}</div>
           </div>
           <button
             type="button"
-            onClick={() => signOut({ redirectUrl: basePath || "/" })}
+            onClick={() => signOut()}
             className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             data-testid="button-signout"
           >

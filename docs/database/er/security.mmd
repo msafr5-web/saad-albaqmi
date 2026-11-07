@@ -37,6 +37,24 @@ erDiagram
     timestamptz revoked_at
     text revoked_reason
   }
+  local_accounts {
+    bigint id PK
+    text email
+    text password_hash
+    bool must_change
+    int failed_attempts
+    timestamptz locked_until
+    timestamptz created_at
+    timestamptz last_login_at
+  }
+  local_sessions {
+    text token_hash PK
+    bigint account_id FK
+    timestamptz created_at
+    timestamptz expires_at
+    inet ip
+    text user_agent
+  }
   otp_challenges {
     uuid id PK
     int member_id FK
@@ -85,6 +103,7 @@ erDiagram
   }
   branches |o--o{ audit_events : "branch_id"
   otp_challenges |o--o{ audit_events : "otp_challenge_id"
+  local_accounts ||--o{ local_sessions : "account_id"
   branches ||--o{ presence_events : "branch_id"
   identity_cards |o--o{ presence_events : "card_id"
   rooms |o--o{ presence_events : "room_id"

@@ -8,6 +8,8 @@ import { PageHeader, ErrorState, LoadingRows } from "@/components/bits";
 import { ROLE_LABELS } from "@/components/shell";
 import { useRecords, useRecordIndex, usePageTitle } from "@/hooks/use-data";
 import { useToast } from "@/hooks/use-toast";
+import { LOCAL_AUTH } from "@/lib/auth";
+import { api } from "@/hooks/use-ops";
 
 const ROLE_ORDER: Role[] = ["super_admin", "branch_manager", "finance", "coordinator", "instructor", "student", "warehouse_keeper", "procurement_officer", "hr_officer"];
 const STATUS: Record<string, string> = { invited: "دعوة معلقة", active: "نشط", revoked: "ملغى" };
@@ -52,6 +54,13 @@ export default function TeamPage() {
       onError: (e) => toast({ title: "تعذر الإلغاء", description: errMessage(e), variant: "destructive" }),
     });
   };
+  /** Self-hosted sign-in: the administrator issues the account and hands over a one-time temporary password. */
+  const issueAccount = async (m: TeamMember) => {
+    try {
+      const r = await api<{ temporaryPassword: string }>("/auth/accounts", { method: "POST", body: { email: m.email } });
+      window.prompt(`كلمة المرور المؤقتة لـ ${m.email} (انسخها الآن؛ لن تظهر مرة أخرى ويغيّرها العضو عند أول دخول):`, r.temporaryPassword);
+    } catch (e) { toast({ title: "تعذر إصدار الحساب", description: errMessage(e), variant: "destructive" }); }
+  };
   const rows = (team.data ?? []).filter((m) => m.status !== "revoked");
 
   return (
@@ -94,7 +103,7 @@ export default function TeamPage() {
                   <td className="px-4 py-3">{ROLE_LABELS[m.role]}</td>
                   <td className="px-4 py-3">{m.branchId ? idx.nameOf(m.branchId) : "كل الفروع"}{m.linkedRecordId ? ` — ${idx.nameOf(m.linkedRecordId)}` : ""}</td>
                   <td className="px-4 py-3">{STATUS[m.status]}</td>
-                  <td className="px-4 py-3 text-left"><Button size="sm" variant="outline" className="text-destructive" onClick={() => revoke(m)} data-testid={`button-revoke-${m.id}`}>{m.status === "invited" ? "إلغاء الدعوة" : "إلغاء الصلاحية"}</Button></td>
+                  <td className="px-4 py-3 text-left">{LOCAL_AUTH ? <Button size="sm" variant="outline" className="ml-2" onClick={() => issueAccount(m)} data-testid={`button-issue-${m.id}`}>إصدار/إعادة كلمة مرور</Button> : null}<Button size="sm" variant="outline" className="text-destructive" onClick={() => revoke(m)} data-testid={`button-revoke-${m.id}`}>{m.status === "invited" ? "إلغاء الدعوة" : "إلغاء الصلاحية"}</Button></td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">لا يوجد أعضاء بعد.</td></tr>}

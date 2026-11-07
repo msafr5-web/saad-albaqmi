@@ -197,6 +197,13 @@ erDiagram
     bigint id PK
     bigint diploma_id FK
   }
+  local_accounts {
+    bigint id PK
+  }
+  local_sessions {
+    text token_hash PK
+    bigint account_id FK
+  }
   match_tolerances {
     bigint id PK
     bigint category_id FK
@@ -520,6 +527,7 @@ erDiagram
   employees ||--o{ leave_requests : "employee_id"
   leave_types ||--o{ leave_requests : "leave_type_id"
   diplomas ||--o{ levels : "diploma_id"
+  local_accounts ||--o{ local_sessions : "account_id"
   item_categories |o--o{ match_tolerances : "category_id"
   installments ||--o{ payment_allocations : "installment_id"
   payments ||--o{ payment_allocations : "payment_id"

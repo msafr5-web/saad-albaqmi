@@ -1,7 +1,7 @@
 {
  "stats": {
-  "tables": 85,
-  "relationships": 195,
+  "tables": 87,
+  "relationships": 196,
   "views": [
    "v_audit_workflow",
    "v_branch_budget_status",
@@ -808,6 +808,20 @@
      "columns": 11,
      "references": [
       "org_members"
+     ]
+    },
+    {
+     "name": "local_accounts",
+     "comment": "حسابات الدخول المحلية: بريد وبصمة كلمة المرور (scrypt) بلا مزود هوية خارجي",
+     "columns": 8,
+     "references": []
+    },
+    {
+     "name": "local_sessions",
+     "comment": "جلسات المتصفح؛ تُخزَّن بصمة الرمز فقط ولا يُخزَّن الرمز نفسه",
+     "columns": 6,
+     "references": [
+      "local_accounts"
      ]
     },
     {

@@ -1,4 +1,4 @@
-// 85 tables. Generated from the live database by lib/db/scripts/er.mjs — do not edit by hand.
+// 87 tables. Generated from the live database by lib/db/scripts/er.mjs — do not edit by hand.
 Project saad_albaqmi { database_type: 'PostgreSQL' }
 
 TableGroup org { branches document_sequences documents notifications org_settings } // المؤسسة والإعدادات
@@ -12,7 +12,7 @@ TableGroup expenses { branch_budgets cost_report_snapshots expense_categories ex
 TableGroup inventory { item_categories items reorder_alerts stock_count_lines stock_counts stock_levels stock_movements stock_transfer_lines stock_transfers units warehouses } // المخزون
 TableGroup sourcing { procurement_exceptions purchase_request_lines purchase_requests quotation_evaluations quotation_lines quotations rfq_awards rfq_suppliers rfqs supplier_categories suppliers } // المشتريات: الموردون وعروض الأسعار
 TableGroup orders { direct_purchase_policies goods_receipt_lines goods_receipts match_tolerances purchase_limits purchase_order_lines purchase_orders supplier_invoice_lines supplier_invoices supplier_payments } // المشتريات: الأوامر والاستلام والفواتير
-TableGroup security { audit_events identity_cards otp_challenges presence_events } // الأمان والهوية والحضور
+TableGroup security { audit_events identity_cards local_accounts local_sessions otp_challenges presence_events } // الأمان والهوية والحضور
 TableGroup legacy { cost_policies education_audit education_records org_members } // الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا
 
 Table approval_delegations {
@@ -503,6 +503,28 @@ Table levels {
   level_no int [not null]
   name text [not null]
   Note: 'مستويات كل دبلوم'
+}
+
+Table local_accounts {
+  id bigint [pk, increment]
+  email text [not null]
+  password_hash text [not null]
+  must_change bool [not null, default: `false`]
+  failed_attempts int [not null, default: `0`]
+  locked_until timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  last_login_at timestamptz
+  Note: 'حسابات الدخول المحلية: بريد وبصمة كلمة المرور (scrypt) بلا مزود هوية خارجي'
+}
+
+Table local_sessions {
+  token_hash text [pk]
+  account_id bigint [not null]
+  created_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null]
+  ip inet
+  user_agent text
+  Note: 'جلسات المتصفح؛ تُخزَّن بصمة الرمز فقط ولا يُخزَّن الرمز نفسه'
 }
 
 Table match_tolerances {
@@ -1233,6 +1255,7 @@ Ref: leave_requests.employee_id > employees.id [delete: no action]
 Ref: leave_requests.leave_type_id > leave_types.id [delete: no action]
 Ref: leave_requests.requested_by > org_members.id [delete: no action]
 Ref: levels.diploma_id > diplomas.id [delete: no action]
+Ref: local_sessions.account_id > local_accounts.id [delete: cascade]
 Ref: match_tolerances.category_id > item_categories.id [delete: no action]
 Ref: match_tolerances.set_by > org_members.id [delete: no action]
 Ref: notifications.member_id > org_members.id [delete: no action]

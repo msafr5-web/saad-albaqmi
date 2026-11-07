@@ -9,8 +9,11 @@ ENV_FILE="${1:-/root/secrets.env}"
 [ -f "$ENV_FILE" ] || { echo "Missing $ENV_FILE (copy deploy/secrets.env to the server first)"; exit 1; }
 set -a; . "$ENV_FILE"; set +a
 : "${DB_PASSWORD:?DB_PASSWORD is empty}"
-: "${CLERK_SECRET_KEY:?CLERK_SECRET_KEY is empty}"
-: "${VITE_CLERK_PUBLISHABLE_KEY:?VITE_CLERK_PUBLISHABLE_KEY is empty}"
+AUTH_MODE="${AUTH_MODE:-local}"   # local = self-hosted sign-in + in-app OTP (no Clerk, no e-mail provider); clerk = external provider
+if [ "$AUTH_MODE" = "clerk" ]; then
+  : "${CLERK_SECRET_KEY:?CLERK_SECRET_KEY is empty}"
+  : "${VITE_CLERK_PUBLISHABLE_KEY:?VITE_CLERK_PUBLISHABLE_KEY is empty}"
+fi
 : "${ORG_OWNER_EMAIL:?ORG_OWNER_EMAIL is empty}"
 : "${OTP_HMAC_SECRET:?OTP_HMAC_SECRET is empty}"
 : "${CARD_HMAC_SECRET:?CARD_HMAC_SECRET is empty}"
@@ -58,8 +61,11 @@ cat > "$ETC/api.env" <<ENV
 NODE_ENV=production
 PORT=$PORT
 DATABASE_URL=$DATABASE_URL
-CLERK_SECRET_KEY=$CLERK_SECRET_KEY
-CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY:-$VITE_CLERK_PUBLISHABLE_KEY}
+AUTH_MODE=$AUTH_MODE
+OTP_CHANNEL=${OTP_CHANNEL:-$([ "$AUTH_MODE" = local ] && echo app || echo email)}
+OWNER_SETUP_TOKEN=${OWNER_SETUP_TOKEN:-$(head -c 24 /dev/urandom | base64 | tr -dc A-Za-z0-9)}
+CLERK_SECRET_KEY=${CLERK_SECRET_KEY:-}
+CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY:-${VITE_CLERK_PUBLISHABLE_KEY:-}}
 ORG_OWNER_EMAIL=$ORG_OWNER_EMAIL
 RESEND_API_KEY=${RESEND_API_KEY:-}
 RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-}
@@ -76,7 +82,8 @@ DB_NAME=$DB_NAME
 API_PORT=$PORT
 ENV
 cat > "$ETC/web-build.env" <<ENV
-VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+VITE_AUTH_MODE=$AUTH_MODE
+VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY:-}
 VITE_CLERK_PROXY_URL=${VITE_CLERK_PROXY_URL:-}
 ENV
 chmod 640 "$ETC/api.env" "$ETC/web-build.env"

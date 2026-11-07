@@ -66,6 +66,8 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:fiscal
       - name: Digital cards and attendance
         run: pnpm --filter @workspace/api-server run check:cards
+      - name: Self-hosted sign-in and in-app OTP
+        run: pnpm --filter @workspace/api-server run check:auth
       - name: Legacy importer
         run: pnpm --filter @workspace/db run check:import
       - name: Production build of the API (same command as the server deploy)
