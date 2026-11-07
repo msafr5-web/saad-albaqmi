@@ -5,6 +5,7 @@ import teamRouter from "./team";
 import otpRouter from "./otp";
 import inventoryRouter from "./inventory";
 import procurementRouter from "./procurement";
+import hrRouter from "./hr";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(teamRouter);
 router.use(otpRouter);
 router.use(inventoryRouter);
 router.use(procurementRouter);
+router.use(hrRouter);
 
 export default router;

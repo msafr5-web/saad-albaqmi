@@ -9,7 +9,7 @@ import { ROLE_LABELS } from "@/components/shell";
 import { useRecords, useRecordIndex, usePageTitle } from "@/hooks/use-data";
 import { useToast } from "@/hooks/use-toast";
 
-const ROLE_ORDER: Role[] = ["super_admin", "branch_manager", "finance", "coordinator", "instructor", "student", "warehouse_keeper", "procurement_officer"];
+const ROLE_ORDER: Role[] = ["super_admin", "branch_manager", "finance", "coordinator", "instructor", "student", "warehouse_keeper", "procurement_officer", "hr_officer"];
 const STATUS: Record<string, string> = { invited: "دعوة معلقة", active: "نشط", revoked: "ملغى" };
 
 function errMessage(e: unknown) {
@@ -32,7 +32,7 @@ export default function TeamPage() {
   const [link, setLink] = useState("");
 
   const branches = idx.of("branch");
-  const needsBranch = role !== "super_admin" && role !== "finance" && role !== "procurement_officer";
+  const needsBranch = role !== "super_admin" && role !== "finance" && role !== "procurement_officer" && role !== "hr_officer";
   const linkKind = role === "student" ? "student" : role === "instructor" ? "instructor" : null;
   const linkables = linkKind ? idx.of(linkKind).filter((r) => String(r.branchId) === branch) : [];
   const refresh = () => qc.invalidateQueries({ queryKey: getListTeamQueryKey() });

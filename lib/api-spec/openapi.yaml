@@ -253,7 +253,7 @@ components:
   schemas:
     Role:
       type: string
-      enum: [super_admin, branch_manager, finance, coordinator, instructor, student, warehouse_keeper, procurement_officer]
+      enum: [super_admin, branch_manager, finance, coordinator, instructor, student, warehouse_keeper, procurement_officer, hr_officer]
     Workspace:
       type: object
       required: [mode, canWrite, label, role, branchId, pages, writableKinds, canManageTeam, canViewPayroll, canViewLedger]

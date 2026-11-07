@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
 import {
   LayoutDashboard, Building2, DoorOpen, Package, GraduationCap, Users, UserRound,
-  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart,
+  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/hooks/use-data";
@@ -21,6 +21,7 @@ export const NAV = [
   { href: "/finance", label: "المالية", icon: Wallet },
   { href: "/inventory", label: "المخزون", icon: Boxes },
   { href: "/procurement", label: "المشتريات", icon: ShoppingCart },
+  { href: "/hr", label: "الموارد البشرية", icon: Briefcase },
   { href: "/schedule", label: "الجدولة", icon: CalendarClock },
   { href: "/reports", label: "التقارير", icon: FileBarChart },
   { href: "/nfc", label: "أدوات NFC", icon: Nfc },
@@ -32,7 +33,7 @@ export const NAV = [
 export const ROLE_LABELS: Record<string, string> = {
   super_admin: "الإدارة العليا", branch_manager: "مدير فرع", finance: "المالية",
   coordinator: "منسق", instructor: "مدرب", student: "طالب",
-  warehouse_keeper: "أمين مستودع", procurement_officer: "مختص مشتريات",
+  warehouse_keeper: "أمين مستودع", procurement_officer: "مختص مشتريات", hr_officer: "مسؤول موارد بشرية",
 };
 
 /** Mirrors the server's page list; the server remains the enforcement point for data. */
