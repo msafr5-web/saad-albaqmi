@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { eq, inArray } from "drizzle-orm";
 import { db, branches, itemCategories, orgMembers, notifications, reorderAlerts, rooms, units, warehouses, pool } from "@workspace/db";
+import { syncOrganization } from "../src/lib/legacy-sync";
 import { consumption, createItem, listAlerts, listBalances, listNotifications, markNotificationRead, postMovement, setStockLevel } from "../src/lib/inventory";
 import { DomainError } from "../src/lib/education-validation";
 import type { Member } from "../src/lib/education-access";
@@ -20,11 +21,27 @@ const mk = async (n: string, role: string, branchId: number | null): Promise<Mem
 };
 
 async function main() {
+  // legacy -> relational bridge keeps ids, creates one warehouse per branch, is idempotent, and repairs the identity sequence
+  const legacy = async (kind: string, name: string, branchId: number | null, details: object) =>
+    (await pool.query("insert into education_records (owner_id, kind, name, branch_id, status, details) values ('org:main',$1,$2,$3,'نشط',$4) returning id", [kind, name, branchId, JSON.stringify(details)])).rows[0].id as number;
+  const lb = await legacy("branch", `فرع قديم ${stamp}`, null, { city: "الدمام", budget: 1000 });
+  const lr = await legacy("room", `معمل قديم ${stamp}`, lb, { type: "عملي", area: 55, capacity: 18, powerKw: 7 });
+  const first = (await syncOrganization({ force: true }))!;
+  assert.ok(first.branches >= 1 && first.rooms >= 1);
+  const rb = (await pool.query("select id::int, city, status from branches where id = $1", [lb])).rows[0]; assert.equal(rb.city, "الدمام");
+  const rr = (await pool.query("select id::int, branch_id::int, room_type, capacity from rooms where id = $1", [lr])).rows[0]; assert.deepEqual([rr.branch_id, rr.room_type, rr.capacity], [lb, "lab", 18]);
+  assert.equal((await pool.query("select count(*)::int n from warehouses where branch_id = $1", [lb])).rows[0].n, 1, "one warehouse per branch");
+  const again = (await syncOrganization({ force: true }))!; assert.equal(again.warehousesCreated, 0, "idempotent");
+  await pool.query("update education_records set name = $1 where id = $2", [`فرع معدّل ${stamp}`, lb]); await syncOrganization({ force: true });
+  assert.equal((await pool.query("select name from branches where id = $1", [lb])).rows[0].name, `فرع معدّل ${stamp}`, "renames propagate");
+  await pool.query("insert into branches (code, name, city) values ($1, 'يدوي', 'x')", [`SEQ${stamp}`]);       // would fail with a duplicate key if the sequence were not repaired
+
   const [brA] = await db.insert(branches).values({ code: `IA${stamp}`, name: "فرع أ", city: "الرياض" }).returning();
   const [brB] = await db.insert(branches).values({ code: `IB${stamp}`, name: "فرع ب", city: "جدة" }).returning();
   const [whA] = await db.insert(warehouses).values({ branchId: brA!.id, code: `WA${stamp}`, name: "مستودع أ" }).returning();
   const [roomA] = await db.insert(rooms).values({ branchId: brA!.id, code: "R1", name: "معمل 1", roomType: "lab", areaM2: 40, capacity: 20 }).returning();
   const [roomB] = await db.insert(rooms).values({ branchId: brB!.id, code: "R1", name: "معمل ب", roomType: "lab", areaM2: 40, capacity: 20 }).returning();
+  const keeper = await mk("keeper", "warehouse_keeper", brA!.id), buyerA = await mk("buyerA", "procurement_officer", brA!.id), buyerHQ = await mk("buyerHQ", "procurement_officer", null), buyerB = await mk("buyerB", "procurement_officer", brB!.id);
   const admin = await mk("admin", "super_admin", null), mgrA = await mk("mgrA", "branch_manager", brA!.id), mgrB = await mk("mgrB", "branch_manager", brB!.id), coord = await mk("coord", "coordinator", brA!.id);
   const [cat] = await db.select().from(itemCategories).where(eq(itemCategories.code, "LAB")); const [unit] = await db.select().from(units).limit(1);
 
@@ -39,6 +56,8 @@ async function main() {
   await fails(setStockLevel(mgrB, { warehouseId: whA!.id, itemId: i1.id, minQty: 5 }), 403, "other branch");
   await fails(postMovement(mgrB, { warehouseId: whA!.id, itemId: i1.id, type: "opening", qty: 1 }, {}), 403, "other branch movement");
   await fails(postMovement(coord, { warehouseId: whA!.id, itemId: i1.id, type: "opening", qty: 1 }, {}), 403, "coordinator is read-only");
+  await fails(postMovement(buyerA, { warehouseId: whA!.id, itemId: i1.id, type: "opening", qty: 1 }, {}), 403, "procurement officers do not move stock");
+  const k = await postMovement(keeper, { warehouseId: whA!.id, itemId: i2.id, type: "opening", qty: 4 }, {}); assert.equal(k.balance, 4);   // the warehouse keeper can
 
   // opening balance once, minimum set, no alert yet
   const open = await postMovement(mgrA, { warehouseId: whA!.id, itemId: i1.id, type: "opening", qty: 10, unitCostHalalas: 500 }, {});
@@ -60,6 +79,8 @@ async function main() {
   assert.equal(alerts.length, 1); assert.equal(alerts[0]!.status, "open");
   const inbox = (m: Member) => listNotifications(m).then((r) => r.filter((n) => n.type === "reorder_alert" && n.subjectId === alerts[0]!.id));
   assert.equal((await inbox(mgrA)).length, 1); assert.equal((await inbox(admin)).length, 1); assert.equal((await inbox(mgrB)).length, 0, "other branch manager must not be notified");
+  assert.equal((await inbox(buyerA)).length, 1, "branch procurement officer is notified"); assert.equal((await inbox(buyerHQ)).length, 1, "head-office procurement officer is notified"); assert.equal((await inbox(buyerB)).length, 0);
+  assert.equal((await inbox(keeper)).length, 1, "warehouse keeper is notified");
   await postMovement(mgrA, { warehouseId: whA!.id, itemId: i1.id, type: "issue", qty: 1, roomId: roomA!.id, purpose: "تجربة ثانية" }, {});
   assert.equal((await db.select().from(reorderAlerts).where(eq(reorderAlerts.warehouseId, whA!.id))).length, 1, "still one alert");
   assert.equal((await inbox(mgrA)).length, 1, "no duplicate notification");
@@ -91,7 +112,7 @@ async function main() {
   delete process.env.OTP_FINANCE_REQUIRED;
   assert.equal(Number((await pool.query("select coalesce(sum(qty_delta),0) q from stock_movements where warehouse_id=$1 and item_id=$2", [whA!.id, i1.id])).rows[0].q), 3 + 20 - 2);
 
-  await db.delete(notifications).where(inArray(notifications.memberId, [admin.id, mgrA.id, mgrB.id, coord.id]));
+  await db.delete(notifications).where(inArray(notifications.memberId, [admin.id, mgrA.id, mgrB.id, coord.id, keeper.id, buyerA.id, buyerHQ.id, buyerB.id]));
   console.log("inventory.check passed");
 }
 main().then(() => pool.end(), (e) => { console.error(e); pool.end().finally(() => process.exit(1)); });

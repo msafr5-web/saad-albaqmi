@@ -4,17 +4,20 @@ import type { Member } from "./education-access";
 import { DomainError } from "./education-validation";
 import { consumeChallenge, otpEnabled } from "./otp";
 import { recordAudit } from "./audit";
+import { syncOrganization } from "./legacy-sync";
 
 /**
  * Inventory service. The database guarantees the invariants (append-only ledger, no negative stock, one open reorder alert
  * per item and warehouse, automatic alert opening/closing); this layer adds authorization, validation, notifications and audit.
- * Until dedicated warehouse/procurement roles exist, writes are limited to super_admin and branch_manager (own branch).
+ * Writes: super_admin, branch_manager and warehouse_keeper (own branch). Reads also: finance, coordinator, procurement_officer.
  */
-const WRITE_ROLES: string[] = ["super_admin", "branch_manager"];
-const READ_ROLES: string[] = ["super_admin", "branch_manager", "finance", "coordinator"];
+const WRITE_ROLES: string[] = ["super_admin", "branch_manager", "warehouse_keeper"];
+const READ_ROLES: string[] = [...WRITE_ROLES, "finance", "coordinator", "procurement_officer"];
+/** Roles that may have no branch and then see every warehouse. */
+const ORG_WIDE: string[] = ["finance", "procurement_officer"];
 
 export const canReadInventory = (m: Member) => READ_ROLES.includes(m.role);
-const inScope = (m: Member, branchId: number) => m.role === "super_admin" || m.branchId === branchId || (m.role === "finance" && m.branchId == null);
+const inScope = (m: Member, branchId: number) => m.role === "super_admin" || m.branchId === branchId || (ORG_WIDE.includes(m.role) && m.branchId == null);
 const deny = (msg = "ليست لديك صلاحية على هذا المستودع"): never => { throw new DomainError(msg, 403); };
 const pgCode = (e: unknown) => ((e as { cause?: { code?: string } }).cause?.code ?? (e as { code?: string }).code);
 const pgMessage = (e: unknown) => String((e as { cause?: { message?: string } }).cause?.message ?? (e as Error).message ?? "");
@@ -41,18 +44,26 @@ async function loadWarehouse(id: unknown, m: Member, write: boolean) {
 // ---------- Catalogue ---------------------------------------------------------------------------------------------
 export async function listCatalogue(m: Member) {
   if (!canReadInventory(m)) deny();
-  const [cats, uns, its, whs] = await Promise.all([
+  await syncOrganization();                                   // branches/rooms still live in the legacy records; mirror them (throttled)
+  const [cats, uns, its, whs, rms] = await Promise.all([
     db.select().from(itemCategories).orderBy(asc(itemCategories.name)),
     db.select().from(units).orderBy(asc(units.name)),
     db.select().from(items).where(eq(items.isActive, true)).orderBy(asc(items.itemCode)),
     db.select().from(warehouses).where(eq(warehouses.status, "active")).orderBy(asc(warehouses.code)),
+    db.select({ id: rooms.id, branchId: rooms.branchId, name: rooms.name, roomType: rooms.roomType }).from(rooms).where(eq(rooms.status, "active")).orderBy(asc(rooms.name)),
   ]);
-  return { categories: cats, units: uns, items: its, warehouses: whs.filter((w) => inScope(m, w.branchId)) };
+  const branchRows = (await db.execute(sql`select id::int as id, name from branches where status = 'active' order by id`)).rows as { id: number; name: string }[];
+  return {
+    categories: cats, units: uns, items: its,
+    warehouses: whs.filter((w) => inScope(m, w.branchId)),
+    rooms: rms.filter((r) => inScope(m, r.branchId)),
+    branches: branchRows.filter((b) => inScope(m, b.id)),
+  };
 }
 
 /** Item codes look like LAB-0001: category code + a per-category counter that is never reused. */
 export async function createItem(m: Member, input: { name?: unknown; categoryId?: unknown; unitId?: unknown; itemType?: unknown; description?: unknown }) {
-  if (!WRITE_ROLES.includes(m.role)) deny("إنشاء الأصناف متاح للإدارة العليا ومديري الفروع");
+  if (!WRITE_ROLES.includes(m.role)) deny("إنشاء الأصناف متاح للإدارة العليا ومديري الفروع وأمناء المستودعات");
   const name = text(input.name, "اسم الصنف")!;
   const itemType = typeof input.itemType === "string" ? input.itemType : "consumable";
   if (!["consumable", "asset", "service"].includes(itemType)) throw new DomainError("نوع الصنف غير صحيح");
@@ -113,7 +124,7 @@ async function notifyOpenAlerts(tx: Tx, warehouseId: number, itemId: number) {
     select m.id, 'reorder_alert', 'وصل صنف إلى الحد الأدنى: ' || i.name,
            'الرصيد ' || a.qty_at_trigger::text || ' والحد الأدنى ' || a.min_qty::text || ' في ' || w.name || '. أصدر طلب عرض سعر قبل نفاد الصنف.', '/inventory', 'reorder_alert', a.id
       from reorder_alerts a join items i on i.id = a.item_id join warehouses w on w.id = a.warehouse_id
-      join org_members m on m.status = 'active' and (m.role = 'super_admin' or (m.role = 'branch_manager' and m.branch_id = w.branch_id))
+      join org_members m on m.status = 'active' and (m.role = 'super_admin' or (m.role in ('branch_manager','warehouse_keeper','procurement_officer') and m.branch_id = w.branch_id) or (m.role = 'procurement_officer' and m.branch_id is null))
      where a.warehouse_id = ${warehouseId} and a.item_id = ${itemId} and a.status = 'open'
        and not exists (select 1 from notifications n where n.subject_type = 'reorder_alert' and n.subject_id = a.id and n.member_id = m.id)`);
 }

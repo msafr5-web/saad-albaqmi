@@ -4,6 +4,7 @@ import type { Role } from "./education-access";
 const ROLE_AR: Record<Role, string> = {
   super_admin: "الإدارة العليا", branch_manager: "مدير فرع", finance: "المالية",
   coordinator: "منسق", instructor: "مدرب", student: "طالب",
+  warehouse_keeper: "أمين مستودع", procurement_officer: "مختص مشتريات",
 };
 
 export type MailResult = { sent: true } | { sent: false; error: string };

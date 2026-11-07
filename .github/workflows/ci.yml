@@ -54,3 +54,5 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:otp
       - name: Inventory service
         run: pnpm --filter @workspace/api-server run check:inventory
+      - name: Procurement cycle
+        run: pnpm --filter @workspace/api-server run check:procurement

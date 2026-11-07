@@ -15,6 +15,8 @@ export const Role = {
   coordinator: 'coordinator',
   instructor: 'instructor',
   student: 'student',
+  warehouse_keeper: 'warehouse_keeper',
+  procurement_officer: 'procurement_officer',
 } as const;
 
 export type WorkspaceMode = typeof WorkspaceMode[keyof typeof WorkspaceMode];

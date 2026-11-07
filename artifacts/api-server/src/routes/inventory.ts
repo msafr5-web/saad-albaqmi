@@ -1,6 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { accessOf, workspaceAccess } from "../middlewares/workspaceAccess";
 import { DomainError } from "../lib/education-validation";
+import { syncOrganization } from "../lib/legacy-sync";
 import { canReadInventory, consumption, createItem, listAlerts, listBalances, listCatalogue, listNotifications, markNotificationRead, postMovement, setStockLevel } from "../lib/inventory";
 
 const router: IRouter = Router();
@@ -13,6 +14,10 @@ router.use(["/inventory", "/notifications"], workspaceAccess, (_req, res, next) 
 });
 const member = (res: Response) => { const a = accessOf(res); if (a.kind !== "org") throw new DomainError("غير مصرح", 403); return a.member; };
 
+router.post("/inventory/sync", async (_req, res) => {
+  if (member(res).role !== "super_admin") throw new DomainError("المزامنة للإدارة العليا فقط", 403);
+  res.json(await syncOrganization({ force: true }));
+});
 router.get("/inventory/catalogue", async (_req, res) => { res.json(await listCatalogue(member(res))); });
 router.post("/inventory/items", async (req, res) => { res.status(201).json(await createItem(member(res), req.body ?? {})); });
 router.put("/inventory/stock-levels", async (req, res) => { res.json(await setStockLevel(member(res), req.body ?? {})); });

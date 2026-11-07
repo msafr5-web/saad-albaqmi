@@ -19,6 +19,9 @@ export const OTP_ACTIONS: Record<string, string> = {
   "record.update": "تعديل معاملة مالية",
   "record.delete": "حذف معاملة مالية",
   "stock.movement": "حركة مخزون",
+  "procurement.award.approve": "اعتماد ترسية عرض سعر",
+  "procurement.po.prepare": "إعداد أمر شراء",
+  "procurement.po.approve": "اعتماد أمر شراء",
 };
 
 export type OtpContext = { ip: string | null; userAgent: string | null };
