@@ -66,7 +66,7 @@ OTP_CHANNEL=${OTP_CHANNEL:-$([ "$AUTH_MODE" = local ] && echo app || echo email)
 SMTP_HOST=${SMTP_HOST:-smtp.hostinger.com}
 SMTP_PORT=${SMTP_PORT:-465}
 SMTP_USER=${SMTP_USER:-}
-SMTP_FROM=${SMTP_FROM:-}
+SMTP_FROM="${SMTP_FROM:-}"
 SMTP_PASSWORD=${SMTP_PASSWORD:-}
 OWNER_SETUP_TOKEN=${OWNER_SETUP_TOKEN:-$(head -c 24 /dev/urandom | base64 | tr -dc A-Za-z0-9)}
 CLERK_SECRET_KEY=${CLERK_SECRET_KEY:-}
