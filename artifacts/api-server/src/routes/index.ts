@@ -7,6 +7,7 @@ import inventoryRouter from "./inventory";
 import procurementRouter from "./procurement";
 import hrRouter from "./hr";
 import fiscalRouter from "./fiscal";
+import cardsRouter from "./cards";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(inventoryRouter);
 router.use(procurementRouter);
 router.use(hrRouter);
 router.use(fiscalRouter);
+router.use(cardsRouter);
 
 export default router;

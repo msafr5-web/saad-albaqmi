@@ -24,15 +24,15 @@ const WRITABLE: Record<Role, string[]> = {
 };
 
 const PAGES: Record<Role, string[]> = {
-  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit", "inventory", "procurement", "hr", "fiscal"],
-  branch_manager: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "inventory", "procurement", "hr", "fiscal"],
-  finance: ["dashboard", "branches", "students", "instructors", "finance", "reports", "settings", "inventory", "procurement", "hr", "fiscal"],
-  coordinator: ["dashboard", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings", "inventory"],
-  instructor: ["dashboard", "students", "schedule", "settings"],
-  student: ["dashboard", "schedule", "finance", "settings"],
-  warehouse_keeper: ["dashboard", "inventory", "settings"],
-  procurement_officer: ["dashboard", "inventory", "procurement", "settings"],
-  hr_officer: ["dashboard", "hr", "settings"],
+  super_admin: ["dashboard", "card", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit", "inventory", "procurement", "hr", "fiscal", "attendance"],
+  branch_manager: ["dashboard", "card", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "inventory", "procurement", "hr", "fiscal", "attendance"],
+  finance: ["dashboard", "card", "branches", "students", "instructors", "finance", "reports", "settings", "inventory", "procurement", "hr", "fiscal"],
+  coordinator: ["dashboard", "card", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings", "inventory", "attendance"],
+  instructor: ["dashboard", "card", "students", "schedule", "settings"],
+  student: ["dashboard", "card", "schedule", "finance", "settings"],
+  warehouse_keeper: ["dashboard", "card", "inventory", "settings"],
+  procurement_officer: ["dashboard", "card", "inventory", "procurement", "settings"],
+  hr_officer: ["dashboard", "card", "hr", "settings", "attendance"],
 };
 
 /** Roles whose scope is a single branch (finance may also be organization-wide with a null branch). */

@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
 import {
   LayoutDashboard, Building2, DoorOpen, Package, GraduationCap, Users, UserRound,
-  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase, Receipt,
+  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase, Receipt, CreditCard, ScanLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/hooks/use-data";
@@ -12,6 +12,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export const NAV = [
   { href: "/dashboard", label: "النظرة التنفيذية", icon: LayoutDashboard },
+  { href: "/card", label: "بطاقتي", icon: CreditCard },
   { href: "/branches", label: "الفروع", icon: Building2 },
   { href: "/rooms", label: "القاعات والمعامل", icon: DoorOpen },
   { href: "/assets", label: "الأصول والجرد", icon: Package },
@@ -23,6 +24,7 @@ export const NAV = [
   { href: "/procurement", label: "المشتريات", icon: ShoppingCart },
   { href: "/hr", label: "الموارد البشرية", icon: Briefcase },
   { href: "/fiscal", label: "الميزانية والضريبة", icon: Receipt },
+  { href: "/attendance", label: "الحضور والبطاقات", icon: ScanLine },
   { href: "/schedule", label: "الجدولة", icon: CalendarClock },
   { href: "/reports", label: "التقارير", icon: FileBarChart },
   { href: "/nfc", label: "أدوات NFC", icon: Nfc },
