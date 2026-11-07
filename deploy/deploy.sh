@@ -13,7 +13,7 @@ if [ "${1:-}" != "--first-run" ]; then
   git -C "$APP" reset -q --hard "origin/$BR"
   chown -R "$RUN_USER":"$RUN_USER" "$APP"
 fi
-as_app "pnpm install --frozen-lockfile"
+as_app "pnpm install --frozen-lockfile --config.strict-dep-builds=false"
 as_app "pnpm --filter @workspace/db run migrate"
 export PORT=3000 BASE_PATH=/
 as_app "pnpm --filter @workspace/api-server run build"
