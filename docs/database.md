@@ -74,6 +74,35 @@ erDiagram
   otp_challenges ||--o{ audit_events : "evidence for"
 ```
 
+## ER diagram and documentation (generated from the live database)
+
+Everything below is produced by `pnpm --filter @workspace/db run er` against a migrated database, so it can never drift from the schema
+(the command fails if a table has no Arabic description in `lib/db/scripts/table-comments.mjs`; the same descriptions are stored in the
+database as `COMMENT ON TABLE`, migration 0004).
+
+| File | What it is |
+|---|---|
+| `docs/database/ER-diagram-saad-albaqmi.pdf` | 31-page reference: reading guide, domain map, one full ER diagram per domain with a table-by-table description, and the all-tables map |
+| `docs/database/er/overview.svg` | map of the 13 domains and the foreign keys between them |
+| `docs/database/er/<domain>.svg` / `.mmd` | full ER diagram per domain (all columns, types, PK/FK/UK, cardinality); Mermaid source alongside |
+| `docs/database/er/full-map.svg` | every table and all 195 relationships on one canvas (key columns only) |
+| `docs/database/saad_albaqmi.dbml` | the complete schema for dbdiagram.io / DBML tools |
+| `docs/database/data-dictionary.md` | every table: columns, types, defaults, generated expressions, keys, checks, indexes, triggers (Arabic) |
+| `docs/database/saad_albaqmi_full.sql` | ONE standalone script that builds the whole database on an empty PostgreSQL 15+ server |
+
+Build the database from the standalone script:
+
+```bash
+psql -U postgres -c "CREATE DATABASE saad_albaqmi ENCODING 'UTF8' TEMPLATE template0"
+psql -U postgres -d saad_albaqmi -f docs/database/saad_albaqmi_full.sql
+```
+
+(or, with the journal, `pnpm --filter @workspace/db run create-db && pnpm --filter @workspace/db run migrate`). Regenerate the script after a new
+migration with `pnpm --filter @workspace/db run bundle-sql > docs/database/saad_albaqmi_full.sql`.
+
+Render the diagrams after changing the schema: `npx @mermaid-js/mermaid-cli -i docs/database/er/<domain>.mmd -o docs/database/er/<domain>.svg`
+(the full map needs `--size 9000` for PNG). Edges to `org_members` (created_by / approved_by ...) are left out of the drawings and listed in the dictionary.
+
 ## Creating and migrating
 
 ```bash

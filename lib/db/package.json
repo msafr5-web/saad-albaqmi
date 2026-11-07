@@ -13,7 +13,9 @@
     "migrate": "node ./scripts/migrate.mjs",
     "check:schema": "node ./tests/schema.check.mjs",
     "push": "drizzle-kit push --config ./drizzle.config.ts",
-    "push-force": "drizzle-kit push --force --config ./drizzle.config.ts"
+    "push-force": "drizzle-kit push --force --config ./drizzle.config.ts",
+    "er": "node ./scripts/er.mjs",
+    "bundle-sql": "node ./scripts/bundle-sql.mjs"
   },
   "dependencies": {
     "drizzle-orm": "catalog:",

@@ -1,0 +1,72 @@
+%% المرافق والأصول - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  asset_categories {
+    bigint id PK
+    bigint parent_id FK
+    text name
+    int default_useful_life_months
+  }
+  asset_maintenance {
+    bigint id PK
+    bigint asset_id FK
+    date due_date
+    date performed_at
+    bigint cost_halalas
+    text notes
+    text status
+  }
+  assets {
+    bigint id PK
+    text asset_tag UK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint category_id FK
+    text name
+    text serial_no
+    text specifications
+    date purchase_date
+    bigint purchase_cost_halalas
+    numeric_6_3_ salvage_percent
+    int useful_life_months
+    bigint source_supplier_invoice_line_id FK
+    text status
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  electricity_meters {
+    bigint id PK
+    bigint branch_id FK
+    text meter_no
+    text description
+    bool is_sub_meter
+    text status
+  }
+  rooms {
+    bigint id PK
+    bigint branch_id FK
+    text code
+    text name
+    text room_type
+    numeric_10_2_ area_m2
+    int capacity
+    numeric_8_2_ power_kw
+    bigint meter_id FK
+    text status
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  branches {
+    bigint id PK
+  }
+  supplier_invoice_lines {
+    bigint id PK
+  }
+  asset_categories |o--o{ asset_categories : "parent_id"
+  assets ||--o{ asset_maintenance : "asset_id"
+  branches ||--o{ assets : "branch_id"
+  asset_categories |o--o{ assets : "category_id"
+  rooms |o--o{ assets : "room_id"
+  supplier_invoice_lines |o--o{ assets : "source_supplier_invoice_line_id"
+  branches ||--o{ electricity_meters : "branch_id"
+  branches ||--o{ rooms : "branch_id"
+  electricity_meters |o--o{ rooms : "meter_id"

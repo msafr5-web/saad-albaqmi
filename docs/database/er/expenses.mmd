@@ -1,0 +1,76 @@
+%% المصروفات والميزانيات - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  branch_budgets {
+    bigint id PK
+    bigint branch_id FK
+    date period_month
+    bigint category_id FK
+    bigint amount_halalas
+    int warn_at_percent
+    int approved_by FK
+    timestamptz created_at
+  }
+  cost_report_snapshots {
+    bigint id PK
+    date period_from
+    date period_to
+    int policy_version
+    jsonb result
+    int created_by FK
+    timestamptz created_at
+  }
+  expense_categories {
+    bigint id PK
+    bigint parent_id FK
+    text code UK
+    text name
+    bool is_petty
+  }
+  expenses {
+    bigint id PK
+    text expense_no UK
+    bigint branch_id FK
+    bigint category_id FK
+    date expense_date
+    text description
+    bigint net_halalas
+    bigint vat_halalas
+    bigint gross_halalas "generated"
+    text source
+    bigint supplier_invoice_id FK
+    text status
+    int created_by FK
+    timestamptz confirmed_at
+    bigint reverses_expense_id FK
+    text reversal_reason
+    timestamptz created_at
+  }
+  utility_invoices {
+    bigint id PK
+    bigint branch_id FK
+    bigint meter_id FK
+    date bill_month
+    numeric_14_2_ kwh
+    bigint net_halalas
+    bigint vat_halalas
+    text bill_no
+    timestamptz created_at
+  }
+  branches {
+    bigint id PK
+  }
+  supplier_invoices {
+    bigint id PK
+  }
+  electricity_meters {
+    bigint id PK
+  }
+  branches ||--o{ branch_budgets : "branch_id"
+  expense_categories |o--o{ branch_budgets : "category_id"
+  expense_categories |o--o{ expense_categories : "parent_id"
+  branches ||--o{ expenses : "branch_id"
+  expense_categories ||--o{ expenses : "category_id"
+  expenses |o--o{ expenses : "reverses_expense_id"
+  supplier_invoices |o--o{ expenses : "supplier_invoice_id"
+  branches ||--o{ utility_invoices : "branch_id"
+  electricity_meters ||--o{ utility_invoices : "meter_id"

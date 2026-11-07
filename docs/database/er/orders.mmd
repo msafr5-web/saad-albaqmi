@@ -1,0 +1,186 @@
+%% المشتريات: الأوامر والاستلام والفواتير - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  direct_purchase_policies {
+    bigint id PK
+    bigint max_amount_halalas
+    numeric_14_3_ max_qty
+    bigint monthly_cap_halalas
+    int anti_split_window_days
+    text conditions
+    date valid_from
+    int set_by FK
+  }
+  goods_receipt_lines {
+    bigint id PK
+    bigint grn_id FK
+    bigint po_line_id FK
+    numeric_14_3_ qty_received
+    numeric_14_3_ qty_accepted
+    numeric_14_3_ qty_rejected "generated"
+    text quality_result
+    text quality_notes
+  }
+  goods_receipts {
+    bigint id PK
+    text grn_no UK
+    bigint po_id FK
+    bigint warehouse_id FK
+    text status
+    int received_by FK
+    timestamptz received_at
+    text delivery_note_no
+    text notes
+  }
+  match_tolerances {
+    bigint id PK
+    bigint category_id FK
+    numeric_6_3_ price_percent
+    numeric_6_3_ qty_percent
+    date valid_from
+    int set_by FK
+  }
+  purchase_limits {
+    bigint id PK
+    bigint branch_id FK
+    text period
+    bigint max_amount_halalas
+    date valid_from
+    date valid_to
+    int set_by FK
+  }
+  purchase_order_lines {
+    bigint id PK
+    bigint po_id FK
+    int line_no
+    bigint item_id FK
+    text description
+    numeric_14_3_ quantity
+    bigint unit_price_halalas
+    numeric_6_3_ vat_rate
+    bigint net_halalas "generated"
+    bigint vat_halalas "generated"
+  }
+  purchase_orders {
+    bigint id PK
+    text po_no
+    int version
+    bigint supersedes_po_id FK
+    bigint pr_id FK
+    bigint rfq_id FK
+    bigint exception_id FK
+    bigint branch_id FK
+    bigint warehouse_id FK
+    bigint supplier_id FK
+    text entity_name
+    text entity_vat_number
+    text supplier_vat_number
+    date issue_date
+    date delivery_date
+    text terms
+    text status
+    bigint net_halalas
+    bigint vat_halalas
+    bigint gross_halalas "generated"
+    int prepared_by FK
+    timestamptz prepared_at
+    int approved_by FK
+    timestamptz approved_at
+    bigint approved_via_delegation_id FK
+    timestamptz sent_at
+    timestamptz acknowledged_at
+    text document_hash
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  supplier_invoice_lines {
+    bigint id PK
+    bigint invoice_id FK
+    bigint po_line_id FK
+    bigint item_id FK
+    text description
+    numeric_14_3_ quantity
+    bigint unit_price_halalas
+    numeric_6_3_ vat_rate
+    bigint net_halalas "generated"
+    bigint vat_halalas "generated"
+    text classification
+  }
+  supplier_invoices {
+    bigint id PK
+    bigint supplier_id FK
+    text supplier_invoice_no
+    text supplier_vat_number
+    bigint po_id FK
+    bigint branch_id FK
+    date invoice_date
+    bigint net_halalas
+    bigint vat_halalas
+    bigint gross_halalas "generated"
+    text status
+    jsonb match_result
+    timestamptz matched_at
+    int approved_by FK
+    int created_by FK
+    timestamptz created_at
+  }
+  supplier_payments {
+    bigint id PK
+    bigint supplier_invoice_id FK
+    bigint amount_halalas
+    date paid_on
+    text method
+    text reference
+    text status
+    int paid_by FK
+    timestamptz confirmed_at
+  }
+  warehouses {
+    bigint id PK
+  }
+  item_categories {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  items {
+    bigint id PK
+  }
+  approval_delegations {
+    bigint id PK
+  }
+  procurement_exceptions {
+    bigint id PK
+  }
+  purchase_requests {
+    bigint id PK
+  }
+  rfqs {
+    bigint id PK
+  }
+  suppliers {
+    bigint id PK
+  }
+  goods_receipts ||--o{ goods_receipt_lines : "grn_id"
+  purchase_order_lines ||--o{ goods_receipt_lines : "po_line_id"
+  purchase_orders ||--o{ goods_receipts : "po_id"
+  warehouses ||--o{ goods_receipts : "warehouse_id"
+  item_categories |o--o{ match_tolerances : "category_id"
+  branches |o--o{ purchase_limits : "branch_id"
+  items ||--o{ purchase_order_lines : "item_id"
+  purchase_orders ||--o{ purchase_order_lines : "po_id"
+  branches ||--o{ purchase_orders : "branch_id"
+  approval_delegations |o--o{ purchase_orders : "approved_via_delegation_id"
+  procurement_exceptions |o--o{ purchase_orders : "exception_id"
+  purchase_requests ||--o{ purchase_orders : "pr_id"
+  rfqs |o--o{ purchase_orders : "rfq_id"
+  purchase_orders |o--o{ purchase_orders : "supersedes_po_id"
+  suppliers ||--o{ purchase_orders : "supplier_id"
+  warehouses ||--o{ purchase_orders : "warehouse_id"
+  supplier_invoices ||--o{ supplier_invoice_lines : "invoice_id"
+  items |o--o{ supplier_invoice_lines : "item_id"
+  purchase_order_lines |o--o{ supplier_invoice_lines : "po_line_id"
+  branches ||--o{ supplier_invoices : "branch_id"
+  purchase_orders |o--o{ supplier_invoices : "po_id"
+  suppliers ||--o{ supplier_invoices : "supplier_id"
+  supplier_invoices ||--o{ supplier_payments : "supplier_invoice_id"

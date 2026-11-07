@@ -1,0 +1,100 @@
+%% المبيعات والتحصيل - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  installments {
+    bigint id PK
+    bigint student_id FK
+    bigint sales_invoice_id FK
+    int seq
+    date due_date
+    bigint amount_halalas
+    text status
+    timestamptz created_at
+  }
+  payment_allocations {
+    bigint payment_id PK, FK
+    bigint installment_id PK, FK
+    bigint amount_halalas
+  }
+  payments {
+    bigint id PK
+    text receipt_no UK
+    bigint branch_id FK
+    bigint student_id FK
+    bigint amount_halalas
+    date paid_on
+    text method
+    text reference
+    text status
+    int collected_by FK
+    timestamptz confirmed_at
+    bigint reverses_payment_id FK
+    text reversal_reason
+    timestamptz receipt_emailed_at
+    timestamptz created_at
+  }
+  sales_invoice_lines {
+    bigint id PK
+    bigint invoice_id FK
+    int line_no
+    text description
+    bigint diploma_id FK
+    bigint subject_id FK
+    numeric_14_3_ quantity
+    bigint unit_price_halalas
+    bigint discount_halalas
+    numeric_6_3_ vat_rate
+    bigint net_halalas "generated"
+    bigint vat_halalas "generated"
+  }
+  sales_invoices {
+    bigint id PK
+    text invoice_no UK
+    uuid invoice_uuid UK
+    bigint branch_id FK
+    bigint student_id FK
+    text customer_name
+    text customer_vat_number
+    text invoice_type
+    date issue_date
+    text status
+    bigint net_halalas
+    bigint vat_halalas
+    bigint gross_halalas "generated"
+    text zatca_status
+    text zatca_hash
+    int created_by FK
+    timestamptz created_at
+  }
+  tax_rates {
+    bigint id PK
+    text code
+    text name
+    numeric_6_3_ rate
+    text category
+    date valid_from
+    date valid_to
+  }
+  students {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  diplomas {
+    bigint id PK
+  }
+  subjects {
+    bigint id PK
+  }
+  sales_invoices |o--o{ installments : "sales_invoice_id"
+  students ||--o{ installments : "student_id"
+  installments ||--o{ payment_allocations : "installment_id"
+  payments ||--o{ payment_allocations : "payment_id"
+  branches ||--o{ payments : "branch_id"
+  payments |o--o{ payments : "reverses_payment_id"
+  students ||--o{ payments : "student_id"
+  diplomas |o--o{ sales_invoice_lines : "diploma_id"
+  sales_invoices ||--o{ sales_invoice_lines : "invoice_id"
+  subjects |o--o{ sales_invoice_lines : "subject_id"
+  branches ||--o{ sales_invoices : "branch_id"
+  students |o--o{ sales_invoices : "student_id"

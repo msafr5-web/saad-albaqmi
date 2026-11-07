@@ -1,0 +1,866 @@
+{
+ "stats": {
+  "tables": 85,
+  "relationships": 195,
+  "views": [
+   "v_audit_workflow",
+   "v_branch_budget_status",
+   "v_consumption_monthly",
+   "v_purchase_period_usage",
+   "v_reorder_status",
+   "v_stock_balances",
+   "v_student_ledger",
+   "v_vat_purchases",
+   "v_vat_sales"
+  ],
+  "triggers": 34
+ },
+ "domains": [
+  {
+   "id": "org",
+   "title": "المؤسسة والإعدادات",
+   "tables": [
+    {
+     "name": "branches",
+     "comment": "الفروع (المركز الرئيسي والفروع)، ولكل فرع رقم ضريبي وحالة",
+     "columns": 14,
+     "references": []
+    },
+    {
+     "name": "document_sequences",
+     "comment": "عدادات الترقيم المتسلسل للمستندات (PO-2026-000123) دون فجوات",
+     "columns": 3,
+     "references": []
+    },
+    {
+     "name": "documents",
+     "comment": "سجل المرفقات (عروض أسعار، فواتير، عقود) مع بصمة الملف ومفتاح التخزين",
+     "columns": 10,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "notifications",
+     "comment": "صندوق الإشعارات داخل النظام (تنبيهات الحد الأدنى، الميزانية، الاعتماد)",
+     "columns": 11,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "org_settings",
+     "comment": "إعدادات المؤسسة (نسبة الضريبة، سياسة OTP، عدد العروض المطلوبة...)",
+     "columns": 5,
+     "references": [
+      "org_members"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hr",
+   "title": "الموارد البشرية والتفويض",
+   "tables": [
+    {
+     "name": "approval_delegations",
+     "comment": "تفويض الصلاحيات (تقترحه الموارد البشرية ويعتمده المدير العام) بمدة محددة",
+     "columns": 12,
+     "references": [
+      "org_members",
+      "leave_requests"
+     ]
+    },
+    {
+     "name": "departments",
+     "comment": "الأقسام الإدارية، عامة أو تابعة لفرع، بتدرج هرمي",
+     "columns": 9,
+     "references": [
+      "branches",
+      "employees",
+      "departments"
+     ]
+    },
+    {
+     "name": "employee_shifts",
+     "comment": "إسناد الورديات للموظفين بفترات صلاحية",
+     "columns": 4,
+     "references": [
+      "employees",
+      "shifts"
+     ]
+    },
+    {
+     "name": "employees",
+     "comment": "سجل الموظفين: الفرع والقسم والراتب والبيانات الشخصية",
+     "columns": 21,
+     "references": [
+      "branches",
+      "departments",
+      "job_titles",
+      "org_members"
+     ]
+    },
+    {
+     "name": "job_titles",
+     "comment": "المسميات الوظيفية",
+     "columns": 4,
+     "references": []
+    },
+    {
+     "name": "leave_requests",
+     "comment": "طلبات الإجازة؛ يمنع النظام تداخل إجازتين لنفس الموظف",
+     "columns": 11,
+     "references": [
+      "org_members",
+      "employees",
+      "leave_types"
+     ]
+    },
+    {
+     "name": "leave_types",
+     "comment": "أنواع الإجازات (سنوية، مرضية، اضطرارية...)",
+     "columns": 5,
+     "references": []
+    },
+    {
+     "name": "payroll_lines",
+     "comment": "بنود الرواتب لكل موظف؛ تُقفل بعد اعتماد الدورة",
+     "columns": 8,
+     "references": [
+      "employees",
+      "payroll_runs"
+     ]
+    },
+    {
+     "name": "payroll_runs",
+     "comment": "دورات الرواتب الشهرية لكل فرع (مسودة، معتمدة، مصروفة)",
+     "columns": 7,
+     "references": [
+      "org_members",
+      "branches"
+     ]
+    },
+    {
+     "name": "shifts",
+     "comment": "ورديات الدوام وفترة السماح",
+     "columns": 5,
+     "references": []
+    }
+   ]
+  },
+  {
+   "id": "facilities",
+   "title": "المرافق والأصول",
+   "tables": [
+    {
+     "name": "asset_categories",
+     "comment": "تصنيفات الأصول بتدرج هرمي وعمر افتراضي",
+     "columns": 4,
+     "references": [
+      "asset_categories"
+     ]
+    },
+    {
+     "name": "asset_maintenance",
+     "comment": "جدولة الصيانة وسجلها وتكلفتها",
+     "columns": 7,
+     "references": [
+      "assets"
+     ]
+    },
+    {
+     "name": "assets",
+     "comment": "الأصول والتجهيزات داخل القاعات: القيمة والشراء والإهلاك والحالة",
+     "columns": 16,
+     "references": [
+      "branches",
+      "asset_categories",
+      "rooms",
+      "supplier_invoice_lines"
+     ]
+    },
+    {
+     "name": "electricity_meters",
+     "comment": "عدادات الكهرباء الرئيسية والفرعية لكل فرع",
+     "columns": 6,
+     "references": [
+      "branches"
+     ]
+    },
+    {
+     "name": "rooms",
+     "comment": "القاعات والمعامل: النوع والمساحة والسعة وقدرة الأجهزة والعداد",
+     "columns": 12,
+     "references": [
+      "branches",
+      "electricity_meters"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "curriculum",
+   "title": "الدبلومات والمناهج",
+   "tables": [
+    {
+     "name": "diplomas",
+     "comment": "الدبلومات: المدة والساعات وشروط القبول والسعر (شامل/غير شامل الضريبة) مع صافٍ وإجمالي مولَّدين",
+     "columns": 14,
+     "references": []
+    },
+    {
+     "name": "levels",
+     "comment": "مستويات كل دبلوم",
+     "columns": 4,
+     "references": [
+      "diplomas"
+     ]
+    },
+    {
+     "name": "subject_prerequisites",
+     "comment": "المتطلبات السابقة للمواد (مستوى أسبق في الدبلوم نفسه)",
+     "columns": 2,
+     "references": [
+      "subjects"
+     ]
+    },
+    {
+     "name": "subjects",
+     "comment": "المواد: المستوى والسعر والساعات",
+     "columns": 12,
+     "references": [
+      "diplomas",
+      "levels"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "people",
+   "title": "الطلاب والمدربون",
+   "tables": [
+    {
+     "name": "instructor_evaluations",
+     "comment": "تقييم أداء المدربين (التدريس، الالتزام، آراء الطلاب)",
+     "columns": 10,
+     "references": [
+      "org_members",
+      "instructors"
+     ]
+    },
+    {
+     "name": "instructor_subjects",
+     "comment": "المواد التي يقدمها كل مدرب",
+     "columns": 2,
+     "references": [
+      "instructors",
+      "subjects"
+     ]
+    },
+    {
+     "name": "instructors",
+     "comment": "المدربون: المؤهل وأجر الساعة والساعات الأسبوعية",
+     "columns": 12,
+     "references": [
+      "branches",
+      "employees",
+      "org_members"
+     ]
+    },
+    {
+     "name": "student_subjects",
+     "comment": "تسجيل الطالب في المواد وحالته فيها",
+     "columns": 5,
+     "references": [
+      "students",
+      "subjects"
+     ]
+    },
+    {
+     "name": "students",
+     "comment": "الطلاب: الفرع والدبلوم والمستوى والبيانات الشخصية وحساب البوابة",
+     "columns": 18,
+     "references": [
+      "branches",
+      "levels",
+      "diplomas",
+      "org_members"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "timetable",
+   "title": "الجدولة والحضور والدرجات",
+   "tables": [
+    {
+     "name": "attendance_records",
+     "comment": "حضور الطلاب في الحصص (يدوي أو بالبطاقة)",
+     "columns": 7,
+     "references": [
+      "org_members",
+      "class_sessions",
+      "students"
+     ]
+    },
+    {
+     "name": "class_sessions",
+     "comment": "الحصص: القاعة والمدرب والوقت؛ تمنع قيود الاستبعاد حجز القاعة أو المدرب مرتين",
+     "columns": 14,
+     "references": [
+      "branches",
+      "diplomas",
+      "instructors",
+      "session_recurrences",
+      "rooms",
+      "subjects"
+     ]
+    },
+    {
+     "name": "grades",
+     "comment": "درجات الطلاب في المواد",
+     "columns": 9,
+     "references": [
+      "org_members",
+      "students",
+      "subjects"
+     ]
+    },
+    {
+     "name": "session_recurrences",
+     "comment": "أنماط الجدول الأسبوعي المتكرر",
+     "columns": 13,
+     "references": [
+      "branches",
+      "org_members",
+      "diplomas",
+      "instructors",
+      "rooms",
+      "subjects"
+     ]
+    },
+    {
+     "name": "session_students",
+     "comment": "الطلاب المسجلون في كل حصة؛ يتحقق المحفّز من السعة والتعارض",
+     "columns": 2,
+     "references": [
+      "class_sessions",
+      "students"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sales",
+   "title": "المبيعات والتحصيل",
+   "tables": [
+    {
+     "name": "installments",
+     "comment": "أقساط الطلاب وتواريخ استحقاقها",
+     "columns": 8,
+     "references": [
+      "sales_invoices",
+      "students"
+     ]
+    },
+    {
+     "name": "payment_allocations",
+     "comment": "توزيع الدفعات على الأقساط",
+     "columns": 3,
+     "references": [
+      "installments",
+      "payments"
+     ]
+    },
+    {
+     "name": "payments",
+     "comment": "المبالغ المحصلة من الطلاب؛ تُؤكَّد برمز OTP وتتجمد وتُصحَّح بقيد عكسي",
+     "columns": 15,
+     "references": [
+      "branches",
+      "org_members",
+      "payments",
+      "students"
+     ]
+    },
+    {
+     "name": "sales_invoice_lines",
+     "comment": "بنود فواتير المبيعات، والضريبة والصافي مولَّدان",
+     "columns": 12,
+     "references": [
+      "diplomas",
+      "sales_invoices",
+      "subjects"
+     ]
+    },
+    {
+     "name": "sales_invoices",
+     "comment": "فواتير المبيعات (قياسية أو مبسطة) بحقول جاهزة للفوترة الإلكترونية",
+     "columns": 17,
+     "references": [
+      "branches",
+      "org_members",
+      "students"
+     ]
+    },
+    {
+     "name": "tax_rates",
+     "comment": "نسب ضريبة القيمة المضافة وفئاتها وفترات سريانها",
+     "columns": 7,
+     "references": []
+    }
+   ]
+  },
+  {
+   "id": "expenses",
+   "title": "المصروفات والميزانيات",
+   "tables": [
+    {
+     "name": "branch_budgets",
+     "comment": "الميزانية الشهرية لكل فرع (إجمالية أو لفئة) ونسبة التنبيه",
+     "columns": 8,
+     "references": [
+      "org_members",
+      "branches",
+      "expense_categories"
+     ]
+    },
+    {
+     "name": "cost_report_snapshots",
+     "comment": "لقطات تقارير التكلفة المحسوبة بسياسة معتمدة",
+     "columns": 7,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "expense_categories",
+     "comment": "فئات المصروفات (مع تمييز النثريات)",
+     "columns": 5,
+     "references": [
+      "expense_categories"
+     ]
+    },
+    {
+     "name": "expenses",
+     "comment": "المصروفات التشغيلية المؤكَّدة؛ تتجمد بعد التأكيد",
+     "columns": 17,
+     "references": [
+      "branches",
+      "expense_categories",
+      "org_members",
+      "expenses",
+      "supplier_invoices"
+     ]
+    },
+    {
+     "name": "utility_invoices",
+     "comment": "فواتير الكهرباء: فاتورة واحدة لكل عداد وشهر",
+     "columns": 9,
+     "references": [
+      "branches",
+      "electricity_meters"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inventory",
+   "title": "المخزون",
+   "tables": [
+    {
+     "name": "item_categories",
+     "comment": "تصنيفات الأصناف",
+     "columns": 4,
+     "references": [
+      "item_categories"
+     ]
+    },
+    {
+     "name": "items",
+     "comment": "بطاقات الأصناف بكود تلقائي ونوع وطريقة تقييم",
+     "columns": 12,
+     "references": [
+      "item_categories",
+      "org_members",
+      "units"
+     ]
+    },
+    {
+     "name": "reorder_alerts",
+     "comment": "تنبيهات الوصول للحد الأدنى؛ تنبيه مفتوح واحد لكل صنف ومستودع",
+     "columns": 10,
+     "references": [
+      "items",
+      "purchase_requests",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "stock_count_lines",
+     "comment": "بنود الجرد وفروقاته وأسبابها",
+     "columns": 5,
+     "references": [
+      "stock_counts",
+      "items"
+     ]
+    },
+    {
+     "name": "stock_counts",
+     "comment": "الجرد الفعلي للمستودعات",
+     "columns": 6,
+     "references": [
+      "org_members",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "stock_levels",
+     "comment": "الحد الأدنى والأقصى وكمية إعادة الطلب لكل صنف ومستودع",
+     "columns": 8,
+     "references": [
+      "items",
+      "org_members",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "stock_movements",
+     "comment": "دفتر حركات المخزون (إضافة فقط)؛ الرصيد = مجموع الحركات ولا يسمح برصيد سالب",
+     "columns": 16,
+     "references": [
+      "org_members",
+      "departments",
+      "rooms",
+      "items",
+      "otp_challenges",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "stock_transfer_lines",
+     "comment": "بنود النقل",
+     "columns": 4,
+     "references": [
+      "items",
+      "stock_transfers"
+     ]
+    },
+    {
+     "name": "stock_transfers",
+     "comment": "مستندات النقل بين المستودعات",
+     "columns": 9,
+     "references": [
+      "warehouses",
+      "org_members"
+     ]
+    },
+    {
+     "name": "units",
+     "comment": "وحدات القياس",
+     "columns": 3,
+     "references": []
+    },
+    {
+     "name": "warehouses",
+     "comment": "المستودعات (مستودع لكل فرع)",
+     "columns": 7,
+     "references": [
+      "branches",
+      "org_members"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sourcing",
+   "title": "المشتريات: الموردون وعروض الأسعار",
+   "tables": [
+    {
+     "name": "procurement_exceptions",
+     "comment": "استثناءات قاعدة الثلاثة عروض والشراء المباشر بسبب مكتوب واعتماد",
+     "columns": 8,
+     "references": [
+      "org_members",
+      "purchase_requests"
+     ]
+    },
+    {
+     "name": "purchase_request_lines",
+     "comment": "أصناف وكميات طلب الشراء",
+     "columns": 5,
+     "references": [
+      "items",
+      "purchase_requests"
+     ]
+    },
+    {
+     "name": "purchase_requests",
+     "comment": "طلبات الشراء، من تنبيه المخزون أو يدويًا",
+     "columns": 12,
+     "references": [
+      "reorder_alerts",
+      "branches",
+      "org_members",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "quotation_evaluations",
+     "comment": "تقييم العروض فنيًا وجودةً وماليًا",
+     "columns": 8,
+     "references": [
+      "org_members",
+      "quotations"
+     ]
+    },
+    {
+     "name": "quotation_lines",
+     "comment": "أسعار بنود العرض، والصافي والضريبة مولَّدان",
+     "columns": 8,
+     "references": [
+      "items",
+      "quotations"
+     ]
+    },
+    {
+     "name": "quotations",
+     "comment": "عروض الأسعار المدخلة، عرض واحد لكل مورد",
+     "columns": 13,
+     "references": [
+      "org_members",
+      "rfqs",
+      "suppliers"
+     ]
+    },
+    {
+     "name": "rfq_awards",
+     "comment": "الترسية؛ تتطلب ثلاثة عروض، ومبررًا إن لم تكن الأقل سعرًا",
+     "columns": 9,
+     "references": [
+      "org_members",
+      "procurement_exceptions",
+      "quotations",
+      "rfqs"
+     ]
+    },
+    {
+     "name": "rfq_suppliers",
+     "comment": "الموردون المدعوون لكل طلب عروض",
+     "columns": 4,
+     "references": [
+      "rfqs",
+      "suppliers"
+     ]
+    },
+    {
+     "name": "rfqs",
+     "comment": "طلبات عروض الأسعار وموعدها النهائي",
+     "columns": 7,
+     "references": [
+      "org_members",
+      "purchase_requests"
+     ]
+    },
+    {
+     "name": "supplier_categories",
+     "comment": "تخصصات الموردين بحسب تصنيف الأصناف",
+     "columns": 2,
+     "references": [
+      "item_categories",
+      "suppliers"
+     ]
+    },
+    {
+     "name": "suppliers",
+     "comment": "الموردون برقم ضريبي مُتحقَّق من شكله؛ لا يُعتمد مورد بلا رقم ضريبي",
+     "columns": 16,
+     "references": [
+      "org_members"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "orders",
+   "title": "المشتريات: الأوامر والاستلام والفواتير",
+   "tables": [
+    {
+     "name": "direct_purchase_policies",
+     "comment": "شروط مسار الشراء المباشر الصغير",
+     "columns": 8,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "goods_receipt_lines",
+     "comment": "كميات الاستلام والمقبول والمرفوض ونتيجة الجودة",
+     "columns": 8,
+     "references": [
+      "goods_receipts",
+      "purchase_order_lines"
+     ]
+    },
+    {
+     "name": "goods_receipts",
+     "comment": "محاضر استلام البضاعة",
+     "columns": 9,
+     "references": [
+      "purchase_orders",
+      "org_members",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "match_tolerances",
+     "comment": "نسب التسامح في المطابقة الثلاثية للسعر والكمية",
+     "columns": 6,
+     "references": [
+      "item_categories",
+      "org_members"
+     ]
+    },
+    {
+     "name": "purchase_limits",
+     "comment": "سقوف الشراء الأسبوعية والشهرية (من المدير العام)",
+     "columns": 7,
+     "references": [
+      "branches",
+      "org_members"
+     ]
+    },
+    {
+     "name": "purchase_order_lines",
+     "comment": "بنود أمر الشراء",
+     "columns": 10,
+     "references": [
+      "items",
+      "purchase_orders"
+     ]
+    },
+    {
+     "name": "purchase_orders",
+     "comment": "أوامر الشراء باسم الجهة؛ تتجمد بعد التجهيز، ولا يعتمدها من أعدّها",
+     "columns": 30,
+     "references": [
+      "org_members",
+      "branches",
+      "approval_delegations",
+      "procurement_exceptions",
+      "purchase_requests",
+      "rfqs",
+      "purchase_orders",
+      "suppliers",
+      "warehouses"
+     ]
+    },
+    {
+     "name": "supplier_invoice_lines",
+     "comment": "بنود فاتورة المورد وتصنيفها",
+     "columns": 11,
+     "references": [
+      "supplier_invoices",
+      "items",
+      "purchase_order_lines"
+     ]
+    },
+    {
+     "name": "supplier_invoices",
+     "comment": "فواتير الموردين؛ تمنع القاعدة تكرار رقم الفاتورة لنفس المورد",
+     "columns": 16,
+     "references": [
+      "org_members",
+      "branches",
+      "purchase_orders",
+      "suppliers"
+     ]
+    },
+    {
+     "name": "supplier_payments",
+     "comment": "مدفوعات الموردين",
+     "columns": 9,
+     "references": [
+      "org_members",
+      "supplier_invoices"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "security",
+   "title": "الأمان والهوية والحضور",
+   "tables": [
+    {
+     "name": "audit_events",
+     "comment": "سجل المراجعة المتسلسل بالبصمات؛ إضافة فقط",
+     "columns": 22,
+     "references": [
+      "org_members",
+      "branches",
+      "otp_challenges"
+     ]
+    },
+    {
+     "name": "identity_cards",
+     "comment": "البطاقات الرقمية والفيزيائية برمز معتّم ولا يُخزَّن إلا بصمته",
+     "columns": 11,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "otp_challenges",
+     "comment": "رموز التأكيد: بصمة الرمز مرتبطة بالمستخدم والإجراء والمستند، مع زمن الإرسال والتصديق وعنوان IP",
+     "columns": 20,
+     "references": [
+      "org_members"
+     ]
+    },
+    {
+     "name": "presence_events",
+     "comment": "حركات الدخول والخروج وحضور القاعات والحصص",
+     "columns": 13,
+     "references": [
+      "branches",
+      "identity_cards",
+      "org_members",
+      "rooms",
+      "class_sessions"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy",
+   "title": "الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا",
+   "tables": [
+    {
+     "name": "cost_policies",
+     "comment": "سياسات التكلفة المعتمدة والمسودات",
+     "columns": 9,
+     "references": []
+    },
+    {
+     "name": "education_audit",
+     "comment": "سجل تدقيق مبسط قديم",
+     "columns": 6,
+     "references": []
+    },
+    {
+     "name": "education_records",
+     "comment": "السجلات القديمة لكل الكيانات (فروع، قاعات، طلاب، حصص...) بعمود JSONB",
+     "columns": 8,
+     "references": []
+    },
+    {
+     "name": "org_members",
+     "comment": "حسابات أعضاء المؤسسة وأدوارهم ونطاقهم (مرجع كل الجداول للمستخدمين)",
+     "columns": 11,
+     "references": []
+    }
+   ]
+  }
+ ]
+}

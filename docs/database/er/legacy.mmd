@@ -1,0 +1,44 @@
+%% الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  cost_policies {
+    text owner_id PK
+    jsonb draft
+    int draft_version
+    jsonb approved
+    int approved_version
+    text approved_by
+    timestamptz approved_at
+    text updated_by
+    timestamptz updated_at
+  }
+  education_audit {
+    int id PK
+    text owner_id
+    text actor_id
+    text action
+    int record_id
+    timestamptz created_at
+  }
+  education_records {
+    int id PK
+    text owner_id
+    text kind
+    text name
+    int branch_id
+    text status
+    jsonb details
+    timestamptz created_at
+  }
+  org_members {
+    int id PK
+    text clerk_user_id
+    text email
+    text role
+    int branch_id
+    int linked_record_id
+    text status
+    text invited_by
+    timestamptz created_at
+    timestamptz activated_at
+    timestamptz revoked_at
+  }

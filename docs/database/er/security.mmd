@@ -1,0 +1,91 @@
+%% الأمان والهوية والحضور - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  audit_events {
+    bigint id PK
+    timestamptz occurred_at
+    int actor_member_id FK
+    text actor_role
+    bigint branch_id FK
+    text action
+    text subject_type
+    bigint subject_id
+    text subject_no
+    jsonb before_state
+    jsonb after_state
+    text reason
+    text result
+    uuid otp_challenge_id FK
+    timestamptz otp_sent_at
+    timestamptz otp_verified_at
+    inet ip_sent
+    inet ip_verified
+    text user_agent
+    text content_hash
+    text prev_hash
+    text row_hash
+  }
+  identity_cards {
+    bigint id PK
+    text token_hash UK
+    text holder_type
+    bigint holder_id
+    text card_type
+    text status
+    int key_version
+    int issued_by FK
+    timestamptz issued_at
+    timestamptz revoked_at
+    text revoked_reason
+  }
+  otp_challenges {
+    uuid id PK
+    int member_id FK
+    text action
+    text subject_type
+    bigint subject_id
+    text subject_hash
+    text code_hmac
+    text channel
+    text destination_masked
+    text status
+    int attempts
+    int max_attempts
+    timestamptz sent_at
+    timestamptz expires_at
+    timestamptz verified_at
+    timestamptz consumed_at
+    inet sent_ip
+    inet verified_ip
+    text sent_user_agent
+    text verified_user_agent
+  }
+  presence_events {
+    bigint id PK
+    bigint card_id FK
+    text holder_type
+    bigint holder_id
+    bigint branch_id FK
+    text event_type
+    bigint room_id FK
+    bigint session_id FK
+    text method
+    int device_member_id FK
+    bool verified
+    inet ip
+    timestamptz occurred_at
+  }
+  branches {
+    bigint id PK
+  }
+  rooms {
+    bigint id PK
+  }
+  class_sessions {
+    bigint id PK
+  }
+  branches |o--o{ audit_events : "branch_id"
+  otp_challenges |o--o{ audit_events : "otp_challenge_id"
+  branches ||--o{ presence_events : "branch_id"
+  identity_cards |o--o{ presence_events : "card_id"
+  rooms |o--o{ presence_events : "room_id"
+  class_sessions |o--o{ presence_events : "session_id"

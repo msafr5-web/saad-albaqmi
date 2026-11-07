@@ -46,6 +46,8 @@ jobs:
           pnpm --filter @workspace/db run migrate
       - name: Schema constraints, triggers and views
         run: pnpm --filter @workspace/db run check:schema
+      - name: Every table documented (ER generation)
+        run: pnpm --filter @workspace/db run er
       - name: Access scoping
         run: pnpm --filter @workspace/api-server run check:access
       - name: Cost engine

@@ -1,0 +1,92 @@
+%% الجدولة والحضور والدرجات - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  attendance_records {
+    bigint id PK
+    bigint session_id FK
+    bigint student_id FK
+    bool present
+    text method
+    int recorded_by FK
+    timestamptz recorded_at
+  }
+  class_sessions {
+    bigint id PK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint instructor_id FK
+    bigint diploma_id FK
+    bigint subject_id FK
+    text title
+    date session_date
+    time start_time
+    time end_time
+    text status
+    bigint recurrence_id FK
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  grades {
+    bigint id PK
+    bigint student_id FK
+    bigint subject_id FK
+    text assessment_type
+    numeric_6_2_ score
+    numeric_6_2_ max_score
+    date assessed_on
+    int recorded_by FK
+    timestamptz created_at
+  }
+  session_recurrences {
+    bigint id PK
+    bigint branch_id FK
+    bigint room_id FK
+    bigint instructor_id FK
+    bigint diploma_id FK
+    bigint subject_id FK
+    int4__ weekdays
+    time start_time
+    time end_time
+    date valid_from
+    date valid_to
+    int created_by FK
+    timestamptz created_at
+  }
+  session_students {
+    bigint session_id PK, FK
+    bigint student_id PK, FK
+  }
+  students {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  diplomas {
+    bigint id PK
+  }
+  instructors {
+    bigint id PK
+  }
+  rooms {
+    bigint id PK
+  }
+  subjects {
+    bigint id PK
+  }
+  class_sessions ||--o{ attendance_records : "session_id"
+  students ||--o{ attendance_records : "student_id"
+  branches ||--o{ class_sessions : "branch_id"
+  diplomas ||--o{ class_sessions : "diploma_id"
+  instructors ||--o{ class_sessions : "instructor_id"
+  session_recurrences |o--o{ class_sessions : "recurrence_id"
+  rooms ||--o{ class_sessions : "room_id"
+  subjects |o--o{ class_sessions : "subject_id"
+  students ||--o{ grades : "student_id"
+  subjects ||--o{ grades : "subject_id"
+  branches ||--o{ session_recurrences : "branch_id"
+  diplomas ||--o{ session_recurrences : "diploma_id"
+  instructors ||--o{ session_recurrences : "instructor_id"
+  rooms ||--o{ session_recurrences : "room_id"
+  subjects |o--o{ session_recurrences : "subject_id"
+  class_sessions ||--o{ session_students : "session_id"
+  students ||--o{ session_students : "student_id"

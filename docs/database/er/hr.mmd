@@ -1,0 +1,125 @@
+%% الموارد البشرية والتفويض - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  approval_delegations {
+    bigint id PK
+    int delegator_member_id FK
+    int delegate_member_id FK
+    text scope
+    date valid_from
+    date valid_to
+    bigint leave_request_id FK
+    int proposed_by FK
+    int approved_by FK
+    timestamptz approved_at
+    text status
+    timestamptz created_at
+  }
+  departments {
+    bigint id PK
+    bigint branch_id FK
+    bigint parent_id FK
+    text code UK
+    text name
+    bigint manager_employee_id FK
+    text status
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  employee_shifts {
+    bigint employee_id PK, FK
+    bigint shift_id FK
+    date valid_from PK
+    date valid_to
+  }
+  employees {
+    bigint id PK
+    text employee_no UK
+    text full_name
+    bigint branch_id FK
+    bigint department_id FK
+    bigint job_title_id FK
+    int org_member_id FK
+    text national_id
+    text nationality
+    text email
+    text phone
+    text iban
+    text employment_type
+    date hire_date
+    date termination_date
+    text status
+    bigint basic_salary_halalas
+    bigint housing_allowance_halalas
+    bigint transport_allowance_halalas
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  job_titles {
+    bigint id PK
+    text name UK
+    text grade
+    timestamptz created_at
+  }
+  leave_requests {
+    bigint id PK
+    bigint employee_id FK
+    bigint leave_type_id FK
+    date start_date
+    date end_date
+    text status
+    text reason
+    int requested_by FK
+    int decided_by FK
+    timestamptz decided_at
+    timestamptz created_at
+  }
+  leave_types {
+    bigint id PK
+    text code UK
+    text name
+    bool is_paid
+    int annual_days
+  }
+  payroll_lines {
+    bigint id PK
+    bigint run_id FK
+    bigint employee_id FK
+    bigint basic_halalas
+    bigint allowances_halalas
+    bigint deductions_halalas
+    bigint net_halalas "generated"
+    numeric_5_2_ days_worked
+  }
+  payroll_runs {
+    bigint id PK
+    bigint branch_id FK
+    date period_month
+    text status
+    int approved_by FK
+    timestamptz approved_at
+    timestamptz created_at
+  }
+  shifts {
+    bigint id PK
+    text name UK
+    time start_time
+    time end_time
+    int grace_minutes
+  }
+  branches {
+    bigint id PK
+  }
+  leave_requests |o--o{ approval_delegations : "leave_request_id"
+  branches |o--o{ departments : "branch_id"
+  employees |o--o{ departments : "manager_employee_id"
+  departments |o--o{ departments : "parent_id"
+  employees ||--o{ employee_shifts : "employee_id"
+  shifts ||--o{ employee_shifts : "shift_id"
+  branches ||--o{ employees : "branch_id"
+  departments |o--o{ employees : "department_id"
+  job_titles |o--o{ employees : "job_title_id"
+  employees ||--o{ leave_requests : "employee_id"
+  leave_types ||--o{ leave_requests : "leave_type_id"
+  employees ||--o{ payroll_lines : "employee_id"
+  payroll_runs ||--o{ payroll_lines : "run_id"
+  branches ||--o{ payroll_runs : "branch_id"
