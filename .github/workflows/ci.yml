@@ -68,3 +68,12 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:cards
       - name: Legacy importer
         run: pnpm --filter @workspace/db run check:import
+      - name: Production build of the API (same command as the server deploy)
+        run: pnpm --filter @workspace/api-server run build
+      - name: Production build of the web app (same command as the server deploy)
+        env:
+          PORT: "3000"
+          BASE_PATH: /
+          NODE_ENV: production
+          VITE_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
+        run: pnpm --filter @workspace/saad-albaqmi run build
