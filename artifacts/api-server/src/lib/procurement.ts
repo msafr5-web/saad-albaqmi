@@ -8,6 +8,7 @@ import type { Member } from "./education-access";
 import { DomainError } from "./education-validation";
 import { consumeChallenge, otpEnabled } from "./otp";
 import { recordAudit } from "./audit";
+import { budgetAlerts } from "./fiscal";
 
 /**
  * Procurement cycle, standard path: purchase request -> RFQ -> 3+ quotations -> evaluation -> award (justified when not the
@@ -355,6 +356,7 @@ export async function approvePurchaseOrder(m: Member, poId: number, ctx: { chall
       const subject = { poId: po.id, poNo: po.poNo, netHalalas: po.netHalalas, vatHalalas: po.vatHalalas, documentHash };
       const otp = otpEnabled() ? await consumeChallenge(tx, { challengeId: ctx.challengeId, memberId: m.id, action: "procurement.po.approve", subject }) : null;
       const [row] = await tx.update(purchaseOrders).set({ status: "approved", approvedBy: m.id, approvedAt: new Date(), approvedViaDelegationId: auth.delegationId, documentHash }).where(eq(purchaseOrders.id, po.id)).returning();
+      await budgetAlerts(tx, po.branchId, `${String(po.issueDate).slice(0, 7)}-01`);   // approved orders are commitments against the monthly budget
       await recordAudit(tx, { actorMemberId: m.id, actorRole: m.role, branchId: po.branchId, action: "po.approve", subjectType: "purchase_order", subjectId: po.id, subjectNo: po.poNo, after: { ...subject, viaDelegation: auth.delegationId },
         otp: otp ? { challengeId: otp.challengeId, sentAt: otp.sentAt, verifiedAt: otp.verifiedAt, sentIp: otp.sentIp, verifiedIp: otp.verifiedIp } : null, userAgent: ctx.userAgent, contentHash: otp?.subjectHash ?? documentHash });
       return row!;

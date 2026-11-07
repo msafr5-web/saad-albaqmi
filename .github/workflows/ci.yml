@@ -60,3 +60,5 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:fulfilment
       - name: HR and delegation
         run: pnpm --filter @workspace/api-server run check:hr
+      - name: Budgets, VAT and sales invoices
+        run: pnpm --filter @workspace/api-server run check:fiscal

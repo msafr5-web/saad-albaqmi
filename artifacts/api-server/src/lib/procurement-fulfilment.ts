@@ -7,6 +7,7 @@ import type { Member } from "./education-access";
 import { DomainError } from "./education-validation";
 import { consumeChallenge, otpEnabled } from "./otp";
 import { recordAudit } from "./audit";
+import { budgetAlerts } from "./fiscal";
 
 /**
  * After the purchase order is approved: send it, receive goods (quality check + stock posting), book the supplier invoice
@@ -224,6 +225,7 @@ export async function approveSupplierInvoice(m: Member, id: number, input: { rea
       const [br] = await tx.select().from(branches).where(eq(branches.id, inv.branchId));
       await tx.insert(expenses).values({ expenseNo: eno.n, branchId: inv.branchId, categoryId: expCat!.id, expenseDate: inv.invoiceDate, description: `فاتورة مورد ${inv.supplierInvoiceNo}${br ? ` — ${br.name}` : ""}`,
         netHalalas: inv.netHalalas, vatHalalas: inv.vatHalalas, source: "supplier_invoice", supplierInvoiceId: inv.id, status: "confirmed", confirmedAt: new Date(), createdBy: m.id });
+      await budgetAlerts(tx, inv.branchId, `${String(inv.invoiceDate).slice(0, 7)}-01`);
       await recordAudit(tx, { actorMemberId: m.id, actorRole: m.role, branchId: inv.branchId, action: "invoice.approve", subjectType: "supplier_invoice", subjectId: id, subjectNo: inv.supplierInvoiceNo, after: subject, reason: reason || null, otp: evidence(otp), userAgent: ctx.userAgent, contentHash: otp?.subjectHash });
       return row!;
     });

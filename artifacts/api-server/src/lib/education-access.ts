@@ -24,9 +24,9 @@ const WRITABLE: Record<Role, string[]> = {
 };
 
 const PAGES: Record<Role, string[]> = {
-  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit", "inventory", "procurement", "hr"],
-  branch_manager: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "inventory", "procurement", "hr"],
-  finance: ["dashboard", "branches", "students", "instructors", "finance", "reports", "settings", "inventory", "procurement", "hr"],
+  super_admin: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "team", "audit", "inventory", "procurement", "hr", "fiscal"],
+  branch_manager: ["dashboard", "branches", "rooms", "assets", "diplomas", "students", "instructors", "finance", "schedule", "reports", "nfc", "settings", "inventory", "procurement", "hr", "fiscal"],
+  finance: ["dashboard", "branches", "students", "instructors", "finance", "reports", "settings", "inventory", "procurement", "hr", "fiscal"],
   coordinator: ["dashboard", "rooms", "assets", "diplomas", "students", "instructors", "schedule", "nfc", "settings", "inventory"],
   instructor: ["dashboard", "students", "schedule", "settings"],
   student: ["dashboard", "schedule", "finance", "settings"],
