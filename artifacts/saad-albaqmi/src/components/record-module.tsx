@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { KINDS, det, errorText, fmtDate, fmtNum, fmtSAR, type FieldDef, type Kind } from "@/lib/domain";
 import { useRecordIndex, useRecordMutations, useRecords, useWorkspace } from "@/hooks/use-data";
 import { EmptyState, ErrorState, LoadingRows, ReadOnlyNotice, StatusPill } from "@/components/bits";
+import { useOtpGate } from "@/components/otp-gate";
 
 type Index = ReturnType<typeof useRecordIndex>;
 
@@ -86,6 +87,7 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
   const [serverError, setServerError] = useState<string | null>(null);
   const { create, update } = useRecordMutations();
   const { toast } = useToast();
+  const otp = useOtpGate();
   const pending = create.isPending || update.isPending;
 
   const setD = (k: string, v: unknown) => setState((s) => {
@@ -129,10 +131,10 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
         toast({ title: editing ? "تم حفظ التعديلات" : `تمت إضافة ${def.singular}`, description: data.name });
         onOpenChange(false);
       },
-      onError: (err: unknown) => setServerError(errorText(err)),
+      onError: (err: unknown) => { if (!otp.handle(err, run)) setServerError(errorText(err)); },
     };
-    if (editing) update.mutate({ id: editing.id, data }, opts);
-    else create.mutate({ data }, opts);
+    const run = () => (editing ? update.mutate({ id: editing.id, data }, opts) : create.mutate({ data }, opts));
+    run();
   };
 
   const err = (k: string) => errors[k] && <p className="mt-1 text-[11px] text-destructive">{errors[k]}</p>;
@@ -256,6 +258,7 @@ function RecordForm({ kind, editing, open, onOpenChange, idx }: { kind: Kind; ed
           <Button variant="outline" onClick={() => onOpenChange(false)} data-testid="button-cancel">إلغاء</Button>
         </DialogFooter>
       </DialogContent>
+      {otp.dialog}
     </Dialog>
   );
 }
@@ -267,6 +270,7 @@ function KindTable({ kind, extra }: { kind: Kind; extra?: ReactNode }) {
   const idx = useRecordIndex(records.data);
   const { remove } = useRecordMutations();
   const { toast } = useToast();
+  const otp = useOtpGate();
   const [q, setQ] = useState("");
   const [branch, setBranch] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
@@ -397,15 +401,21 @@ function KindTable({ kind, extra }: { kind: Kind; extra?: ReactNode }) {
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
-              onClick={() => deleting && remove.mutate({ id: deleting.id }, {
-                onSuccess: () => toast({ title: "تم الحذف", description: deleting.name }),
-                onError: (e) => toast({ title: "تعذر الحذف", description: errorText(e), variant: "destructive" }),
-              })}
+              onClick={() => {
+                if (!deleting) return;
+                const target = deleting;
+                const run = (): void => remove.mutate({ id: target.id }, {
+                  onSuccess: () => toast({ title: "تم الحذف", description: target.name }),
+                  onError: (e) => { if (!otp.handle(e, run)) toast({ title: "تعذر الحذف", description: errorText(e), variant: "destructive" }); },
+                });
+                run();
+              }}
             >حذف نهائي</AlertDialogAction>
             <AlertDialogCancel data-testid="button-cancel-delete">تراجع</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {otp.dialog}
     </div>
   );
 }

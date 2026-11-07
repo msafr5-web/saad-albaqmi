@@ -88,6 +88,10 @@ router.patch("/team/:id", async (req, res: Response) => {
       if (n === 0) throw new DomainError("لا يمكن إزالة آخر مدير للإدارة العليا", 409);
     }
     const [row] = await tx.update(orgMembers).set(revoke ? { status: "revoked", revokedAt: new Date() } : next).where(eq(orgMembers.id, current.id)).returning();
+    // Role/branch changes and revocations are the most sensitive admin actions: always leave a trace of who did what.
+    const by = accessOf(res);
+    const change = revoke ? `revoke:${current.email}:${current.role}` : `update:${current.email}:role=${current.role}>${next.role};branch=${current.branchId ?? "-"}>${next.branchId ?? "-"};link=${current.linkedRecordId ?? "-"}>${next.linkedRecordId ?? "-"}`;
+    await tx.insert(educationAudit).values({ ownerId: ORG_OWNER_ID, actorId: by.kind === "org" ? by.userId : null, action: `member_${change}`.slice(0, 250), recordId: current.id });
     return row!;
   });
   res.json(UpdateMemberResponse.parse(present(updated)));

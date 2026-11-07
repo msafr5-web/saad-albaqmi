@@ -1,4 +1,4 @@
-import { Router, type IRouter, type Response } from "express";
+import { Router, type IRouter, type Request, type Response } from "express";
 import { and, eq, sql } from "drizzle-orm";
 import { db, educationRecords, educationAudit, costPolicies, ORG_OWNER_ID } from "@workspace/db";
 import { CreateRecordBody, UpdateRecordBody, UpdateRecordParams, DeleteRecordParams, ListRecordsResponse, GetSummaryResponse, GetWorkspaceResponse, GetPayrollQueryParams, GetCostPolicyResponse, SaveCostPolicyDraftBody, SaveCostPolicyDraftResponse, ApproveCostPolicyBody, ApproveCostPolicyResponse, GetCostReportQueryParams, GetCostReportResponse, GetPayrollResponse, GetLedgerResponse, CreateRecordResponse, UpdateRecordResponse } from "@workspace/api-zod";
@@ -8,6 +8,8 @@ import { computeCostReport, validatePolicy, type CostPolicy } from "../lib/educa
 import { DomainError, ensureDeletable, validateRecord } from "../lib/education-validation";
 import { assertCanWrite, assertCanWriteExisting, canViewLedger, canViewPayroll, capabilities, summaryFor, visibleRows } from "../lib/education-access";
 import { accessOf, workspaceAccess } from "../middlewares/workspaceAccess";
+import { consumeChallenge, otpEnabled } from "../lib/otp";
+import { recordAudit } from "../lib/audit";
 
 const router: IRouter = Router();
 const serialize = (rows: (typeof educationRecords.$inferSelect)[]): EducationRow[] => rows.map(r => ({
@@ -21,6 +23,12 @@ async function records(res: Response) {
   const all = serialize(await db.select().from(educationRecords).where(eq(educationRecords.ownerId, ownerKey(res)!)));
   return a.kind === "org" ? visibleRows(a.member, all) : all;
 }
+/** Money records (revenue and expense) need an OTP confirmation from the executor when OTP_FINANCE_REQUIRED=true. */
+const OTP_KINDS = ["payment", "expense", "invoice", "installment"];
+const PERSONAL_RECORD_LIMIT = Number(process.env.PERSONAL_RECORD_LIMIT ?? 2000);
+const needsOtp = (a: ReturnType<typeof accessOf>, kind: string) => a.kind === "org" && otpEnabled() && OTP_KINDS.includes(kind);
+const otpChallengeOf = (req: Request) => req.get("x-otp-challenge") ?? undefined;
+const evidence = (o: NonNullable<Awaited<ReturnType<typeof consumeChallenge>>>) => ({ challengeId: o.challengeId, sentAt: o.sentAt, verifiedAt: o.verifiedAt, sentIp: o.sentIp, verifiedIp: o.verifiedIp });
 const forbid = (res: Response, msg = "ليست لديك صلاحية لهذه البيانات") => { res.status(403).json({ error: msg }); };
 
 router.use(["/workspace","/records","/summary","/payroll","/ledger","/cost-policy","/cost-report"], workspaceAccess);
@@ -158,11 +166,16 @@ router.post("/records", async(req,res): Promise<void> => {
   const a = accessOf(res);
   const created = await db.transaction(async tx => {
     const { key, all } = await lockedAll(tx, res);
+    // Registration is open, so one account must not be able to fill the database: cap personal workspaces.
+    if (a.kind === "personal" && all.length >= PERSONAL_RECORD_LIMIT) throw new DomainError("بلغت الحد الأقصى لعدد السجلات في المساحة الشخصية", 429);
     const input = {...parsed.data,branchId:parsed.data.branchId ?? null};
     if (a.kind === "org") assertCanWrite(a.member, input.kind, input.branchId, input.details, all);
     validateRecord(input, all);
+    const subject = { kind: input.kind, name: input.name.trim(), branchId: input.branchId, status: input.status, details: input.details };
+    const otp = a.kind === "org" && needsOtp(a, input.kind) ? await consumeChallenge(tx, { challengeId: otpChallengeOf(req), memberId: a.member.id, action: "record.create", subject }) : null;
     const [result] = await tx.insert(educationRecords).values({...parsed.data,name:parsed.data.name.trim(),ownerId:key}).returning();
     await tx.insert(educationAudit).values({ownerId:key,actorId:actor(res),action:"create",recordId:result!.id});
+    if (otp && a.kind === "org") await recordAudit(tx, { actorMemberId: a.member.id, actorRole: a.member.role, branchId: input.branchId, action: "record.create", subjectType: input.kind, subjectId: result!.id, subjectNo: input.name.trim(), after: subject, otp: evidence(otp), userAgent: req.get("user-agent"), contentHash: otp.subjectHash });
     return serialize([result!])[0];
   });
   res.status(201).json(CreateRecordResponse.parse(created));
@@ -182,11 +195,14 @@ router.patch("/records/:id", async(req,res): Promise<void> => {
       assertCanWrite(a.member, parsed.data.kind, parsed.data.branchId ?? null, parsed.data.details, all);
     }
     validateRecord({...parsed.data,branchId:parsed.data.branchId ?? null},all,params.data.id);
+    const subject = { id: params.data.id, kind: parsed.data.kind, name: parsed.data.name.trim(), branchId: parsed.data.branchId ?? null, status: parsed.data.status, details: parsed.data.details };
+    const otp = a.kind === "org" && needsOtp(a, current.kind) ? await consumeChallenge(tx, { challengeId: otpChallengeOf(req), memberId: a.member.id, action: "record.update", subject }) : null;
     // Revalidate dependents to prevent room capacity / student diploma edits invalidating sessions.
     const candidate = all.map(r => r.id === params.data.id ? {...r,...parsed.data,branchId:parsed.data.branchId ?? null} : r);
     for (const r of candidate.filter(r=>["session","student","installment","payment","subject","level"].includes(r.kind))) validateRecord(r,candidate,r.id);
     const [result] = await tx.update(educationRecords).set({...parsed.data,name:parsed.data.name.trim()}).where(and(eq(educationRecords.id,params.data.id),eq(educationRecords.ownerId,key))).returning();
     await tx.insert(educationAudit).values({ownerId:key,actorId:actor(res),action:"update",recordId:params.data.id});
+    if (otp && a.kind === "org") await recordAudit(tx, { actorMemberId: a.member.id, actorRole: a.member.role, branchId: current.branchId, action: "record.update", subjectType: current.kind, subjectId: current.id, subjectNo: current.name, before: { name: current.name, status: current.status, details: current.details }, after: subject, otp: evidence(otp), userAgent: req.get("user-agent"), contentHash: otp.subjectHash });
     return serialize([result!])[0];
   });
   res.json(UpdateRecordResponse.parse(updated));
@@ -201,8 +217,10 @@ router.delete("/records/:id", async(req,res): Promise<void> => {
     if (!current || (a.kind === "org" && !visibleRows(a.member, all).some(r => r.id === current.id))) throw new DomainError("السجل غير موجود",404);
     if (a.kind === "org") assertCanWriteExisting(a.member, current, all);
     ensureDeletable(params.data.id,all);
+    const otp = a.kind === "org" && needsOtp(a, current.kind) ? await consumeChallenge(tx, { challengeId: otpChallengeOf(req), memberId: a.member.id, action: "record.delete", subject: { id: current.id } }) : null;
     await tx.delete(educationRecords).where(and(eq(educationRecords.id,params.data.id),eq(educationRecords.ownerId,key)));
     await tx.insert(educationAudit).values({ownerId:key,actorId:actor(res),action:"delete",recordId:params.data.id});
+    if (otp && a.kind === "org") await recordAudit(tx, { actorMemberId: a.member.id, actorRole: a.member.role, branchId: current.branchId, action: "record.delete", subjectType: current.kind, subjectId: current.id, subjectNo: current.name, before: { name: current.name, status: current.status, details: current.details }, otp: evidence(otp), userAgent: req.get("user-agent"), contentHash: otp.subjectHash });
   });
   res.status(204).end();
 });

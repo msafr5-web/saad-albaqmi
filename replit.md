@@ -8,7 +8,9 @@ Arabic RTL educational branch and resource management web application with insta
 - API workflow: `artifacts/api-server: API Server`
 - `pnpm run typecheck` — full workspace typecheck
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API contracts
-- `pnpm --filter @workspace/db run push` — development schema only
+- `pnpm --filter @workspace/db run create-db | migrate | check:schema` — create database `saad_albaqmi`, apply versioned migrations, run 31 constraint checks (see `docs/database.md`)
+- `pnpm --filter @workspace/db run push` — development schema only; never against production (use `migrate`)
+- `pnpm --filter @workspace/api-server run check:otp` — OTP service and audit ledger (needs a scratch database and `ALLOW_DB_TESTS=1`)
 - `node scripts/create-pwa-icons.mjs` — reproduce PNG installation icons
 
 ## Sources and scope
@@ -18,7 +20,7 @@ Arabic RTL educational branch and resource management web application with insta
 - Web app: `artifacts/saad-albaqmi/`, at `/`.
 - Shared API: `artifacts/api-server/`, at `/api`.
 - API contract: `lib/api-spec/openapi.yaml`.
-- Database schema: `lib/db/src/schema/education.ts`.
+- Database schema: legacy JSONB tables in `lib/db/src/schema/education.ts`; relational schema (80+ tables, halalas, FKs, triggers) in `lib/db/src/schema/*.ts`, migrations in `lib/db/drizzle`; docs in `docs/database.md` and `docs/security.md`.
 
 ## Product decisions
 
@@ -45,3 +47,7 @@ Arabic RTL educational branch and resource management web application with insta
 ## Before institutional use
 
 Complete verified administrator onboarding, team invitations and branch-scoped authorization; approved cost/utility/depreciation models; detailed curricula and trainer dues; recovery, security and performance validation.
+
+## Financial confirmation (OTP)
+
+Money records created/edited/deleted by organization members can require an emailed OTP (`OTP_FINANCE_REQUIRED=true`, off by default). The API answers 428 with the exact subject to confirm; the web app shows `components/otp-gate.tsx`. Each confirmation is appended to the hash-chained `audit_events` ledger with OTP times and IPs. Details: `docs/security.md`.
