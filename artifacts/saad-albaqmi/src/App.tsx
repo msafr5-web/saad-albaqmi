@@ -25,6 +25,7 @@ import HrPage from "@/pages/hr";
 import FiscalPage from "@/pages/fiscal";
 import CardPage from "@/pages/card";
 import AttendancePage from "@/pages/attendance";
+import RequestsPage from "@/pages/requests";
 import { useWorkspace } from "@/hooks/use-data";
 import { LOCAL_AUTH, LocalAuthProvider, LocalSignIn, Show } from "@/lib/auth";
 
@@ -182,7 +183,7 @@ const P = {
   assets: protect(AssetsPage, "assets"), diplomas: protect(DiplomasPage, "diplomas"), students: protect(StudentsPage, "students"),
   instructors: protect(InstructorsPage, "instructors"), finance: protect(FinancePage, "finance"), schedule: protect(SchedulePage, "schedule"),
   reports: protect(ReportsPage, "reports"), settings: protect(SettingsPage, "settings"), nfc: protect(NfcPage, "nfc"), team: protect(TeamPage, "team"), audit: protect(AuditPage, "audit"),
-  inventory: protect(InventoryPage, "inventory"), procurement: protect(ProcurementPage, "procurement"), hr: protect(HrPage, "hr"), fiscal: protect(FiscalPage, "fiscal"), card: protect(CardPage, "card"), attendance: protect(AttendancePage, "attendance"),
+  inventory: protect(InventoryPage, "inventory"), procurement: protect(ProcurementPage, "procurement"), hr: protect(HrPage, "hr"), fiscal: protect(FiscalPage, "fiscal"), card: protect(CardPage, "card"), attendance: protect(AttendancePage, "attendance"), requests: protect(RequestsPage, "requests"),
 };
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -224,6 +225,7 @@ function AppRoutes({ children }: { children?: ReactNode }) {
               <Route path="/fiscal" component={P.fiscal} />
               <Route path="/card" component={P.card} />
               <Route path="/attendance" component={P.attendance} />
+              <Route path="/requests" component={P.requests} />
               <Route path="/settings" component={P.settings} />
               <Route component={NotFound} />
             </Switch>

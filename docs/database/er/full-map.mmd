@@ -166,6 +166,19 @@ erDiagram
     bigint employee_id FK
     int org_member_id FK
   }
+  internal_request_events {
+    bigint id PK
+    bigint request_id FK
+    int actor_member_id FK
+  }
+  internal_requests {
+    bigint id PK
+    text request_no UK
+    bigint branch_id FK
+    bigint assignee_id FK
+    int created_by FK
+    int closed_by FK
+  }
   item_categories {
     bigint id PK
     bigint parent_id FK
@@ -524,6 +537,9 @@ erDiagram
   subjects ||--o{ instructor_subjects : "subject_id"
   branches ||--o{ instructors : "branch_id"
   employees |o--o{ instructors : "employee_id"
+  internal_requests ||--o{ internal_request_events : "request_id"
+  employees ||--o{ internal_requests : "assignee_id"
+  branches ||--o{ internal_requests : "branch_id"
   item_categories |o--o{ item_categories : "parent_id"
   item_categories ||--o{ items : "category_id"
   units ||--o{ items : "unit_id"

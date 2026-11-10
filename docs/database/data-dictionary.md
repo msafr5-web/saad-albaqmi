@@ -1,6 +1,6 @@
 # قاموس بيانات قاعدة `saad_albaqmi`
 
-مولَّد آليًا من القاعدة الحية بواسطة `lib/db/scripts/er.mjs`؛ لا يُعدَّل يدويًا. **88 جدولًا، 196 علاقة (مفتاح أجنبي)، 9 عروضًا، 34 محفّزًا.**
+مولَّد آليًا من القاعدة الحية بواسطة `lib/db/scripts/er.mjs`؛ لا يُعدَّل يدويًا. **90 جدولًا، 202 علاقة (مفتاح أجنبي)، 10 عروضًا، 35 محفّزًا.**
 
 الرموز: **PK** مفتاح أساسي، **FK** مفتاح أجنبي، **UK** فريد. المبالغ بالهللات (`*_halalas`) والكميات `numeric(14,3)`.
 
@@ -20,6 +20,7 @@
 | المشتريات: الموردون وعروض الأسعار | [`procurement_exceptions`](#procurement_exceptions)، [`purchase_request_lines`](#purchase_request_lines)، [`purchase_requests`](#purchase_requests)، [`quotation_evaluations`](#quotation_evaluations)، [`quotation_lines`](#quotation_lines)، [`quotations`](#quotations)، [`rfq_awards`](#rfq_awards)، [`rfq_suppliers`](#rfq_suppliers)، [`rfqs`](#rfqs)، [`supplier_categories`](#supplier_categories)، [`suppliers`](#suppliers) |
 | المشتريات: الأوامر والاستلام والفواتير | [`direct_purchase_policies`](#direct_purchase_policies)، [`goods_receipt_lines`](#goods_receipt_lines)، [`goods_receipts`](#goods_receipts)، [`match_tolerances`](#match_tolerances)، [`purchase_limits`](#purchase_limits)، [`purchase_order_lines`](#purchase_order_lines)، [`purchase_orders`](#purchase_orders)، [`supplier_invoice_lines`](#supplier_invoice_lines)، [`supplier_invoices`](#supplier_invoices)، [`supplier_payments`](#supplier_payments) |
 | الأمان والهوية والحضور | [`audit_events`](#audit_events)، [`identity_cards`](#identity_cards)، [`local_accounts`](#local_accounts)، [`local_sessions`](#local_sessions)، [`login_codes`](#login_codes)، [`otp_challenges`](#otp_challenges)، [`presence_events`](#presence_events) |
+| الطلبات والمهام الداخلية | [`internal_request_events`](#internal_request_events)، [`internal_requests`](#internal_requests) |
 | الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا | [`cost_policies`](#cost_policies)، [`education_audit`](#education_audit)، [`education_records`](#education_records)، [`org_members`](#org_members) |
 
 ## المؤسسة والإعدادات
@@ -324,7 +325,7 @@
 **الفهارس:**
 - `فريد btree (run_id, employee_id)`
 
-**محفّزات:** `trg_payroll_lines_lock` (BEFORE DELETE/INSERT/UPDATE)
+**محفّزات:** `trg_payroll_lines_lock` (BEFORE INSERT/UPDATE/DELETE)
 
 ### payroll_runs
 
@@ -555,7 +556,7 @@
 **قيود التحقق:**
 - `subject_prerequisites_self_ck`: `((subject_id <> prerequisite_id))`
 
-**محفّزات:** `trg_subject_prerequisites_guard` (BEFORE UPDATE/INSERT)
+**محفّزات:** `trg_subject_prerequisites_guard` (BEFORE INSERT/UPDATE)
 
 ### subjects
 
@@ -585,7 +586,7 @@
 - `فريد btree (diploma_id, name)`
 - `btree (level_id)`
 
-**محفّزات:** `trg_subjects_level_guard` (BEFORE UPDATE/INSERT)
+**محفّزات:** `trg_subjects_level_guard` (BEFORE INSERT/UPDATE)
 
 ## الطلاب والمدربون
 
@@ -910,7 +911,7 @@
 - `فريد btree (receipt_no)`
 - `btree (student_id, paid_on)`
 
-**محفّزات:** `trg_payments_immutable` (BEFORE UPDATE/DELETE)
+**محفّزات:** `trg_payments_immutable` (BEFORE DELETE/UPDATE)
 
 ### sales_invoice_lines
 
@@ -1274,7 +1275,7 @@
 - `btree (issued_to_room_id, occurred_at) WHERE (issued_to_room_id IS NOT NULL)`
 - `btree (warehouse_id, item_id, occurred_at)`
 
-**محفّزات:** `trg_stock_movements_alert` (AFTER INSERT)، `trg_stock_movements_append_only` (BEFORE DELETE/UPDATE)، `trg_stock_movements_guard` (BEFORE INSERT)
+**محفّزات:** `trg_stock_movements_alert` (AFTER INSERT)، `trg_stock_movements_append_only` (BEFORE UPDATE/DELETE)، `trg_stock_movements_guard` (BEFORE INSERT)
 
 ### stock_transfer_lines
 
@@ -1725,7 +1726,7 @@
 **الفهارس:**
 - `فريد btree (po_id, line_no)`
 
-**محفّزات:** `trg_purchase_order_lines_freeze` (BEFORE UPDATE/DELETE/INSERT)
+**محفّزات:** `trg_purchase_order_lines_freeze` (BEFORE DELETE/INSERT/UPDATE)
 
 ### purchase_orders
 
@@ -2058,6 +2059,71 @@
 - `btree (holder_type, holder_id, occurred_at)`
 - `btree (session_id) WHERE (session_id IS NOT NULL)`
 
+## الطلبات والمهام الداخلية
+
+المخطط: `er/requests.mmd` (و`er/requests.svg` عند التوليد).
+
+### internal_request_events
+
+سجل أحداث الطلب (إضافة فقط): من فعل ماذا ومتى
+
+| العمود | النوع | فارغ؟ | افتراضي / مولَّد | مفاتيح | يشير إلى |
+|---|---|---|---|---|---|
+| `id` | bigint | لا | هوية تلقائية | PK |  |
+| `request_id` | bigint | لا |  | FK | `internal_requests.id` (CASCADE) |
+| `event_type` | text | لا |  |  |  |
+| `actor_member_id` | int | نعم |  | FK | `org_members.id` (NO ACTION) |
+| `note` | text | نعم |  |  |  |
+| `created_at` | timestamptz | لا | `now()` |  |  |
+
+**قيود التحقق:**
+- `internal_request_events_type_ck`: `((event_type = ANY (ARRAY['created'::text, 'received'::text, 'responded'::text, 'closed'::text, 'cancelled'::text, 'reminder'::text])))`
+
+**الفهارس:**
+- `btree (request_id, created_at)`
+
+**محفّزات:** `trg_internal_request_events_append_only` (BEFORE UPDATE/DELETE)
+
+### internal_requests
+
+طلبات ومهام الإدارة من المدير إلى الموظف، بأربع مراحل زمنية يسجلها النظام: الإرسال، الاستقبال، الرد، الإغلاق
+
+| العمود | النوع | فارغ؟ | افتراضي / مولَّد | مفاتيح | يشير إلى |
+|---|---|---|---|---|---|
+| `id` | bigint | لا | هوية تلقائية | PK |  |
+| `request_no` | text | لا |  | UK |  |
+| `title` | text | لا |  |  |  |
+| `description` | text | نعم |  |  |  |
+| `request_type` | text | لا | `'other'::text` |  |  |
+| `priority` | text | لا | `'normal'::text` |  |  |
+| `branch_id` | bigint | لا |  | FK | `branches.id` (NO ACTION) |
+| `assignee_id` | bigint | لا |  | FK | `employees.id` (NO ACTION) |
+| `created_by` | int | لا |  | FK | `org_members.id` (NO ACTION) |
+| `due_at` | timestamptz | نعم |  |  |  |
+| `status` | text | لا | `'sent'::text` |  |  |
+| `sent_at` | timestamptz | لا | `now()` |  |  |
+| `received_at` | timestamptz | نعم |  |  |  |
+| `responded_at` | timestamptz | نعم |  |  |  |
+| `closed_at` | timestamptz | نعم |  |  |  |
+| `cancelled_at` | timestamptz | نعم |  |  |  |
+| `response_text` | text | نعم |  |  |  |
+| `response_links` | jsonb | لا | `'[]'::jsonb` |  |  |
+| `close_note` | text | نعم |  |  |  |
+| `closed_by` | int | نعم |  | FK | `org_members.id` (NO ACTION) |
+
+**قيود التحقق:**
+- `internal_requests_order_ck`: `((((received_at IS NULL) OR (received_at >= sent_at)) AND ((responded_at IS NULL) OR (received_at IS NULL) OR (responded_at >= received_at)) AND ((closed_at IS NULL) OR (responded_at IS NULL) OR (closed_at >= responded_at))))`
+- `internal_requests_priority_ck`: `((priority = ANY (ARRAY['normal'::text, 'high'::text, 'urgent'::text])))`
+- `internal_requests_stage_ck`: `((((status <> ALL (ARRAY['received'::text, 'responded'::text, 'closed'::text])) OR (received_at IS NOT NULL)) AND ((status <> ALL (ARRAY['responded'::text, 'closed'::text])) OR (responded_at IS NOT NULL)) AND ((status <> 'closed'::text) OR ((closed_at IS NOT NULL) AND (closed_by IS NOT NULL))) AND ((status <> 'cancelled'::text) OR (cancelled_at IS NOT NULL))))`
+- `internal_requests_status_ck`: `((status = ANY (ARRAY['sent'::text, 'received'::text, 'responded'::text, 'closed'::text, 'cancelled'::text])))`
+- `internal_requests_type_ck`: `((request_type = ANY (ARRAY['registration'::text, 'upload'::text, 'report'::text, 'other'::text])))`
+
+**الفهارس:**
+- `btree (assignee_id, status)`
+- `btree (branch_id, status)`
+- `btree (created_by)`
+- `فريد btree (request_no)`
+
 ## الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا
 
 المخطط: `er/legacy.mmd` (و`er/legacy.svg` عند التوليد).
@@ -2138,6 +2204,7 @@
 - `v_audit_workflow`
 - `v_branch_budget_status`
 - `v_consumption_monthly`
+- `v_internal_requests`
 - `v_purchase_period_usage`
 - `v_reorder_status`
 - `v_stock_balances`

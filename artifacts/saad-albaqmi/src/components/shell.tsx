@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuthUser, useSignOutAction } from "@/lib/auth";
 import {
   LayoutDashboard, Building2, DoorOpen, Package, GraduationCap, Users, UserRound,
-  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase, Receipt, CreditCard, ScanLine,
+  Wallet, CalendarClock, UsersRound, ScrollText, FileBarChart, Settings, Nfc, LogOut, Menu, X, Boxes, ShoppingCart, Briefcase, Receipt, CreditCard, ScanLine, ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/hooks/use-data";
@@ -22,6 +22,7 @@ export const NAV = [
   { href: "/finance", label: "المالية", icon: Wallet },
   { href: "/inventory", label: "المخزون", icon: Boxes },
   { href: "/procurement", label: "المشتريات", icon: ShoppingCart },
+  { href: "/requests", label: "الطلبات والمهام", icon: ClipboardList },
   { href: "/hr", label: "الموارد البشرية", icon: Briefcase },
   { href: "/fiscal", label: "الميزانية والضريبة", icon: Receipt },
   { href: "/attendance", label: "الحضور والبطاقات", icon: ScanLine },

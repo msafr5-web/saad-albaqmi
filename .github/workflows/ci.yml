@@ -68,6 +68,8 @@ jobs:
         run: pnpm --filter @workspace/api-server run check:cards
       - name: Self-hosted sign-in and in-app OTP
         run: pnpm --filter @workspace/api-server run check:auth
+      - name: Internal requests and tasks
+        run: pnpm --filter @workspace/api-server run check:requests
       - name: Legacy importer
         run: pnpm --filter @workspace/db run check:import
       - name: Production build of the API (same command as the server deploy)

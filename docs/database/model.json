@@ -1,11 +1,12 @@
 {
  "stats": {
-  "tables": 88,
-  "relationships": 196,
+  "tables": 90,
+  "relationships": 202,
   "views": [
    "v_audit_workflow",
    "v_branch_budget_status",
    "v_consumption_monthly",
+   "v_internal_requests",
    "v_purchase_period_usage",
    "v_reorder_status",
    "v_stock_balances",
@@ -13,7 +14,7 @@
    "v_vat_purchases",
    "v_vat_sales"
   ],
-  "triggers": 34
+  "triggers": 35
  },
  "domains": [
   {
@@ -848,6 +849,31 @@
       "org_members",
       "rooms",
       "class_sessions"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "requests",
+   "title": "الطلبات والمهام الداخلية",
+   "tables": [
+    {
+     "name": "internal_request_events",
+     "comment": "سجل أحداث الطلب (إضافة فقط): من فعل ماذا ومتى",
+     "columns": 6,
+     "references": [
+      "org_members",
+      "internal_requests"
+     ]
+    },
+    {
+     "name": "internal_requests",
+     "comment": "طلبات ومهام الإدارة من المدير إلى الموظف، بأربع مراحل زمنية يسجلها النظام: الإرسال، الاستقبال، الرد، الإغلاق",
+     "columns": 20,
+     "references": [
+      "employees",
+      "branches",
+      "org_members"
      ]
     }
    ]

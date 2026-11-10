@@ -11,6 +11,7 @@ flowchart LR
   sourcing["المشتريات: الموردون وعروض الأسعار<br/>(11 جدولًا)"]
   orders["المشتريات: الأوامر والاستلام والفواتير<br/>(10 جدولًا)"]
   security["الأمان والهوية والحضور<br/>(7 جدولًا)"]
+  requests["الطلبات والمهام الداخلية<br/>(2 جدولًا)"]
   legacy["الجداول القديمة (JSONB) التي يستخدمها التطبيق حاليًا<br/>(4 جدولًا)"]
   hr -- "8 FK" --> legacy
   facilities -- "3 FK" --> org
@@ -34,6 +35,9 @@ flowchart LR
   people -- "4 FK" --> curriculum
   people -- "2 FK" --> org
   people -- "1 FK" --> hr
+  requests -- "3 FK" --> legacy
+  requests -- "1 FK" --> hr
+  requests -- "1 FK" --> org
   inventory -- "6 FK" --> legacy
   sales -- "2 FK" --> org
   sales -- "2 FK" --> legacy

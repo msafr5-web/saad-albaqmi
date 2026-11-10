@@ -9,6 +9,7 @@ import procurementRouter from "./procurement";
 import hrRouter from "./hr";
 import fiscalRouter from "./fiscal";
 import cardsRouter from "./cards";
+import requestsRouter from "./requests";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(procurementRouter);
 router.use(hrRouter);
 router.use(fiscalRouter);
 router.use(cardsRouter);
+router.use(requestsRouter);
 
 export default router;

@@ -1,0 +1,41 @@
+%% الطلبات والمهام الداخلية - edges to org_members (created_by/approved_by/...) are omitted
+erDiagram
+  internal_request_events {
+    bigint id PK
+    bigint request_id FK
+    text event_type
+    int actor_member_id FK
+    text note
+    timestamptz created_at
+  }
+  internal_requests {
+    bigint id PK
+    text request_no UK
+    text title
+    text description
+    text request_type
+    text priority
+    bigint branch_id FK
+    bigint assignee_id FK
+    int created_by FK
+    timestamptz due_at
+    text status
+    timestamptz sent_at
+    timestamptz received_at
+    timestamptz responded_at
+    timestamptz closed_at
+    timestamptz cancelled_at
+    text response_text
+    jsonb response_links
+    text close_note
+    int closed_by FK
+  }
+  employees {
+    bigint id PK
+  }
+  branches {
+    bigint id PK
+  }
+  internal_requests ||--o{ internal_request_events : "request_id"
+  employees ||--o{ internal_requests : "assignee_id"
+  branches ||--o{ internal_requests : "branch_id"
