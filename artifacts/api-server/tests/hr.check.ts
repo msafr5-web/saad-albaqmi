@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { db, branches, orgMembers, jobTitles, pool } from "@workspace/db";
-import { createDepartment, createEmployee, createLeave, decideDelegation, decideLeave, listDelegations, listEmployees, listLeave, proposeDelegation, revokeDelegation, updateEmployee, hrCatalogue } from "../src/lib/hr";
+import { updateDepartment, createDepartment, createEmployee, createLeave, decideDelegation, decideLeave, listDelegations, listEmployees, listLeave, proposeDelegation, revokeDelegation, updateEmployee, hrCatalogue } from "../src/lib/hr";
 import { DomainError } from "../src/lib/education-validation";
 import type { Member } from "../src/lib/education-access";
 
@@ -28,6 +28,10 @@ async function main() {
   await fails(createDepartment(mgrA, { name: "x" }), 403, "manager cannot create departments");
   await fails(hrCatalogue(keeper), 403, "keeper has no HR access");
   const dep = await createDepartment(hr, { name: `الحسابات ${stamp}`, branchId: brA!.id });
+  await fails(updateDepartment(mgrA, dep.id, { name: "x", code: "X1" }), 403, "managers cannot rename departments");
+  await fails(updateDepartment(hr, 999999999, { name: "x", code: "X1" }), 404, "unknown department");
+  const dep2 = await updateDepartment(hr, dep.id, { name: `المالية ${stamp}`, code: dep.code, branchId: brA!.id });
+  assert.equal(dep2.name, `المالية ${stamp}`); assert.equal(dep2.id, dep.id);
   const e1 = await createEmployee(hr, { fullName: "سارة", branchId: brA!.id, departmentId: dep.id, jobTitleId: title!.id, hireDate: "2026-01-01", nationalId: `1${String(stamp).slice(-9)}`, iban: "SA0380000000608010167519", basicSalaryHalalas: 900000, housingAllowanceHalalas: 250000, transportAllowanceHalalas: 50000 });
   const e2 = await createEmployee(hr, { fullName: "خالد", branchId: brB!.id, hireDate: "2026-02-01", basicSalaryHalalas: 700000 });
   assert.match(e1.employeeNo, /^EMP-\d{4}$/); assert.equal(Number(e2.employeeNo.slice(-4)), Number(e1.employeeNo.slice(-4)) + 1);

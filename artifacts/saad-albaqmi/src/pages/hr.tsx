@@ -11,6 +11,7 @@ import { ROLE_LABELS } from "@/components/shell";
 import { usePageTitle } from "@/hooks/use-data";
 import { api, toHalalas, useAct, useOps, useRole } from "@/hooks/use-ops";
 import { fmtSAR } from "@/lib/domain";
+import { ExcelTools } from "@/components/excel-tools";
 
 type Catalogue = { departments: { id: number; name: string; branchId: number | null }[]; jobTitles: { id: number; name: string }[]; leaveTypes: { id: number; name: string }[]; branches: { id: number; name: string }[]; members: { id: number; email: string; role: string; branchId: number | null }[] };
 type Employee = { id: number; employeeNo: string; fullName: string; branchId: number; departmentId: number | null; status: string; hireDate: string; basicSalaryHalalas: number | null; housingAllowanceHalalas: number | null; transportAllowanceHalalas: number | null };
@@ -53,6 +54,7 @@ export default function HrPage() {
       <PageHeader eyebrow="الموارد البشرية" title="الموارد البشرية"
         desc="سجلات الموظفين والأقسام والإجازات. تفويض الصلاحيات (مثل اعتماد المشتريات أثناء إجازة مدير الفرع) تقترحه الموارد البشرية ويعتمده المدير العام. الرواتب مخفية عن مديري الفروع."
         actions={canWrite ? <div className="flex flex-wrap gap-2"><Button onClick={() => setDlg("emp")} className="gap-1.5" data-testid="button-new-employee"><Plus className="h-4 w-4" /> موظف</Button><Button variant="outline" onClick={() => setDlg("dep")} data-testid="button-new-department">قسم</Button></div> : undefined} />
+      <div className="mb-5 grid gap-3 md:grid-cols-2"><ExcelTools entity="employees" /><ExcelTools entity="departments" /></div>
       <Tabs defaultValue="employees" dir="rtl">
         <TabsList className="mb-4 flex-wrap">
           <TabsTrigger value="employees" data-testid="tab-employees">الموظفون</TabsTrigger>

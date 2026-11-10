@@ -5,6 +5,7 @@ import { LedgerPanel, PayrollPanel } from "@/components/finance-panels";
 import { Overview } from "@/components/overview";
 import { useRecords, useRecordIndex, usePageTitle, useWorkspace } from "@/hooks/use-data";
 import { det, fmtSAR, fmtNum, num, toMinutes } from "@/lib/domain";
+import { ExcelTools } from "@/components/excel-tools";
 
 export function DashboardPage() {
   usePageTitle("النظرة التنفيذية");
@@ -19,11 +20,11 @@ export function DashboardPage() {
 
 export function BranchesPage() {
   usePageTitle("الفروع");
-  return (<><PageHeader eyebrow="الهيكل" title="الفروع" desc="المركز الرئيسي والفروع الحالية والمستقبلية. الميزانية هنا سقف للمقارنة، لا مصروف فعلي." /><RecordModule kinds={["branch"]} /></>);
+  return (<><PageHeader eyebrow="الهيكل" title="الفروع" desc="المركز الرئيسي والفروع الحالية والمستقبلية. الميزانية هنا سقف للمقارنة، لا مصروف فعلي." /><ExcelTools entity="branches" className="mb-4" /><RecordModule kinds={["branch"]} /></>);
 }
 export function RoomsPage() {
   usePageTitle("القاعات والمعامل");
-  return (<><PageHeader eyebrow="المرافق" title="القاعات والمعامل" desc="النوع والمساحة والسعة وقدرة الأجهزة لكل قاعة؛ تعتمد عليها الجدولة وتوزيع الأصول." /><RecordModule kinds={["room"]} /></>);
+  return (<><PageHeader eyebrow="المرافق" title="القاعات والمعامل" desc="النوع والمساحة والسعة وقدرة الأجهزة لكل قاعة؛ تعتمد عليها الجدولة وتوزيع الأصول." /><ExcelTools entity="rooms" className="mb-4" /><RecordModule kinds={["room"]} /></>);
 }
 export function AssetsPage() {
   usePageTitle("الأصول والجرد");

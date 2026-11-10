@@ -61,6 +61,24 @@ export async function createDepartment(m: Member, i: { name?: unknown; branchId?
   } catch (e) { return friendly(e); }
 }
 
+/** Rename a department, change its code or branch (used by the Excel update sheet and available to HR directly). */
+export async function updateDepartment(m: Member, id: number, i: { name?: unknown; branchId?: unknown; code?: unknown }) {
+  if (!HR_WRITE.includes(m.role)) deny("إدارة الأقسام للموارد البشرية");
+  const name = str(i.name, "اسم القسم")!;
+  const code = str(i.code, "الرمز", 20)!.toUpperCase();
+  const branchId = i.branchId == null || i.branchId === "" ? null : Number(i.branchId);
+  if (branchId != null && !Number.isInteger(branchId)) throw new DomainError("الفرع غير صحيح");
+  try {
+    return await db.transaction(async (tx) => {
+      const [prev] = await tx.select().from(departments).where(eq(departments.id, id));
+      if (!prev) throw new DomainError("القسم غير موجود", 404);
+      const [row] = await tx.update(departments).set({ name, code, branchId }).where(eq(departments.id, id)).returning();
+      await recordAudit(tx, { actorMemberId: m.id, actorRole: m.role, branchId, action: "department.update", subjectType: "department", subjectId: id, subjectNo: code, before: { name: prev.name, code: prev.code, branchId: prev.branchId }, after: { name, code, branchId } });
+      return row!;
+    });
+  } catch (e) { return friendly(e); }
+}
+
 export async function listEmployees(m: Member) {
   if (!canReadHr(m)) deny();
   const rows = await db.select().from(employees).orderBy(desc(employees.id)).limit(500);

@@ -1,7 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { accessOf, workspaceAccess } from "../middlewares/workspaceAccess";
 import { DomainError } from "../lib/education-validation";
-import { canReadHr, createDepartment, createEmployee, createLeave, decideDelegation, decideLeave, hrCatalogue, listDelegations, listEmployees, listLeave, proposeDelegation, revokeDelegation, updateEmployee } from "../lib/hr";
+import { canReadHr, createDepartment, updateDepartment, createEmployee, createLeave, decideDelegation, decideLeave, hrCatalogue, listDelegations, listEmployees, listLeave, proposeDelegation, revokeDelegation, updateEmployee } from "../lib/hr";
 
 const router: IRouter = Router();
 router.use("/hr", workspaceAccess, (_req, res, next) => {
@@ -14,6 +14,7 @@ const id = (req: Request) => { const n = Number(req.params.id); if (!Number.isIn
 
 router.get("/hr/catalogue", async (_req, res) => { res.json(await hrCatalogue(member(res))); });
 router.post("/hr/departments", async (req, res) => { res.status(201).json(await createDepartment(member(res), req.body ?? {})); });
+router.put("/hr/departments/:id", async (req, res) => { res.json(await updateDepartment(member(res), id(req), req.body ?? {})); });
 router.get("/hr/employees", async (_req, res) => { res.json(await listEmployees(member(res))); });
 router.post("/hr/employees", async (req, res) => { res.status(201).json(await createEmployee(member(res), req.body ?? {})); });
 router.put("/hr/employees/:id", async (req, res) => { res.json(await updateEmployee(member(res), id(req), req.body ?? {})); });
